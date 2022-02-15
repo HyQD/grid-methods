@@ -40,8 +40,8 @@ w  = 1
 
 for i in range(0,N_rho):
     for j in range(0,N_z):
-        V[i,j] = -1/(np.sqrt(rho[i]**2 + z[j+1]**2))
-        #V[i,j] = -1/(np.sqrt(rho[i]**2 + (z[j+1]-1)**2 + (z[j+1]+1)**2))
+        #V[i,j] = -1/(np.sqrt(rho[i]**2 + z[j+1]**2))
+        V[i,j] = -1/np.sqrt(rho[i]**2 + (z[j+1]-1)**2) - 1/np.sqrt(rho[i]**2+(z[j+1]+1)**2)
         #V[i,j] = (1/2)*w*(rho[i+1]**2 + z[j+1]**2)
 
 
