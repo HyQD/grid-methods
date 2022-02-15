@@ -73,7 +73,7 @@ h = scipy.sparse.diags([h_diag, h_off, h_off,h_off_off,h_off_off], offsets=[0, -
 
 
 t0 = time.time()
-epsilon, phi = scipy.sparse.linalg.eigs(h, k=100, which="SM")
+epsilon, phi = scipy.sparse.linalg.eigsh(h, k=3, which="SA")
 t1 = time.time()
 print (np.sort(epsilon).real)
 
