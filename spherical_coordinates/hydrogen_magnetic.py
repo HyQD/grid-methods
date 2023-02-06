@@ -56,16 +56,17 @@ r = np.arange(1, n_r + 1) * dr
 B = 1.0
 m = -1
 
-l_max = 5
-dim = n_r * (l_max + 1)
+l_max = 6
+dim = n_r * (l_max + 1 - abs(m))
+print(f"Dim={dim}")
 
 H = np.zeros((dim, dim))
 
 row = 0
-for l1 in range(l_max + 1):
+for l1 in range(abs(m), l_max + 1):
     for k1 in range(n_r):
         col = 0
-        for l2 in range(l_max + 1):
+        for l2 in range(abs(m), l_max + 1):
             for k2 in range(n_r):
                 H[row, col] = T(k1 + 1, k2 + 1, dr) * kron_delta(l1, l2)
                 H[row, col] += (
@@ -94,6 +95,5 @@ for l1 in range(l_max + 1):
 # print(np.allclose(H, H.T))
 
 eps, C = np.linalg.eigh(H)
-
-print(0.5 * B * (abs(m) + m + 1) - eps[0:10])
-print(eps[0:10])
+print(0.5 * B * (abs(m) + m + 1) - eps[0])
+print(eps[0])
