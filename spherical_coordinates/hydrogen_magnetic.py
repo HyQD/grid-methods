@@ -34,19 +34,14 @@ def T(k1, k2, dr):
 
 
 def Yl1m1_sin2theta_Yl2m2(l1, m1, l2, m2):
-    if abs(m1) > l1 or abs(m2) > l2:
-        return 0
-    else:
-        Y_m1_l1 = sph_harm(m1, l1, phi, theta)
-        Y_m2_l2 = sph_harm(m2, l2, phi, theta)
+    
+    Y_m1_l1 = sph_harm(m1, l1, phi, theta)
+    Y_m2_l2 = sph_harm(m2, l2, phi, theta)
 
-        integrand = Y_m1_l1.conj() * np.sin(theta) ** 2 * Y_m2_l2
-        integral = np.sum(4 * np.pi * weights * integrand)
+    integrand = Y_m1_l1.conj() * np.sin(theta) ** 2 * Y_m2_l2
+    integral = np.sum(4 * np.pi * weights * integrand)
 
-        if abs(integral.imag) > 1e-10:
-            print(l1, m1, l2, m2)
-
-        return integral
+    return integral
 
 
 r_max = 10
