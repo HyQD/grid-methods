@@ -4,6 +4,64 @@ from scipy.integrate import simps
 import scipy.fftpack
 import scipy.signal
 
+def T_sine_dvr(k1, k2, dr):
+    # Reference: doi.org/10.1063/1.462100
+    # Eq.(A8)
+    if k1 == k2:
+        return (
+            1
+            / (2 * dr**2)
+            * (-1) ** (k1 - k2)
+            * (np.pi**2 / 3 - 1 / (2 * k1**2))
+        )
+    else:
+        return (
+            1
+            / (2 * dr**2)
+            * (-1) ** (k1 - k2)
+            * (2 / (k1 - k2) ** 2 - 2 / (k1 + k2) ** 2)
+        )
+
+def get_T_dvr(n_r, dr):
+    T = np.zeros((n_r, n_r))
+    for k1 in range(n_r):
+        for k2 in range(n_r):
+            T[k1, k2] = T_sine_dvr(k1 + 1, k2 + 1, dr)
+    return T
+
+def regularized_Coulomb(r, eps):
+    if np.abs(r) <= eps:
+        return (1 + 2/np.pi * np.cos(np.pi * r / (2*eps))) / eps
+    else:
+        return 1/np.abs(r)
+
+
+class Gaussian_nuclear_potential:
+    def __init__(self, b=5, n_gauss=10):
+        a = -b
+        N = n_gauss * 2 - 1
+        h = (b - a) / (N)
+        self.weights = np.zeros(N + 1)
+        self.exponents = np.zeros(N + 1)
+
+        self.weights[0] = np.cosh(a) * 1 / np.sqrt(np.pi)
+        self.weights[-1] = np.cosh(b) * 1 / np.sqrt(np.pi)
+        for i in range(1, N):
+            self.weights[i] = 2 * np.cosh(a + i * h) * 1 / np.sqrt(np.pi)
+        for i in range(0, N + 1):
+            self.exponents[i] = np.sinh(a + i * h) ** 2
+        
+        self.weights = self.weights * h * 0.5
+        self.exponents = self.exponents[: len(self.exponents) // 2]
+        self.weights = self.weights[: len(self.weights) // 2] * 2
+
+    def __call__(self, r):
+        result = 0
+        counter = 0
+        for i in range(len(self.weights)):
+            result += self.weights[i] * np.exp(-self.exponents[i] * r**2)
+        return result
+
 delta = lambda x, y: x == y
 
 
@@ -35,8 +93,7 @@ def compute_numerical_states(l_max, n_max, r):
     return eigenenergies, eigenstates
 
 
-def mask_function(r, r0):
-    r_max = r[-1]
+def mask_function(r, r_max, r0):
     if r < r0:
         return 1
     else:
