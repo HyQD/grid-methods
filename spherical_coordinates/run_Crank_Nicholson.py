@@ -39,11 +39,8 @@ for k in range(n_r):
 
 
 potential = 1 / r
-#potential = erf(5 * r) / r
-#potential = -10 * np.exp(-0.1 * r ** 2)
-
-plt.figure()
-plt.plot(r, -potential)
+# potential = erf(5 * r) / r
+# potential = -10 * np.exp(-0.1 * r ** 2)
 
 expec_z, psi_tfinal = CrankNicholson_sine_DVR(
     r,
@@ -59,24 +56,21 @@ psi_tfinal_r = np.zeros(n_r, dtype=psi_tfinal.dtype)
 for l in range(l_max + 1):
     psi_tfinal_r += psi_tfinal[l]
 
-plt.figure()
-plt.plot(time_points, expec_z.real)
 
 plt.figure()
-plt.subplot(211)
-plt.plot(r, np.abs(psi_tfinal_r) ** 2)
-plt.subplot(212)
-plt.plot(r, psi_tfinal[0].real)
-plt.plot(r, psi_tfinal[0].imag)
+plt.plot(r, -potential, label=r"$V(r)$")
+plt.legend()
+plt.xlabel("r[a.u.]")
+
+plt.figure()
+plt.plot(time_points, expec_z.real, label=r"$\langle z(t) \rangle$")
+plt.legend()
+plt.xlabel("Time[a.u.]")
+
+
+plt.figure()
+plt.plot(r, np.abs(psi_tfinal_r) ** 2, label=r"$|\Psi(r, t_{final})|^2$")
+plt.legend()
+plt.xlabel("r[a.u.]")
 
 plt.show()
-
-# h5f = h5py.File(f'dat/{potential_type}_E0={E0}_omega={omega}_nc={nc}_dt={dt}_rmax={r_max}_dr={dr}_lmax={l_max}.h5', 'w')
-# # #h5f.create_dataset('psi_t_r', data=psi_t)
-# h5f.create_dataset('r', data=r)
-# h5f.create_dataset('time_points', data=time_points)
-# h5f.create_dataset('expec_z', data=expec_z)
-# h5f.create_dataset('laser_t', data=laser(time_points))
-# h5f.create_dataset('potential', data=potential)
-# h5f.create_dataset('psi_t_final', data=psi_t)
-# h5f.close()
