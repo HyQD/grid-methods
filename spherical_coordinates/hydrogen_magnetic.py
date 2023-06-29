@@ -1,12 +1,16 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.special import sph_harm
-import quadpy
-import math
 
-scheme = quadpy.u3.schemes["lebedev_029"]()
-theta, phi = scheme.theta_phi
-weights = scheme.weights
+"""
+[1]: DOI: 10.1088/0953-4075/41/5/055005
+"""
+
+N = 29
+coord = np.loadtxt("Lebedev/lebedev_%03d.txt" % N)
+theta = coord[:, 1] * np.pi / 180
+phi = coord[:, 0] * np.pi / 180 + np.pi
+weights = coord[:, 2]
 
 
 def kron_delta(x1, x2):
@@ -34,7 +38,7 @@ def T(k1, k2, dr):
 
 
 def Yl1m1_sin2theta_Yl2m2(l1, m1, l2, m2):
-    
+
     Y_m1_l1 = sph_harm(m1, l1, phi, theta)
     Y_m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -49,7 +53,7 @@ dr = 0.15
 n_r = int(r_max / dr)
 r = np.arange(1, n_r + 1) * dr
 B = 1.0
-m = -1
+m = 0
 
 l_max = 6
 dim = n_r * (l_max + 1 - abs(m))
@@ -87,8 +91,11 @@ for l1 in range(abs(m), l_max + 1):
                 col += 1
         row += 1
 
-# print(np.allclose(H, H.T))
-
 eps, C = np.linalg.eigh(H)
-print(0.5 * B * (abs(m) + m + 1) - eps[0])
-print(eps[0])
+
+
+# Print binding energy as defined in Ref.[1] and groundstate energy.
+# The resulting binding energies for m=0,-1,-2 and B=1.0 are in reasonable agreement with
+# the values reported in Ref.[1] (Table 1,2, and 3).
+print(f"Binding energy: {0.5 * B * (abs(m) + m + 1) - eps[0]}")
+print(f"Groundstate energy: {eps[0]}")
