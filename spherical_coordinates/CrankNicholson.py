@@ -54,13 +54,17 @@ def CrankNicholson_sine_DVR(
     dt = time_points[1] - time_points[0]
 
     T = get_T_dvr(n_r, dr)
+
     Identity = np.eye(n_r)
     V_eff_l = np.zeros((L, n_r, n_r))
     R_l = np.zeros((L, n_r, n_r))
     for l in range(L):
-        np.fill_diagonal(V_eff_l[l], l * (l + 1) / (2 * r ** 2) - potential)
+        np.fill_diagonal(V_eff_l[l], l * (l + 1) / (2 * r**2) - potential)
         np.fill_diagonal(R_l[l], coeff(l) * r)
+
     H_0 = T + V_eff_l[0]
+
+    # Diagonalize the l=0 Hamiltonian
     eps, D = np.linalg.eigh(H_0)
 
     def block_tridiag_Hamiltonian(t, idt2):
@@ -89,20 +93,25 @@ def CrankNicholson_sine_DVR(
         return 2 * expec_z
 
     psi_t = np.zeros((L, n_r), dtype=np.complex128)
+
+    # The intial state is set to the lowest lying l=0 eigenvector/state.
     psi_t[0] = np.complex128(D[:, 0].copy())
 
     expec_z = np.zeros(num_steps, dtype=np.complex128)
     expec_z[0] = compute_expec_z(psi_t)
+
+    norm = np.zeros(num_steps)
+    norm[0] = np.linalg.norm(psi_t.ravel())
 
     for n in tqdm.tqdm(range(num_steps - 1)):
 
         tn = time_points[n]
 
         lower_p, diagonal_p, upper_p = block_tridiag_Hamiltonian(
-            tn + dt, 1j * dt / 2
+            tn + dt / 2, 1j * dt / 2
         )
         lower_m, diagonal_m, upper_m = block_tridiag_Hamiltonian(
-            tn, -1j * dt / 2
+            tn + dt / 2, -1j * dt / 2
         )
 
         z = block_tridiag_product(lower_m, diagonal_m, upper_m, psi_t)
@@ -113,6 +122,7 @@ def CrankNicholson_sine_DVR(
                 psi_t[l] = np.multiply(psi_t[l], absorber[1])
 
         expec_z[n + 1] = compute_expec_z(psi_t)
+        norm[n + 1] = np.linalg.norm(psi_t.ravel())
 
         if dump_psi_t[0]:
             if (n + 1) % dump_psi_t[1] == 0:
@@ -120,4 +130,4 @@ def CrankNicholson_sine_DVR(
                 h5f.create_dataset("psi", data=psi_t, compression="gzip")
                 h5f.close()
 
-    return expec_z, psi_t
+    return norm, expec_z, psi_t
