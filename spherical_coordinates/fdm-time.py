@@ -12,6 +12,7 @@ from utils import (
     tridiag_prod,
     TDMAsolver,
 )
+import tqdm
 
 r_max = 200
 dr = 0.25
@@ -76,11 +77,10 @@ for j in range(n_max * l_max):
 
 Identity_vec = np.ones(M, dtype=np.complex128)
 
-for i in range(num_steps - 1):
+for i in tqdm.tqdm(range(num_steps - 1)):
 
     ti = i * dt
 
-    tic = time.time()
     z1 = tridiag_prod(
         Identity_vec + 1j * dt / 2 * np.diag(H0),
         1j * dt / 2 * np.diag(H0, k=1),
@@ -96,10 +96,7 @@ for i in range(num_steps - 1):
         z1,
     )
     z2 = z2.reshape(n_grid, l_max).T.ravel()
-    toc = time.time()
-    time_mult = toc - tic
 
-    tic = time.time()
     z3 = TDMAsolver(
         -1j * dt / 2 * np.diag(H0, k=-1),
         Identity_vec - 1j * dt / 2 * np.diag(H0),
@@ -118,16 +115,12 @@ for i in range(num_steps - 1):
     )
 
     psi = z4.reshape(n_grid, l_max).T
-    toc = time.time()
-    time_inv = toc - tic
 
     dipole_moment[i + 1] = compute_dipole_moment(r, psi)
     for j in range(n_max * l_max):
         l_j, n_j = mapping[j]
         u_nj_lj = eigenstates[l_j][:, n_j]
         overlaps[i + 1, j] = compute_overlap(r, psi[l_j], u_nj_lj)
-    if i % 500 == 0:
-        print(f"Time mult: {time_mult}, inv: {time_inv}, iter: {i}")
 
 
 np.save("time-points", time_points)
@@ -138,7 +131,6 @@ plt.plot(time_points, -dipole_moment)
 
 plt.figure()
 plt.plot(time_points, np.abs(overlaps) ** 2)
-# plt.plot(time_points, np.abs(overlaps[:, 10]) ** 2)
 
 sum_ovlp_sq = np.sum(np.abs(overlaps) ** 2, axis=1)
 plt.figure()
