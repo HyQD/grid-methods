@@ -17,6 +17,24 @@ class linear_laser:
         return ft * np.sin(self.omega * t) * self.E0
 
 
+class sine_laser:
+    def __init__(self, E0, omega, td, phase=0.0, start=0.0):
+        self.E0 = E0
+        self.omega = omega
+        self.tprime = td
+        self.phase = phase
+        self.t0 = start
+
+    def __call__(self, t):
+        dt = t - self.t0
+        return (
+            self.E0
+            * np.sin(self.omega * t + self.phase)
+            * np.heaviside(dt, 1.0)
+            * np.heaviside(self.tprime - dt, 1.0)
+        )
+
+
 class sine_square_laser:
     def __init__(self, E0, omega, td, phase=0.0, start=0.0):
         self.F_str = E0
