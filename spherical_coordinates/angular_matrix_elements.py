@@ -19,6 +19,15 @@ def a_lm(l, m):
         return 0
 
 
+def b_lm(l, m):
+    if l >= 0:
+        return np.sqrt(
+            ((l + m + 1) * (l + m + 2)) / ((2 * l + 1) * (2 * l + 3))
+        )
+    else:
+        return 0
+
+
 def l1m1_cos_theta_l2m2(l1, m1, l2, m2):
 
     return (
