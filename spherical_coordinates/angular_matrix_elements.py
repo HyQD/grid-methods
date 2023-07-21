@@ -47,6 +47,29 @@ def l1m1_cos_theta_l2m2_Lebedev(l1, m1, l2, m2):
     return integral
 
 
+def l1m1_sin_theta_cos_phi_l2m2(l1, m1, l2, m2):
+    integral = (
+        b_lm(l2 - 1, -m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 + 1)
+    )
+    integral -= b_lm(l2, m2) * kron_delta(l1, l2 + 1) * kron_delta(m1, m2 + 1)
+    integral -= (
+        b_lm(l2 - 1, m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 - 1)
+    )
+    integral += b_lm(l2, -m2) * kron_delta(l1, l2 + 1) * kron_delta(m1, m2 - 1)
+    return 0.5 * integral
+
+
+def l1m1_sin_theta_cos_phi_l2m2_Lebedev(l1, m1, l2, m2):
+
+    m1_l1 = sph_harm(m1, l1, phi, theta)
+    m2_l2 = sph_harm(m2, l2, phi, theta)
+
+    integrand = m1_l1.conj() * np.sin(theta) * np.cos(phi) * m2_l2
+    integral = np.sum(4 * np.pi * weights * integrand)
+
+    return integral
+
+
 def l1m1_sin_theta_ddtheta_l2m2(l1, m1, l2, m2):
 
     return (
@@ -98,5 +121,10 @@ for l1 in range(l_max + 1):
                     l1, m1, l2, m2
                 ) - l1m1_sin_theta_ddtheta_l2m2(l1, m1, l2, m2)
 
+                diff_3 = l1m1_sin_theta_cos_phi_l2m2_Lebedev(
+                    l1, m1, l2, m2
+                ) - l1m1_sin_theta_cos_phi_l2m2(l1, m1, l2, m2)
+
                 assert np.abs(diff) < 1e-12
                 assert np.abs(diff_2) < 1e-12
+                assert np.abs(diff_3) < 1e-12
