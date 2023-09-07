@@ -59,3 +59,68 @@ class sine_square_laser:
             * self.F_str
         )
         return pulse
+
+
+class square_length_dipole:
+    def __init__(
+        self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs
+    ):
+        self.field_strength = field_strength
+        self.A0 = field_strength / omega
+        self.omega = omega
+        self.tprime = 2 * ncycles * np.pi / omega
+        self.phase = phase
+        self.t0 = t0
+
+    def _phase(self, t):
+        if callable(self.phase):
+            return self.phase(t)
+        else:
+            return self.phase
+
+    def __call__(self, t):
+        dt = t - self.t0
+        pulse = (
+            np.sin(np.pi * dt / self.tprime)
+            * (
+                self.omega
+                * np.sin(np.pi * dt / self.tprime)
+                * np.sin(self.omega * dt + self.phase)
+                - (2 * np.pi / self.tprime)
+                * np.cos(np.pi * dt / self.tprime)
+                * np.cos(self.omega * dt + self.phase)
+            )
+            * np.heaviside(dt, 1.0)
+            * np.heaviside(self.tprime - dt, 1.0)
+            * self.A0
+        )
+        return pulse
+
+
+class square_velocity_dipole:
+    def __init__(
+        self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs
+    ):
+        self.field_strength = field_strength
+        self.A0 = field_strength / omega
+        self.omega = omega
+        self.tprime = 2 * ncycles * np.pi / omega
+        self.phase = phase
+        self.t0 = t0
+
+    def _phase(self, t):
+        if callable(self.phase):
+            return self.phase(t)
+        else:
+            return self.phase
+
+    def __call__(self, t):
+        dt = t - self.t0
+        pulse = (
+            (np.sin(np.pi * dt / self.tprime) ** 2)
+            * np.heaviside(dt, 1.0)
+            * np.heaviside(self.tprime - dt, 1.0)
+            * np.cos(self.omega * dt + self._phase(dt))
+            * self.A0
+        )
+        return pulse
