@@ -10,10 +10,7 @@ def T_sine_dvr(k1, k2, dr):
     # Eq.(A8)
     if k1 == k2:
         return (
-            1
-            / (2 * dr**2)
-            * (-1) ** (k1 - k2)
-            * (np.pi**2 / 3 - 1 / (2 * k1**2))
+            1 / (2 * dr**2) * (-1) ** (k1 - k2) * (np.pi**2 / 3 - 1 / (2 * k1**2))
         )
     else:
         return (
@@ -81,11 +78,7 @@ def compute_numerical_states(l_max, n_max, r):
     for l in range(l_max):
         h_diag = 1.0 / (dr**2) + l * (l + 1) / (2 * r**2) - 1 / r
         h_off_diag = -1.0 / (2 * dr**2) * np.ones(n_grid - 1)
-        H = (
-            np.diag(h_diag)
-            + np.diag(h_off_diag, k=-1)
-            + np.diag(h_off_diag, k=1)
-        )
+        H = np.diag(h_diag) + np.diag(h_off_diag, k=-1) + np.diag(h_off_diag, k=1)
         eps_l, u_l = np.linalg.eigh(H)
         eigenstates[l] = u_l[:, :n_max]
         eigenenergies[l] = eps_l[:n_max]
@@ -95,9 +88,7 @@ def compute_numerical_states(l_max, n_max, r):
         states = eigenstates[l]
         normalized_states = np.zeros_like(states)
         for i, state in enumerate(states.T):
-            normalized_states[:, i] = state / np.sqrt(
-                simps(np.abs(state) ** 2, r)
-            )
+            normalized_states[:, i] = state / np.sqrt(simps(np.abs(state) ** 2, r))
         eigenstates[l] = normalized_states
 
     return eigenenergies, eigenstates
@@ -112,7 +103,6 @@ def mask_function(r, r_max, r0):
 
 @jit(nopython=True)
 def tridiag_prod(a, b, c, v):
-
     v_new = np.zeros(v.shape, dtype=np.complex128)
     L = len(v)
 
@@ -158,11 +148,9 @@ def TDMAsolver(a, b, c, d, size):
 
 
 def compute_dipole_moment(r, psi):
-
     dipole_moment = 0j
 
     for l in range(psi.shape[0] - 1):
-
         dipole_moment += (
             2
             * (l + 1)
@@ -174,7 +162,6 @@ def compute_dipole_moment(r, psi):
 
 
 def compute_overlap(r, psi_t, psi_nl):
-
     overlap = simps(psi_t.conj() * psi_nl, r)
     return overlap
 
@@ -185,7 +172,6 @@ def coeff(l):
 
 # Setup Hamiltonian: -1/2*nabla^2 + l*(l+1)/(2*r) - 1/r + z*cos(theta)*E(t)
 def setup_Hamiltonian(r_max, dr, l_max):
-
     n_grid = int(r_max / dr)
     r = np.arange(1, n_grid + 1) * dr
 
@@ -194,7 +180,6 @@ def setup_Hamiltonian(r_max, dr, l_max):
 
     # H0 is tridiagnoal in space (index j)
     for l in range(l_max):
-
         h_diag = 1.0 / (dr**2) + l * (l + 1) / (2 * r**2) - 1 / r
         h_off_diag = -1.0 / (2 * dr**2) * np.ones(n_grid - 1)
 
@@ -202,16 +187,13 @@ def setup_Hamiltonian(r_max, dr, l_max):
         i1 = (l + 1) * n_grid
 
         H0[i0:i1, i0:i1] = (
-            np.diag(h_diag)
-            + np.diag(h_off_diag, k=-1)
-            + np.diag(h_off_diag, k=1)
+            np.diag(h_diag) + np.diag(h_off_diag, k=-1) + np.diag(h_off_diag, k=1)
         )
 
     Hint = np.zeros((M, M))
 
     # Hint is tridiagonal in l.
     for j in range(n_grid):
-
         upper = coeff(np.arange(l_max - 1)) * r[j]
         lower = coeff(np.arange(l_max - 1)) * r[j]
 
@@ -224,7 +206,6 @@ def setup_Hamiltonian(r_max, dr, l_max):
 
 
 def compute_hhg_spectrum(time_points, dipole_moment, hann_window=False):
-
     dip = scipy.signal.detrend(dipole_moment, type="constant")
     if hann_window:
         Px = (
@@ -243,10 +224,7 @@ def compute_hhg_spectrum(time_points, dipole_moment, hann_window=False):
     dt = time_points[1] - time_points[0]
 
     omega = (
-        scipy.fftpack.fftshift(scipy.fftpack.fftfreq(len(time_points)))
-        * 2
-        * np.pi
-        / dt
+        scipy.fftpack.fftshift(scipy.fftpack.fftfreq(len(time_points))) * 2 * np.pi / dt
     )
 
     return omega, Px

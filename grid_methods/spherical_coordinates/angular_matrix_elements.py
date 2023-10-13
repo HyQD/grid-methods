@@ -21,15 +21,12 @@ def a_lm(l, m):
 
 def b_lm(l, m):
     if l >= 0:
-        return np.sqrt(
-            ((l + m + 1) * (l + m + 2)) / ((2 * l + 1) * (2 * l + 3))
-        )
+        return np.sqrt(((l + m + 1) * (l + m + 2)) / ((2 * l + 1) * (2 * l + 3)))
     else:
         return 0
 
 
 def l1m1_cos_theta_l2m2(l1, m1, l2, m2):
-
     return (
         a_lm(l2, m2) * kron_delta(l1, l2 + 1)
         + a_lm(l2 - 1, m2) * kron_delta(l1, l2 - 1)
@@ -37,7 +34,6 @@ def l1m1_cos_theta_l2m2(l1, m1, l2, m2):
 
 
 def l1m1_cos_theta_l2m2_Lebedev(l1, m1, l2, m2):
-
     m1_l1 = sph_harm(m1, l1, phi, theta)
     m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -48,19 +44,14 @@ def l1m1_cos_theta_l2m2_Lebedev(l1, m1, l2, m2):
 
 
 def l1m1_sin_theta_cos_phi_l2m2(l1, m1, l2, m2):
-    integral = (
-        b_lm(l2 - 1, -m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 + 1)
-    )
+    integral = b_lm(l2 - 1, -m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 + 1)
     integral -= b_lm(l2, m2) * kron_delta(l1, l2 + 1) * kron_delta(m1, m2 + 1)
-    integral -= (
-        b_lm(l2 - 1, m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 - 1)
-    )
+    integral -= b_lm(l2 - 1, m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 - 1)
     integral += b_lm(l2, -m2) * kron_delta(l1, l2 + 1) * kron_delta(m1, m2 - 1)
     return 0.5 * integral
 
 
 def l1m1_sin_theta_cos_phi_l2m2_Lebedev(l1, m1, l2, m2):
-
     m1_l1 = sph_harm(m1, l1, phi, theta)
     m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -71,19 +62,14 @@ def l1m1_sin_theta_cos_phi_l2m2_Lebedev(l1, m1, l2, m2):
 
 
 def l1m1_sin_theta_sin_phi_l2m2(l1, m1, l2, m2):
-    integral = (
-        b_lm(l2 - 1, -m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 + 1)
-    )
+    integral = b_lm(l2 - 1, -m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 + 1)
     integral -= b_lm(l2, m2) * kron_delta(l1, l2 + 1) * kron_delta(m1, m2 + 1)
-    integral += (
-        b_lm(l2 - 1, m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 - 1)
-    )
+    integral += b_lm(l2 - 1, m2 - 1) * kron_delta(l1, l2 - 1) * kron_delta(m1, m2 - 1)
     integral -= b_lm(l2, -m2) * kron_delta(l1, l2 + 1) * kron_delta(m1, m2 - 1)
     return -1j * integral / 2
 
 
 def l1m1_sin_theta_sin_phi_l2m2_Lebedev(l1, m1, l2, m2):
-
     m1_l1 = sph_harm(m1, l1, phi, theta)
     m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -94,7 +80,6 @@ def l1m1_sin_theta_sin_phi_l2m2_Lebedev(l1, m1, l2, m2):
 
 
 def l1m1_sin_theta_ddtheta_l2m2(l1, m1, l2, m2):
-
     return (
         l2 * a_lm(l2, m2) * kron_delta(l1, l2 + 1)
         - (l2 + 1) * a_lm(l2 - 1, m2) * kron_delta(l1, l2 - 1)
@@ -102,7 +87,6 @@ def l1m1_sin_theta_ddtheta_l2m2(l1, m1, l2, m2):
 
 
 def l1m1_sin_theta_ddtheta_l2m2_Lebedev(l1, m1, l2, m2):
-
     m1_l1 = sph_harm(m1, l1, phi, theta)
 
     sin_theta_ddtheta_l2m2 = m2 * np.cos(theta) * sph_harm(m2, l2, phi, theta)
@@ -121,7 +105,6 @@ def l1m1_sin_theta_ddtheta_l2m2_Lebedev(l1, m1, l2, m2):
 
 
 def l1m1_sin_theta_sq_l2m2_Lebedev(l1, m1, l2, m2):
-
     m1_l1 = sph_harm(m1, l1, phi, theta)
     m2_l2 = sph_harm(m2, l2, phi, theta)
 

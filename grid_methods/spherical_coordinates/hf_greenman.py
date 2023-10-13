@@ -160,7 +160,6 @@ for nj, lj in zip(Nj, Lj):
 alpha = 0.6  # Linear mixing parameter
 print()
 for I in range(30):
-
     v0 = np.zeros(N - 1)
     Fx_lp = np.zeros((l_max + 1, N - 1, N - 1))
 
@@ -183,9 +182,9 @@ for I in range(30):
         A_nl_out[lj][:, nj] /= np.sqrt(
             np.sum(2 / (N * (N + 1)) * np.abs(A_nl_out[lj][:, nj]) ** 2)
         )
-        A_nl_in[lj][:, nj] = (1 - alpha) * A_nl_in[lj][
+        A_nl_in[lj][:, nj] = (1 - alpha) * A_nl_in[lj][:, nj] + alpha * A_nl_out[lj][
             :, nj
-        ] + alpha * A_nl_out[lj][:, nj]
+        ]
     print()
 
 # Compute <phi_i|r|phi_i> for the occupied orbitals.

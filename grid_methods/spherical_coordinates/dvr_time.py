@@ -25,7 +25,6 @@ def kron_delta(x1, x2):
 
 
 def Yl1m1_costheta_Yl2m2(l1, m1, l2, m2):
-
     Y_m1_l1 = sph_harm(m1, l1, phi, theta)
     Y_m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -39,7 +38,6 @@ def Yl1m1_costheta_Yl2m2(l1, m1, l2, m2):
 
 
 def Yl1m1_sin2theta_Yl2m2(l1, m1, l2, m2):
-
     Y_m1_l1 = sph_harm(m1, l1, phi, theta)
     Y_m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -52,10 +50,7 @@ def Yl1m1_sin2theta_Yl2m2(l1, m1, l2, m2):
 def get_T_element(k1, k2, dr):
     if k1 == k2:
         return (
-            1
-            / (2 * dr**2)
-            * (-1) ** (k1 - k2)
-            * (np.pi**2 / 3 - 1 / (2 * k1**2))
+            1 / (2 * dr**2) * (-1) ** (k1 - k2) * (np.pi**2 / 3 - 1 / (2 * k1**2))
         )
     else:
         return (
@@ -105,19 +100,13 @@ for l1 in range(abs(m), l_max + 1):
                     * kron_delta(k1, k2)
                     * kron_delta(l1, l2)
                 )
-                H[row, col] += (
-                    -1 / r[k2] * kron_delta(k1, k2) * kron_delta(l1, l2)
-                )
+                H[row, col] += -1 / r[k2] * kron_delta(k1, k2) * kron_delta(l1, l2)
                 # H[row, col] += (
                 #     B * m / 2 * kron_delta(k1, k2) * kron_delta(l1, l2)
                 # )
-                H[row, col] += (
-                    B**2 / 8 * r[k2] ** 2 * G[l1, l2] * kron_delta(k1, k2)
-                )
+                H[row, col] += B**2 / 8 * r[k2] ** 2 * G[l1, l2] * kron_delta(k1, k2)
 
-                V_int[row, col] += (
-                    r[k2] * V_angular[l1, l2] * kron_delta(k1, k2)
-                )
+                V_int[row, col] += r[k2] * V_angular[l1, l2] * kron_delta(k1, k2)
 
                 col += 1
         row += 1
@@ -158,9 +147,7 @@ propagator.set_initial_value(C0)
 for i in tqdm.tqdm(range(num_steps - 1)):
     propagator.integrate(propagator.t + dt)
     C_t = propagator.y.reshape(l_max + 1, n_r)
-    dipole_moment[i + 1] = contract(
-        "lk, mk, k, lm->", C_t.conj(), C_t, r, V_angular
-    )
+    dipole_moment[i + 1] = contract("lk, mk, k, lm->", C_t.conj(), C_t, r, V_angular)
 
 np.save("time-points", time_points)
 np.save(f"dvr-dip-mom-B={B}", dipole_moment)

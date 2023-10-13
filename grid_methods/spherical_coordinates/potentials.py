@@ -41,9 +41,5 @@ class SAE:
         return (
             -1
             / r
-            * (
-                1
-                + self.A * np.exp(-r)
-                + (self.Z - 1 - self.A) * np.exp(-self.B * r)
-            )
+            * (1 + self.A * np.exp(-r) + (self.Z - 1 - self.A) * np.exp(-self.B * r))
         )

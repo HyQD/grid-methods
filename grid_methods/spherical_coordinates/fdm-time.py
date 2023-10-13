@@ -78,7 +78,6 @@ for j in range(n_max * l_max):
 Identity_vec = np.ones(M, dtype=np.complex128)
 
 for i in tqdm.tqdm(range(num_steps - 1)):
-
     ti = i * dt
 
     z1 = tridiag_prod(

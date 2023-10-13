@@ -68,9 +68,7 @@ class GaussChebyshevLobatto:
                 elif i == N - 1 and j == N - 1:
                     self.Dx[i, j] = -(1 + 2 * (N - 1) ** 2) / 6
                 elif i == j:
-                    self.Dx[i, j] = -self.nodes[j] / (
-                        2 * (1 - self.nodes[j] ** 2)
-                    )
+                    self.Dx[i, j] = -self.nodes[j] / (2 * (1 - self.nodes[j] ** 2))
                 else:
                     self.Dx[i, j] = (
                         (-1) ** (i + j)
@@ -105,7 +103,6 @@ def quad_test():
 
 
 def quad_test2():
-
     N = 15
     a = 0
     b = 1
@@ -120,7 +117,6 @@ def quad_test2():
 
 
 if __name__ == "__main__":
-
     # Just a simple test of quadrature.
     # Compute definite integral of exp(x)
 

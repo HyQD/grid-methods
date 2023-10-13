@@ -2,7 +2,6 @@ import numpy as np
 
 
 def block_tridiag_product(lower, diagonal, upper, x):
-
     """
     Compute the matrix-vector product v = Ax where A is a block-tridiagonal matrix on the form
 
@@ -29,8 +28,6 @@ def block_tridiag_product(lower, diagonal, upper, x):
             + np.dot(upper[l], x[l + 1])
         )
 
-    v[L - 1] = np.dot(lower[L - 2], x[L - 2]) + np.dot(
-        diagonal[L - 1], x[L - 1]
-    )
+    v[L - 1] = np.dot(lower[L - 2], x[L - 2]) + np.dot(diagonal[L - 1], x[L - 1])
 
     return v

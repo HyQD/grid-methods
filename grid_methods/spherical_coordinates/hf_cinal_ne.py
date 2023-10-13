@@ -74,9 +74,9 @@ for l in l_list:
     for i in range(N - 1):
         for j in range(N - 1):
             H_core[i, j, l] += -0.5 * ddg_tilde[i, j] / (r_dot[i] * r_dot[j])
-            H_core[i, j, l] += (
-                l * (l + 1) / (2 * r[i] ** 2) - Z / r[i]
-            ) * kron_delta(i, j)
+            H_core[i, j, l] += (l * (l + 1) / (2 * r[i] ** 2) - Z / r[i]) * kron_delta(
+                i, j
+            )
 
 eps_0, u_n0 = np.linalg.eigh(H_core[:, :, 0])
 eps_1, u_n1 = np.linalg.eigh(H_core[:, :, 1])
@@ -91,9 +91,9 @@ F = np.zeros((N - 1, N - 1, 2))
 
 
 for l2 in range(A.shape[2]):
-    A[:, :, l2] = np.einsum(
-        "i, ij, j->ij", r / r_dot, ddg_tilde, r / r_dot
-    ) - l2 * (l2 + 1) * np.eye(N - 1)
+    A[:, :, l2] = np.einsum("i, ij, j->ij", r / r_dot, ddg_tilde, r / r_dot) - l2 * (
+        l2 + 1
+    ) * np.eye(N - 1)
     Ainv[:, :, l2] = np.linalg.inv(A[:, :, l2])
     cal_F[:, :, l2] = np.einsum(
         "i, ij, j->ij",
@@ -123,11 +123,8 @@ u_2p_in = np.sqrt(r_dot) * chi_2p / PN_x
 alpha = 0.8
 print()
 for k in range(1, 20):
-
     # Eq.[38]
-    rho_tilde = (
-        np.abs(u_1s_in) ** 2 + np.abs(u_2s_in) ** 2 + 3 * np.abs(u_2p_in) ** 2
-    )
+    rho_tilde = np.abs(u_1s_in) ** 2 + np.abs(u_2s_in) ** 2 + 3 * np.abs(u_2p_in) ** 2
 
     # Eq.[36]
     v_H = -np.dot(cal_F[:, :, 0], rho_tilde)
@@ -138,9 +135,7 @@ for k in range(1, 20):
     )
 
     Fx[:, :, 0] += (
-        3
-        * coeff(0, 1, 1)
-        * np.einsum("i, ij, j->ij", u_2p_in, cal_F[:, :, 1], u_2p_in)
+        3 * coeff(0, 1, 1) * np.einsum("i, ij, j->ij", u_2p_in, cal_F[:, :, 1], u_2p_in)
     )
 
     Fx[:, :, 1] = (
@@ -157,9 +152,7 @@ for k in range(1, 20):
     )
 
     Fx[:, :, 1] += (
-        5
-        * coeff(1, 1, 2)
-        * np.einsum("i, ij, j->ij", u_2p_in, cal_F[:, :, 2], u_2p_in)
+        5 * coeff(1, 1, 2) * np.einsum("i, ij, j->ij", u_2p_in, cal_F[:, :, 2], u_2p_in)
     )
 
     F[:, :, 0] = H_core[:, :, 0] + 2 * np.diag(v_H) + Fx[:, :, 0]

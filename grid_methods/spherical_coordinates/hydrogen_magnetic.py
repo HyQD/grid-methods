@@ -23,10 +23,7 @@ def kron_delta(x1, x2):
 def T(k1, k2, dr):
     if k1 == k2:
         return (
-            1
-            / (2 * dr**2)
-            * (-1) ** (k1 - k2)
-            * (np.pi**2 / 3 - 1 / (2 * k1**2))
+            1 / (2 * dr**2) * (-1) ** (k1 - k2) * (np.pi**2 / 3 - 1 / (2 * k1**2))
         )
     else:
         return (
@@ -38,7 +35,6 @@ def T(k1, k2, dr):
 
 
 def Yl1m1_sin2theta_Yl2m2(l1, m1, l2, m2):
-
     Y_m1_l1 = sph_harm(m1, l1, phi, theta)
     Y_m2_l2 = sph_harm(m2, l2, phi, theta)
 
@@ -75,12 +71,8 @@ for l1 in range(abs(m), l_max + 1):
                     * kron_delta(k1, k2)
                     * kron_delta(l1, l2)
                 )
-                H[row, col] += (
-                    -1 / r[k2] * kron_delta(k1, k2) * kron_delta(l1, l2)
-                )
-                H[row, col] += (
-                    B * m / 2 * kron_delta(k1, k2) * kron_delta(l1, l2)
-                )
+                H[row, col] += -1 / r[k2] * kron_delta(k1, k2) * kron_delta(l1, l2)
+                H[row, col] += B * m / 2 * kron_delta(k1, k2) * kron_delta(l1, l2)
                 H[row, col] += (
                     B**2
                     / 8

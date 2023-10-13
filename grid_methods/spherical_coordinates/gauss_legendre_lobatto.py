@@ -5,7 +5,6 @@ from scipy.special import eval_legendre as Legendre
 
 class Rational_map:
     def __init__(self, r_max=30, alpha=0.4):
-
         self.r_max = r_max
         self.alpha = alpha
         self.L_scale = self.r_max * self.alpha / 2
@@ -30,7 +29,6 @@ class Linear_map:
 
 class GaussLegendreLobatto:
     def __init__(self, N, Mapping):
-
         # Get inner nodes
         c = np.zeros((N + 1,))
         c[-1] = 1

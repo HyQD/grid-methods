@@ -68,7 +68,6 @@ def CrankNicholson_sine_DVR(
     eps, D = np.linalg.eigh(H_0)
 
     def block_tridiag_Hamiltonian(t, idt2):
-
         diagonal = np.zeros((L, n_r, n_r), dtype=np.complex128)
         upper = np.zeros((L - 1, n_r, n_r), dtype=np.complex128)
         lower = np.zeros((L - 1, n_r, n_r), dtype=np.complex128)
@@ -82,7 +81,6 @@ def CrankNicholson_sine_DVR(
         return lower, diagonal, upper
 
     def compute_expec_z(psi):
-
         expec_z = 0
 
         for l in range(0, L - 1):
@@ -104,7 +102,6 @@ def CrankNicholson_sine_DVR(
     norm[0] = np.linalg.norm(psi_t.ravel())
 
     for n in tqdm.tqdm(range(num_steps - 1)):
-
         tn = time_points[n]
 
         lower_p, diagonal_p, upper_p = block_tridiag_Hamiltonian(

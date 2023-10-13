@@ -8,15 +8,17 @@ from utils import compute_numerical_states
 
 delta = lambda x, y: x == y
 
+
 # This is part of the second integral in the dipole matrix element expression
 def c_l(l):
     if l < 0:
         return 0
     else:
-        return (l + 1) / np.sqrt((2*l + 1) * (2*l + 3))
+        return (l + 1) / np.sqrt((2 * l + 1) * (2 * l + 3))
+
 
 def second_integral(l_i, l_j):
-    return c_l(l_i)*delta(l_i+1,l_j)+c_l(l_i-1)*delta(l_i-1,l_j)
+    return c_l(l_i) * delta(l_i + 1, l_j) + c_l(l_i - 1) * delta(l_i - 1, l_j)
 
 
 # Define some stuff
@@ -31,9 +33,9 @@ l_max = 4
 eigenenergies, eigenstates = compute_numerical_states(l_max, n_max, r)
 
 # Allocate space for matrix elements
-H0 = np.zeros([n_max*l_max]*2)
-H_int = np.zeros([n_max*l_max]*2)
-I2 = np.zeros([l_max]*2)
+H0 = np.zeros([n_max * l_max] * 2)
+H_int = np.zeros([n_max * l_max] * 2)
+I2 = np.zeros([l_max] * 2)
 
 for i in range(l_max):
     for j in range(l_max):
@@ -50,14 +52,14 @@ for l in range(l_max):
         i += 1
 
 # Compute H_int
-for i in range(n_max*l_max):
+for i in range(n_max * l_max):
     l_i, n_i = mapping[i]
     u_i = eigenstates[l_i][:, n_i]
-    for j in range(n_max*l_max):
+    for j in range(n_max * l_max):
         l_j, n_j = mapping[j]
         u_j = eigenstates[l_j][:, n_j]
-        H0[i,j] = eigenenergies[l_i][n_i]*delta(i,j)
-        H_int[i, j] = simps(u_i*r*u_j, r) * second_integral(l_i, l_j) 
+        H0[i, j] = eigenenergies[l_i][n_i] * delta(i, j)
+        H_int[i, j] = simps(u_i * r * u_j, r) * second_integral(l_i, l_j)
 
 
 E0 = 0.03  # 0.02387
@@ -101,7 +103,6 @@ for j in range(n_basis):
 
 
 for i in range(num_steps - 1):
-
     r.integrate(r.t + dt)
     dipole_moment[i + 1] = np.vdot(r.y, H_int @ r.y)
     for j in range(n_basis):
@@ -109,7 +110,6 @@ for i in range(num_steps - 1):
     norm[i + 1] = np.vdot(r.y, r.y)
     if i % 100 == 0:
         print(i)
-
 
 
 np.save("time-points-num-orbs", time_points)
@@ -120,7 +120,7 @@ plt.plot(time_points, -dipole_moment.real)
 
 
 plt.figure()
-plt.plot(time_points, np.abs(overlaps[:,0]) ** 2)
+plt.plot(time_points, np.abs(overlaps[:, 0]) ** 2)
 plt.legend()
 
 plt.figure()

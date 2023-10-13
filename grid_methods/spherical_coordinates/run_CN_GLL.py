@@ -93,7 +93,6 @@ print()
 
 
 def block_tridiag_Hamiltonian(t, idt2):
-
     diagonal = np.zeros((L, n_r, n_r), dtype=np.complex128)
     upper = np.zeros((L - 1, n_r, n_r), dtype=np.complex128)
     lower = np.zeros((L - 1, n_r, n_r), dtype=np.complex128)
@@ -107,7 +106,6 @@ def block_tridiag_Hamiltonian(t, idt2):
 
 
 def compute_expec_z(psi):
-
     expec_z = 0
 
     for l in range(0, L - 1):
@@ -119,7 +117,6 @@ def compute_expec_z(psi):
 
 
 def compute_norm(psi):
-
     norm = 0
     for l in range(L):
         norm += GLL.quad(np.abs(psi[l]) ** 2)
@@ -153,15 +150,10 @@ populations[1][0] = np.abs(GLL.quad(u_2p * psi_t[1])) ** 2
 
 
 for n in tqdm.tqdm(range(num_steps - 1)):
-
     tn = time_points[n]
 
-    lower_p, diagonal_p, upper_p = block_tridiag_Hamiltonian(
-        tn + dt / 2, 1j * dt / 2
-    )
-    lower_m, diagonal_m, upper_m = block_tridiag_Hamiltonian(
-        tn + dt / 2, -1j * dt / 2
-    )
+    lower_p, diagonal_p, upper_p = block_tridiag_Hamiltonian(tn + dt / 2, 1j * dt / 2)
+    lower_m, diagonal_m, upper_m = block_tridiag_Hamiltonian(tn + dt / 2, -1j * dt / 2)
 
     z = block_tridiag_product(lower_m, diagonal_m, upper_m, psi_t)
     psi_t = block_tridiag_solve(lower_p, diagonal_p, upper_p, z)
