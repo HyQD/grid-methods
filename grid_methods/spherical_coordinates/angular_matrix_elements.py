@@ -3,11 +3,14 @@ from numpy.polynomial import legendre
 from scipy.special import eval_legendre as Legendre
 import time
 from scipy.special import sph_harm
+from pathlib import Path
 
 
 class AngularMatrixElements:
     def __init__(self, l_max=5, N=101):
-        coord = np.loadtxt("Lebedev/lebedev_%03d.txt" % N)
+        current_file_location = Path(__file__).parent
+        coord = np.loadtxt(current_file_location / ("Lebedev/lebedev_%03d.txt" % N))
+
         self.theta = coord[:, 1] * np.pi / 180
         self.phi = coord[:, 0] * np.pi / 180 + np.pi
         self.weights = coord[:, 2]
