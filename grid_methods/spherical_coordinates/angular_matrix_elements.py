@@ -301,7 +301,10 @@ class AngularMatrixElements_l(AngularMatrixElements):
                         -self.l1m1_sinth_ddtheta_l2m2(l1, m, l2, m)
                         - self.arr["z_Omega"][l1, l2]
                     )
-                else:
+                elif (
+                    arr_to_calc_dict["H_z_beta"]
+                    and arr_to_calc_dict["z_Omega"] == False
+                ):
                     self.arr["H_z_beta"][
                         l1, l2
                     ] = -self.l1m1_sinth_ddtheta_l2m2(
