@@ -37,6 +37,7 @@ from grid_methods.spherical_coordinates.time_dependent_field_interaction import 
     V_psi_length_z,
     V_psi_length,
     V_psi_velocity,
+    V_psi_velocity_z,
 )
 
 from opt_einsum import contract
@@ -46,9 +47,7 @@ from grid_methods.spherical_coordinates.utils import (
     quadrature,
 )
 
-from grid_methods.spherical_coordinates.properties import (
-    expec_x_i,
-)
+from grid_methods.spherical_coordinates.properties import expec_x_i, expec_p_i
 
 from grid_methods.spherical_coordinates.ground_state import compute_ground_state
 
@@ -66,6 +65,7 @@ N = 200
 nr = N - 1
 r_max = 100
 l_max = 3
+alpha = 0.4
 
 ### SETUP ########################
 
@@ -145,6 +145,7 @@ M_linear = LinearOperator((nr * (n_lm), nr * (n_lm)), matvec=preconditioner)
 
 # arrays needed for sampling
 z_Omega = angular_matrix_elements("z_Omega")
+H_z_beta = angular_matrix_elements("H_z_beta")
 
 
 ### RUN ##########################
@@ -172,11 +173,9 @@ for i in tqdm.tqdm(range(num_steps - 1)):
     dpsi_t_dr = contract("ij, Ij->Ii", D1, psi_t)
 
     expec_z[i + 1] = expec_x_i(psi_t, weights, r, z_Omega)
+    expec_pz[i + 1] = expec_p_i(psi_t, dpsi_t_dr, weights, r, z_Omega, H_z_beta)
 
 
-samples = {
-    "time_points": time_points,
-    "expec_z": expec_z,
-}
+samples = {"time_points": time_points, "expec_z": expec_z, "expec_pz": expec_pz}
 
 np.savez("output_velocity_gauge", **samples)
