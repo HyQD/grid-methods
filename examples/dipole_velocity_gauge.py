@@ -1,29 +1,29 @@
 import numpy as np
+from matplotlib import pyplot as plt
+import tqdm
+from opt_einsum import contract
+from scipy.sparse.linalg import LinearOperator, bicgstab
+
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
 from grid_methods.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_l,
-    AngularMatrixElements_lm,
 )
 from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Rational_map,
     Linear_map,
 )
-import time
-from matplotlib import pyplot as plt
+
 from grid_methods.spherical_coordinates.lasers import (
-    square_length_dipole,
     square_velocity_dipole,
 )
-import tqdm
-from opt_einsum import contract
-from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab
+
+
 from grid_methods.spherical_coordinates.utils import mask_function
 from grid_methods.spherical_coordinates.Hpsi_components import (
     H0_psi,
-    pz_psi,
 )
 
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
@@ -34,13 +34,9 @@ from grid_methods.spherical_coordinates.rhs import (
 )
 
 from grid_methods.spherical_coordinates.time_dependent_field_interaction import (
-    V_psi_length_z,
-    V_psi_length,
-    V_psi_velocity,
     V_psi_velocity_z,
 )
 
-from opt_einsum import contract
 
 from grid_methods.spherical_coordinates.utils import (
     Counter,
@@ -84,14 +80,12 @@ T_D2 = -(1 / 2) * radial_matrix_elements.D2
 angular_matrix_elements = AngularMatrixElements_l(
     arr_to_calc=["z_Omega", "H_z_beta"], l_max=l_max
 )
-# angular_matrix_elements = AngularMatrixElements_lm(arr_to_calc=["z_Omega"], l_max=l_max)
 n_lm = angular_matrix_elements.n_lm
 
 # setup mask function
 mask_r = mask_function(r, r[-1], r[-1] - 30)
 
 # Compute ground/intial state
-tic = time.time()
 eps, phi_n = compute_ground_state(
     angular_matrix_elements, radial_matrix_elements, potential
 )
@@ -101,8 +95,6 @@ psi_t = np.zeros((n_lm, nr), dtype=np.complex128)
 psi_t[0] = np.complex128(phi_n[:, 0])
 psi_t[0] /= np.sqrt(quadrature(weights, np.abs(psi_t[0]) ** 2))
 psi0 = psi_t[0].copy()
-toc = time.time()
-print(f"Time computing initial state: {toc-tic}")
 
 # setup pulses
 t_cycle = 2 * np.pi / omega
@@ -130,10 +122,9 @@ H0_psi = H0Psi(
     potential,
 )
 
-Vt_psi = V_psi_velocity(
+Vt_psi = V_psi_velocity_z(
     angular_matrix_elements, radial_matrix_elements, a_field_z=a_field_z
 )
-# Vt_psi = V_psi_length(angular_matrix_elements, radial_matrix_elements, e_field_z=e_field_z)
 
 rhs = HtPsi(angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi])
 
