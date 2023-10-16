@@ -17,7 +17,9 @@ def expec_x_i(psi, weights, r, xi_Omega):
     return expec_xi
 
 
-def expec_p_i(psi, dpsi_dr, r, xi_Omega, H_xi_beta):
+def expec_p_i(psi, dpsi_dr, weights, r, xi_Omega, H_xi_beta):
+
+    n_lm = psi.shape[0]
     tmp_alpha = contract("IJ, Jk->Ik", xi_Omega, dpsi_dr)
     tmp_beta = contract("IJ, Jk->Ik", H_xi_beta, psi)
 
