@@ -91,6 +91,43 @@ class V_psi_length(VPsi):
             return psi_new
 
 
+class V_psi_velocity_z(VPsi):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_z,
+    ):
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            a_field_z=a_field_z,
+        )
+
+        self.r = radial_matrix_elements.r
+        self.nr = radial_matrix_elements.nr
+        self.nl = angular_matrix_elements.n_lm
+
+        self.r_inv = self.radial_matrix_elements.r_inv
+        self.D1 = self.radial_matrix_elements.D1
+
+        self.z_Omega = self.angular_matrix_elements("z_Omega")
+        self.H_z_beta = self.angular_matrix_elements("H_z_beta")
+
+    def __call__(self, psi, t, ravel=True):
+
+        dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
+
+        psi_new = self.a_field_z(t) * pz_psi(
+            psi, dpsi_dr, self.z_Omega, self.H_z_beta, self.r_inv
+        )
+
+        if ravel:
+            return psi_new.ravel()
+        else:
+            return psi_new
+
+
 class V_psi_velocity(VPsi):
     def __init__(
         self,
@@ -134,17 +171,17 @@ class V_psi_velocity(VPsi):
         dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
 
         if self.x_active:
-            psi_new += px_psi(
+            psi_new += self.a_field_x(t) * px_psi(
                 psi, dpsi_dr, self.x_Omega, self.H_x_beta, self.r_inv
             )
 
         if self.y_active:
-            psi_new += py_psi(
+            psi_new += self.a_field_y(t) * py_psi(
                 psi, dpsi_dr, self.y_Omega, self.H_y_beta, self.r_inv
             )
 
         if self.z_active:
-            psi_new += pz_psi(
+            psi_new += self.a_field_z(t) * pz_psi(
                 psi, dpsi_dr, self.z_Omega, self.H_z_beta, self.r_inv
             )
 
