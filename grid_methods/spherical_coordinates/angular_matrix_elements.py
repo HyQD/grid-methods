@@ -9,7 +9,9 @@ from pathlib import Path
 class AngularMatrixElements:
     def __init__(self, l_max=5, N=101):
         current_file_location = Path(__file__).parent
-        coord = np.loadtxt(current_file_location / ("Lebedev/lebedev_%03d.txt" % N))
+        coord = np.loadtxt(
+            current_file_location / ("Lebedev/lebedev_%03d.txt" % N)
+        )
 
         self.theta = coord[:, 1] * np.pi / 180
         self.phi = coord[:, 0] * np.pi / 180 + np.pi
@@ -31,13 +33,17 @@ class AngularMatrixElements:
 
     def a_lm(self, l, m):
         if l >= 0 and abs(m) <= l:
-            return np.sqrt(((l + 1) ** 2 - m**2) / ((2 * l + 1) * (2 * l + 3)))
+            return np.sqrt(
+                ((l + 1) ** 2 - m**2) / ((2 * l + 1) * (2 * l + 3))
+            )
         else:
             return 0
 
     def b_lm(self, l, m):
         if l >= 0 and abs(m) <= l:
-            return np.sqrt(((l + m + 1) * (l + m + 2)) / ((2 * l + 1) * (2 * l + 3)))
+            return np.sqrt(
+                ((l + m + 1) * (l + m + 2)) / ((2 * l + 1) * (2 * l + 3))
+            )
         else:
             return 0
 
@@ -117,14 +123,18 @@ class AngularMatrixElements:
 
         return integral
 
-    def l1m1_sinth_sq_cosph_sq_l2m2_Lebedev(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
+    def l1m1_sinth_sq_cosph_sq_l2m2_Lebedev(
+        self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+    ):
         integrand = Yl1m1_cc * self.sin_th**2 * self.cos_ph**2 * Yl2m2
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
         return integral
 
     def l1m1_sinph_cosph_sinthsq_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
-        integrand = Yl1m1_cc * self.sin_ph * self.cos_ph * self.sin_th**2 * Yl2m2
+        integrand = (
+            Yl1m1_cc * self.sin_ph * self.cos_ph * self.sin_th**2 * Yl2m2
+        )
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
         return integral
@@ -135,14 +145,18 @@ class AngularMatrixElements:
 
         return integral
 
-    def l1m1_sinth_sq_sinph_sq_l2m2_Lebedev(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
+    def l1m1_sinth_sq_sinph_sq_l2m2_Lebedev(
+        self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+    ):
         integrand = Yl1m1_cc * self.sin_th**2 * self.sin_ph**2 * Yl2m2
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
         return integral
 
     def l1m1_sinth_ddtheta_l2m2_Lebedev(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
-        sinth_ddtheta_l2m2 = m2 * self.cos_th * sph_harm(m2, l2, self.phi, self.theta)
+        sinth_ddtheta_l2m2 = (
+            m2 * self.cos_th * sph_harm(m2, l2, self.phi, self.theta)
+        )
         if np.abs(m2 + 1) <= l2:
             sinth_ddtheta_l2m2 += (
                 np.sqrt((l2 - m2) * (l2 + m2 + 1))
@@ -167,7 +181,9 @@ class AngularMatrixElements:
             l1, m1, l2, m2 + 1
         ) - self.c_lm(l2, m2 - 1) * self.l1m1_costh_l2m2(l1, m1, l2, m2 - 1)
 
-        integrand = Yl1m1_cc * self.sin_th * (self.exp_m1j_p - self.exp_p1j_p) * Yl2m2
+        integrand = (
+            Yl1m1_cc * self.sin_th * (self.exp_m1j_p - self.exp_p1j_p) * Yl2m2
+        )
         integral += m2 * np.sum(4 * np.pi * self.weights * integrand)
         return 0.5 * integral
 
@@ -177,7 +193,9 @@ class AngularMatrixElements:
         \left(\cos \phi \cos \theta \frac{\partial}{\partial \theta} - \frac{\sin \phi}{\sin \theta} \frac{\partial}{\partial \phi}\right) Y_{l,m}(\theta, \phi)
         = \frac{1}{2} \left[\cos\theta \left( c_{l,m}Y_{l,m+1} - c_{l,m-1}Y_{l,m-1} \right) + m \sin \theta (e^{-i \phi}-e^{i\phi}) Y_{l,m} \right]
         """
-        integrand = 0.5 * m2 * self.sin_th * (self.exp_m1j_p - self.exp_p1j_p) * Yl2m2
+        integrand = (
+            0.5 * m2 * self.sin_th * (self.exp_m1j_p - self.exp_p1j_p) * Yl2m2
+        )
 
         if abs(m2 + 1) <= l2:
             integrand += (
@@ -207,7 +225,9 @@ class AngularMatrixElements:
             l1, m1, l2, m2 + 1
         ) - self.c_lm(l2, m2 - 1) * self.l1m1_costh_l2m2(l1, m1, l2, m2 - 1)
 
-        integrand = Yl1m1_cc * self.sin_th * (self.exp_m1j_p + self.exp_p1j_p) * Yl2m2
+        integrand = (
+            Yl1m1_cc * self.sin_th * (self.exp_m1j_p + self.exp_p1j_p) * Yl2m2
+        )
         integral += m2 * np.sum(4 * np.pi * self.weights * integrand)
         return 1j * 0.5 * integral
 
@@ -215,7 +235,12 @@ class AngularMatrixElements:
         ###############################################################################
 
         integrand = (
-            1j * 0.5 * m2 * self.sin_th * (self.exp_m1j_p + self.exp_p1j_p) * Yl2m2
+            1j
+            * 0.5
+            * m2
+            * self.sin_th
+            * (self.exp_m1j_p + self.exp_p1j_p)
+            * Yl2m2
         )
 
         if abs(m2 + 1) <= l2:
@@ -268,11 +293,28 @@ class AngularMatrixElements_l(AngularMatrixElements):
         for l1 in range(n_l):
             for l2 in range(n_l):
                 if arr_to_calc_dict["z_Omega"]:
-                    self.arr["z_Omega"][l1, l2] = self.l1m1_costh_l2m2(l1, m, l2, m)
+                    self.arr["z_Omega"][l1, l2] = self.l1m1_costh_l2m2(
+                        l1, m, l2, m
+                    )
+                if arr_to_calc_dict["H_z_beta"] and arr_to_calc_dict["z_Omega"]:
+                    self.arr["H_z_beta"][l1, l2] = (
+                        -self.l1m1_sinth_ddtheta_l2m2(l1, m, l2, m)
+                        - self.arr["z_Omega"][l1, l2]
+                    )
+                else:
+                    self.arr["H_z_beta"][
+                        l1, l2
+                    ] = -self.l1m1_sinth_ddtheta_l2m2(
+                        l1, m, l2, m
+                    ) - self.l1m1_costh_l2m2(
+                        l1, m, l2, m
+                    )
 
 
 class AngularMatrixElements_lm(AngularMatrixElements):
-    def __init__(self, arr_to_calc=[], lmr_arr_to_calc=[], l_max=5, N=101, nr=None):
+    def __init__(
+        self, arr_to_calc=[], lmr_arr_to_calc=[], l_max=5, N=101, nr=None
+    ):
         super().__init__(l_max, N)
 
         self.n_lm = (l_max + 1) ** 2
@@ -303,9 +345,9 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                             Yl2m2 = sph_harm(m2, l2, self.phi, self.theta)
 
                             if arr_to_calc_dict["x_Omega"]:
-                                self.arr["x_Omega"][I, J] = self.l1m1_sinth_cosph_l2m2(
-                                    l1, m1, l2, m2
-                                )
+                                self.arr["x_Omega"][
+                                    I, J
+                                ] = self.l1m1_sinth_cosph_l2m2(l1, m1, l2, m2)
 
                             if arr_to_calc_dict["x_x_Omega"]:
                                 self.arr["x_x_Omega"][
@@ -315,9 +357,9 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                 )
 
                             if arr_to_calc_dict["y_Omega"]:
-                                self.arr["y_Omega"][I, J] = self.l1m1_sinth_sinph_l2m2(
-                                    l1, m1, l2, m2
-                                )
+                                self.arr["y_Omega"][
+                                    I, J
+                                ] = self.l1m1_sinth_sinph_l2m2(l1, m1, l2, m2)
 
                             if arr_to_calc_dict["y_y_Omega"]:
                                 self.arr["y_y_Omega"][
@@ -327,9 +369,9 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                 )
 
                             if arr_to_calc_dict["z_Omega"]:
-                                self.arr["z_Omega"][I, J] = self.l1m1_costh_l2m2(
-                                    l1, m1, l2, m2
-                                )
+                                self.arr["z_Omega"][
+                                    I, J
+                                ] = self.l1m1_costh_l2m2(l1, m1, l2, m2)
 
                             if arr_to_calc_dict["y_x_Omega"]:
                                 self.arr["y_x_Omega"][
@@ -340,13 +382,17 @@ class AngularMatrixElements_lm(AngularMatrixElements):
 
                             if arr_to_calc_dict["x_py_beta"]:
                                 self.arr["x_py_beta"][I, J] = (
-                                    self.l1m1_x_py_l2m2(Yl1m1_cc, Yl2m2, l1, m1, l2, m2)
+                                    self.l1m1_x_py_l2m2(
+                                        Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                    )
                                     - self.y_x_Omega[I, J]
                                 )
 
                             if arr_to_calc_dict["y_px_beta"]:
                                 self.arr["y_px_beta"][I, J] = (
-                                    self.l1m1_y_px_l2m2(Yl1m1_cc, Yl2m2, l1, m1, l2, m2)
+                                    self.l1m1_y_px_l2m2(
+                                        Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                    )
                                     - self.y_x_Omega[I, J]
                                 )
 
@@ -368,7 +414,9 @@ class AngularMatrixElements_lm(AngularMatrixElements):
 
                             if arr_to_calc_dict["H_z_beta"]:
                                 self.arr["H_z_beta"][I, J] = (
-                                    -self.l1m1_sinth_ddtheta_l2m2(l1, m1, l2, m2)
+                                    -self.l1m1_sinth_ddtheta_l2m2(
+                                        l1, m1, l2, m2
+                                    )
                                     - self.z_Omega[I, J]
                                 )
 
@@ -432,9 +480,21 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                     if cond1 and cond2 and cond3:
                                         Y_LM = sph_harm(M, L, phi, theta)
 
-                                        F_r = f_r(r, k, L, M, theta_k, phi_k, sign)
-                                        F_W = _l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2, L, M, Y_l1m1, Y_l2m2, Y_LM
+                                        F_r = f_r(
+                                            r, k, L, M, theta_k, phi_k, sign
+                                        )
+                                        F_W = (
+                                            _l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                                l1,
+                                                m1,
+                                                l2,
+                                                m2,
+                                                L,
+                                                M,
+                                                Y_l1m1,
+                                                Y_l2m2,
+                                                Y_LM,
+                                            )
                                         )
 
                                         index1 = index_mapping[f"{l1},{m1}"]
@@ -450,11 +510,11 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                     cond3 = ((l1 + L + l2 + 1) % 2) == 0
 
                                     if cond1 and cond2 and cond3:
-                                        F_r = f_r(r, k, L, M, theta_k, phi_k, sign)
-                                        F_W = (
-                                            l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(
-                                                l1, m1, l2, m2, L, M
-                                            )
+                                        F_r = f_r(
+                                            r, k, L, M, theta_k, phi_k, sign
+                                        )
+                                        F_W = l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
                                         )
 
                                         index1 = index_mapping[f"{l1},{m1}"]
@@ -493,6 +553,7 @@ def setup_lm_index_mapping_lm(l_max):
 def setup_l_arr_to_calc(arr_to_calc_list=[]):
     arr_to_calc_dict = {
         "z_Omega": False,
+        "H_z_beta": False,
     }
 
     return set_boolean_values_to_dict(arr_to_calc_dict, arr_to_calc_list)
