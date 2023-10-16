@@ -17,7 +17,9 @@ from grid_methods.spherical_coordinates.Hpsi_components import (
 
 
 class V_psi_length_z(VPsi):
-    def __init__(self, angular_matrix_elements, radial_matrix_elements, e_field_z):
+    def __init__(
+        self, angular_matrix_elements, radial_matrix_elements, e_field_z
+    ):
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
@@ -126,19 +128,25 @@ class V_psi_velocity(VPsi):
         self.active = True
 
     def __call__(self, psi, t, ravel=True):
-        psi = psi.reshape((n_lm, nr))
-        psi_new = np.zeros((n_lm, nr), dtype=np.complex128)
+        psi = psi.reshape((self.n_lm, self.nr))
+        psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
 
-        dpsi_dr = contract("ij, Ij->Ii", D1, psi)
+        dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
 
         if self.x_active:
-            psi_new += px_psi(psi, dpsi_dr, self.x_Omega, self.H_x_beta, self.r_inv)
+            psi_new += px_psi(
+                psi, dpsi_dr, self.x_Omega, self.H_x_beta, self.r_inv
+            )
 
         if self.y_active:
-            psi_new += py_psi(psi, dpsi_dr, self.y_Omega, self.H_y_beta, self.r_inv)
+            psi_new += py_psi(
+                psi, dpsi_dr, self.y_Omega, self.H_y_beta, self.r_inv
+            )
 
         if self.z_active:
-            psi_new += pz_psi(psi, dpsi_dr, self.z_Omega, self.H_z_beta, self.r_inv)
+            psi_new += pz_psi(
+                psi, dpsi_dr, self.z_Omega, self.H_z_beta, self.r_inv
+            )
 
         if ravel:
             return psi_new.ravel()
