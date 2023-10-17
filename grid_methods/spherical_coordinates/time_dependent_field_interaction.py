@@ -189,3 +189,118 @@ class V_psi_velocity(VPsi):
             return psi_new.ravel()
         else:
             return psi_new
+
+
+class V_psi_velocity_first(VPsi):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_x=None,
+        a_field_y=None,
+        a_field_z=None,
+        k_x=None,
+        k_y=None,
+        k_z=None,
+    ):
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            a_field_x=a_field_x,
+            a_field_y=a_field_y,
+            a_field_z=a_field_z,
+        )
+
+        self.k_x = k_x
+        self.k_y = k_y
+        self.k_z = k_z
+
+        self.r = self.radial_matrix_elements.r
+        self.r_inv = self.radial_matrix_elements.r_inv
+        self.D1 = self.radial_matrix_elements.D1
+
+        self.x_polarized = False if a_field_x is None else True
+        self.y_polarized = False if a_field_y is None else True
+        self.z_polarized = False if a_field_z is None else True
+
+        self.x_propagation = False if k_x is None else True
+        self.y_propagation = False if k_y is None else True
+        self.z_propagation = False if k_z is None else True
+
+        if self.x_polarized and self.y_propagation:
+            self.x_Omega = self.angular_matrix_elements("x_Omega")
+            self.y_Omega = self.angular_matrix_elements("y_Omega")
+
+            self.y_x_Omega = self.angular_matrix_elements("y_x_Omega")
+            self.y_y_Omega = self.angular_matrix_elements("y_y_Omega")
+
+            self.H_x_beta = self.angular_matrix_elements("H_x_beta")
+            self.y_px_beta = self.angular_matrix_elements("y_px_beta")
+
+        if self.y_polarized and self.x_propagation:
+            self.x_Omega = self.angular_matrix_elements("x_Omega")
+            self.y_Omega = self.angular_matrix_elements("y_Omega")
+            self.H_y_beta = self.angular_matrix_elements("H_y_beta")
+            self.y_x_Omega = self.angular_matrix_elements("y_x_Omega")
+            self.x_py_beta = self.angular_matrix_elements("x_py_beta")
+            self.x_x_Omega = self.angular_matrix_elements("x_x_Omega")
+
+    def __call__(self, psi, t, ravel=True):
+
+        psi = psi.reshape((self.n_lm, self.nr))
+        psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
+
+        dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
+
+        if self.x_polarized and self.y_propagation:
+
+            A1_x_t, A2_x_t = self.a_field_x(t)
+
+            psi_new += A1_x_t * px_psi(
+                psi, dpsi_dr, self.x_Omega, self.H_x_beta, self.r_inv
+            )
+            psi_new += (
+                A2_x_t
+                * self.k_y
+                * y_px_psi(psi, dpsi_dr, self.y_x_Omega, self.y_px_beta, self.r)
+            )
+
+            psi_new += 0.5 * A1_x_t**2 * psi
+            psi_new += (
+                A1_x_t * A2_x_t * self.k_y * y_psi(psi, self.y_Omega, self.r)
+            )
+            psi_new += (
+                0.5
+                * A2_x_t**2
+                * self.k_y**2
+                * y_y_psi(psi, self.y_y_Omega, self.r)
+            )
+
+        if self.y_polarized and self.x_propagation:
+
+            A1_y_t, A2_y_t = self.a_field_y(t)
+
+            psi_new += A1_y_t * px_psi(
+                psi, dpsi_dr, self.y_Omega, self.H_y_beta, self.r_inv
+            )
+            psi_new += (
+                A2_y_t
+                * self.k_x
+                * y_px_psi(psi, dpsi_dr, self.y_x_Omega, self.x_py_beta, self.r)
+            )
+
+            psi_new += 0.5 * A1_y_t**2 * psi
+            psi_new += (
+                A1_y_t * A2_y_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
+            )
+            psi_new += (
+                0.5
+                * A2_y_t**2
+                * self.k_x**2
+                * y_y_psi(psi, self.x_x_Omega, self.r)
+            )
+
+        if ravel:
+            return psi_new.ravel()
+        else:
+            return psi_new
