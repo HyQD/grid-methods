@@ -388,7 +388,7 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     self.l1m1_x_py_l2m2(
                                         Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                     )
-                                    - self.y_x_Omega[I, J]
+                                    - self.arr["y_x_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["y_px_beta"]:
@@ -396,7 +396,7 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     self.l1m1_y_px_l2m2(
                                         Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                     )
-                                    - self.y_x_Omega[I, J]
+                                    - self.arr["y_x_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["H_x_beta"]:
@@ -404,7 +404,7 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     self.l1m1_px_l2m2_Lebedev(
                                         Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                     )
-                                    - self.x_Omega[I, J]
+                                    - self.arr["x_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["H_y_beta"]:
@@ -412,7 +412,7 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     self.l1m1_py_l2m2_Lebedev(
                                         Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                     )
-                                    - self.y_Omega[I, J]
+                                    - self.arr["y_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["H_z_beta"]:
@@ -420,7 +420,7 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     -self.l1m1_sinth_ddtheta_l2m2(
                                         l1, m1, l2, m2
                                     )
-                                    - self.z_Omega[I, J]
+                                    - self.arr["z_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["H_Bz_Omega"]:
