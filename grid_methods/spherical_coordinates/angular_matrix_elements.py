@@ -447,7 +447,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         arr_to_calc_dict = setup_lmr_arr_to_calc(arr_to_calc)
 
         if True in arr_to_calc_dict.values():
-            self.setup_matrix_elements(arr_to_calc_dict)
+            self._setup_matrix_elements(arr_to_calc_dict)
 
     def setup_matrix_elements(self, arr_to_calc_dict):
         r = self.r
@@ -458,17 +458,29 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         theta_k = self.theta_k
         phi_k = self.phi_k
 
+        sph_harms = np.zeros(
+            ((2 * self.n_l) ** 2, len(self.weights)), dtype=np.complex128
+        )
+
+        lm_K, K_lm = setup_lm_index_mapping_lm(l_max=2 * self.n_l - 1)
+
+        for L in range(2 * nl):
+            for M in range(-L, L + 1):
+                I = K_lm[f"{L}{M}"]
+                sph_harms[I, :] = sph_harm(M, L, phi, theta)
+
         for l1 in range(nl - 1):
             for m1 in range(-l1, l1 + 1):
-                Y_l1m1 = sph_harm(m1, l1, phi, theta)
-                I = self.I_lm[f"{l1}{m1}"]
+                I = K_lm[f"{l1}{m1}"]
+                Y_l1m1 = sph_harms[I, :]
                 for l2 in range(nl - 1):
                     for m2 in range(-l2, l2 + 1):
-                        Y_l2m2 = sph_harm(m2, l2, phi, theta)
-                        J = self.I_lm[f"{l2}{m2}"]
+                        J = K_lm[f"{l2}{m2}"]
+                        Y_l2m2 = sph_harms[J, :]
                         for L in range(2 * nl):
                             for M in range(-L, L + 1):
-                                Y_LM = sph_harm(M, L, phi, theta)
+                                K = K_lm[f"{L}{M}"]
+                                Y_LM = sph_harms[K, :]
                                 if arr_to_calc_dict["expph_costh"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2 + 1) and (
