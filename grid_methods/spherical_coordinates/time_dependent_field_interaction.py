@@ -17,9 +17,7 @@ from grid_methods.spherical_coordinates.Hpsi_components import (
 
 
 class V_psi_length_z(VPsi):
-    def __init__(
-        self, angular_matrix_elements, radial_matrix_elements, e_field_z
-    ):
+    def __init__(self, angular_matrix_elements, radial_matrix_elements, e_field_z):
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
@@ -115,7 +113,6 @@ class V_psi_velocity_z(VPsi):
         self.H_z_beta = self.angular_matrix_elements("H_z_beta")
 
     def __call__(self, psi, t, ravel=True):
-
         dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
 
         psi_new = self.a_field_z(t) * pz_psi(
@@ -246,14 +243,12 @@ class V_psi_velocity_first(VPsi):
             self.x_x_Omega = self.angular_matrix_elements("x_x_Omega")
 
     def __call__(self, psi, t, ravel=True):
-
         psi = psi.reshape((self.n_lm, self.nr))
         psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
 
         dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
 
         if self.x_polarized and self.y_propagation:
-
             A1_x_t, A2_x_t = self.a_field_x(t)
 
             psi_new += A1_x_t * px_psi(
@@ -266,18 +261,12 @@ class V_psi_velocity_first(VPsi):
             )
 
             psi_new += 0.5 * A1_x_t**2 * psi
+            psi_new += A1_x_t * A2_x_t * self.k_y * y_psi(psi, self.y_Omega, self.r)
             psi_new += (
-                A1_x_t * A2_x_t * self.k_y * y_psi(psi, self.y_Omega, self.r)
-            )
-            psi_new += (
-                0.5
-                * A2_x_t**2
-                * self.k_y**2
-                * y_y_psi(psi, self.y_y_Omega, self.r)
+                0.5 * A2_x_t**2 * self.k_y**2 * y_y_psi(psi, self.y_y_Omega, self.r)
             )
 
         if self.y_polarized and self.x_propagation:
-
             A1_y_t, A2_y_t = self.a_field_y(t)
 
             psi_new += A1_y_t * px_psi(
@@ -290,15 +279,87 @@ class V_psi_velocity_first(VPsi):
             )
 
             psi_new += 0.5 * A1_y_t**2 * psi
+            psi_new += A1_y_t * A2_y_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
             psi_new += (
-                A1_y_t * A2_y_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
+                0.5 * A2_y_t**2 * self.k_x**2 * y_y_psi(psi, self.x_x_Omega, self.r)
             )
-            psi_new += (
-                0.5
-                * A2_y_t**2
-                * self.k_x**2
-                * y_y_psi(psi, self.x_x_Omega, self.r)
-            )
+
+        if ravel:
+            return psi_new.ravel()
+        else:
+            return psi_new
+
+
+class V_psi_full_z(VPsi):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_z_p,
+        a_field_z_m,
+        a_field2_z_p,
+        a_field2_z_m,
+    ):
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            a_field_z_p=a_field_z_p,
+            a_field_z_m=a_field_z_m,
+            a_field2_z_p=a_field2_z_p,
+            a_field2_z_m=a_field2_z_m,
+        )
+
+        self.D1 = radial_matrix_elements.D1
+        self.r = radial_matrix_elements.r
+        self.nr = radial_matrix_elements.nr
+        self.n_lm = angular_matrix_elements.n_lm
+
+        self.expph_costh_p = self.angular_matrix_elements("expph_costh")
+        self.expph_costh_sinth_ddtheta_p = (
+            self.angular_matrix_elements("expph_sinth_ddtheta") + self.expph_costh_p
+        )
+        self.expph2_p = self.angular_matrix_elements("expph2")
+
+        self.expph_costh_m = self.expph_costh_p.conj()
+        self.expph_costh_sinth_ddtheta_m = self.expph_costh_sinth_ddtheta_p.conj()
+        self.expph2_m = self.expph2_p.conj()
+
+    def __call__(self, psi, t, ravel=True):
+        psi = psi.reshape((self.n_lm, self.nr))
+        psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
+
+        dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
+
+        psi_new -= (
+            (1j / 2)
+            * self.a_field_z_m(t)
+            * contract("IJk, Jk->Ik", self.expph_costh_p, dpsi_dr)
+        )
+        psi_new -= (
+            (1j / 2)
+            * self.a_field_z_p(t)
+            * contract("IJk, Jk->Ik", self.expph_costh_m, dpsi_dr)
+        )
+
+        psi_r = contract("k, Ik->Ik", 1 / self.r, psi)
+
+        psi_new += (
+            (1j / 2)
+            * self.a_field_z_m(t)
+            * contract("IJk, Jk->Ik", self.expph_costh_sinth_ddtheta_p, psi_r)
+        )
+        psi_new += (
+            (1j / 2)
+            * self.a_field_z_p(t)
+            * contract("IJk, Jk->Ik", self.expph_costh_sinth_ddtheta_m, psi_r)
+        )
+
+        psi_new += (
+            (1 / 8) * self.a_field2_z_m(t) * contract("IJk, Jk->Ik", self.expph2_p, psi)
+        )
+        psi_new += (
+            (1 / 8) * self.a_field2_z_p(t) * contract("IJk, Jk->Ik", self.expph2_m, psi)
+        )
 
         if ravel:
             return psi_new.ravel()
