@@ -608,6 +608,16 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
 
                                     self.arr["expph_cosph_sinth"][I, J, :] += F_W * F_r
 
+                                if arr_to_calc_dict["expph_sinph_sinth"]:
+                                    F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
+                                    F_W = (
+                                        self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
+                                        )
+                                    )
+
+                                    self.arr["expph_sinph_sinth"][I, J, :] += F_W * F_r
+
                                 if arr_to_calc_dict["M_tilde_x"]:
                                     F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
                                     F_W1 = (
@@ -642,6 +652,43 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                         )
 
                                     self.arr["M_tilde_x"][I, J, :] += (
+                                        F_W1 + F_W2 + F_W3 + F_W4
+                                    ) * F_r
+
+                                if arr_to_calc_dict["M_tilde_y"]:
+                                    F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
+                                    F_W1 = (
+                                        self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
+                                        )
+                                    )
+                                    F_W2 = (
+                                        -1j
+                                        * m2
+                                        * self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
+                                        )
+                                    )
+                                    F_W3 = 0
+                                    F_W4 = 0
+                                    if abs(m2 + 1) <= l2:
+                                        F_W3 = (
+                                            (1j / 2)
+                                            * coeff_c(l2, m2)
+                                            * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                                l1, m1, l2, m2 + 1, L, M
+                                            )
+                                        )
+                                    if abs(m2 - 1) <= l2:
+                                        F_W4 = (
+                                            (1j / 2)
+                                            * coeff_c(l2, m2 - 1)
+                                            * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                                l1, m1, l2, m2 - 1, L, M
+                                            )
+                                        )
+
+                                    self.arr["M_tilde_y"][I, J, :] += (
                                         F_W1 + F_W2 + F_W3 + F_W4
                                     ) * F_r
 
@@ -705,7 +752,9 @@ def setup_lmr_arr_to_calc(arr_to_calc_list):
         "expph_sinth_ddtheta": False,
         "expph2": False,
         "expph_cosph_sinth": False,
+        "expph_sinph_sinth": False,
         "M_tilde_x": False,
+        "M_tilde_y": False,
     }
 
     return set_boolean_values_to_dict(arr_to_calc_dict, arr_to_calc_list)
