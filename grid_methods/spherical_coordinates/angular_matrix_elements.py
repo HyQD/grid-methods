@@ -243,24 +243,38 @@ class AngularMatrixElements:
 
         return integral
 
-    def l1m1_Y_star_cos_theta_l2m2_Lebedev(
-        self, Y_l1m1, Y_l2m2, Y_LM, l1, m1, l2, m2, L, M
-    ):
-        integrand = Y_l1m1.conj() * Y_LM.conj() * np.cos(self.theta) * Y_l2m2
+    def l1m1_Y_star_cos_theta_l2m2_Lebedev(self, l1, m1, l2, m2, L, M):
+        I = self.I_lm[f"{l1}{m1}"]
+        J = self.I_lm[f"{l2}{m2}"]
+        K = self.I_lm[f"{L}{M}"]
+
+        Y_l1m1 = self.sph_harms[I, :]
+        Y_l2m2 = self.sph_harms[J, :]
+        Y_LM = self.sph_harms[K, :]
+
+        integrand = Y_l1m1.conj() * Y_LM.conj() * self.cos_th * Y_l2m2
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
         return integral
 
-    def l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(
-        self, Y_l1m1, Y_l2m2, Y_LM, l1, m1, l2, m2, L, M
-    ):
-        sin_theta_ddtheta_l2m2 = m2 * np.cos(self.theta) * Y_l2m2
+    def l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(self, l1, m1, l2, m2, L, M):
+        I = self.I_lm[f"{l1}{m1}"]
+        J = self.I_lm[f"{l2}{m2}"]
+        K = self.I_lm[f"{L}{M}"]
+
+        Y_l1m1 = self.sph_harms[I, :]
+        Y_l2m2 = self.sph_harms[J, :]
+        Y_LM = self.sph_harms[K, :]
+
+        sin_theta_ddtheta_l2m2 = m2 * self.cos_th * Y_l2m2
         if np.abs(m2 + 1) <= l2:
+            J_ = self.I_lm[f"{l2}{m2+1}"]
+            Y_l21m2 = self.sph_harms[J_, :]
             sin_theta_ddtheta_l2m2 += (
                 np.sqrt((l2 - m2) * (l2 + m2 + 1))
-                * np.sin(self.theta)
-                * np.exp(-1j * self.phi)
-                * sph_harm(m2 + 1, l2, self.phi, self.theta)
+                * self.sin_th
+                * self.exp_m1j_p
+                * Y_l21m2
             )
 
         integrand = Y_l1m1.conj() * Y_LM.conj() * sin_theta_ddtheta_l2m2
@@ -268,7 +282,15 @@ class AngularMatrixElements:
 
         return integral
 
-    def l1m1_Y_star_l2m2_Lebedev(self, Y_l1m1, Y_l2m2, Y_LM, l1, m1, l2, m2, L, M):
+    def l1m1_Y_star_l2m2_Lebedev(self, l1, m1, l2, m2, L, M):
+        I = self.I_lm[f"{l1}{m1}"]
+        J = self.I_lm[f"{l2}{m2}"]
+        K = self.I_lm[f"{L}{M}"]
+
+        Y_l1m1 = self.sph_harms[I, :]
+        Y_l2m2 = self.sph_harms[J, :]
+        Y_LM = self.sph_harms[K, :]
+
         integrand = Y_l1m1.conj() * Y_LM.conj() * Y_l2m2
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
@@ -432,7 +454,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         self.n_l = l_max + 1
         self.n_lm = (l_max + 1) ** 2
         self.nr = nr
-        self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max)
+        self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max=2 * l_max + 2)
 
         self.r = r
         self.k = k
@@ -447,7 +469,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         arr_to_calc_dict = setup_lmr_arr_to_calc(arr_to_calc)
 
         if True in arr_to_calc_dict.values():
-            self._setup_matrix_elements(arr_to_calc_dict)
+            self.setup_matrix_elements(arr_to_calc_dict)
 
     def setup_matrix_elements(self, arr_to_calc_dict):
         r = self.r
@@ -458,29 +480,27 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         theta_k = self.theta_k
         phi_k = self.phi_k
 
-        sph_harms = np.zeros(
+        self.sph_harms = np.zeros(
             ((2 * self.n_l) ** 2, len(self.weights)), dtype=np.complex128
         )
 
-        lm_K, K_lm = setup_lm_index_mapping_lm(l_max=2 * self.n_l - 1)
-
         for L in range(2 * nl):
             for M in range(-L, L + 1):
-                I = K_lm[f"{L}{M}"]
-                sph_harms[I, :] = sph_harm(M, L, phi, theta)
+                I = self.I_lm[f"{L}{M}"]
+                self.sph_harms[I, :] = sph_harm(M, L, phi, theta)
+
+        sph_jn = np.zeros((2 * self.n_l, self.nr))
+        for L in range(2 * nl):
+            sph_jn[L, :] = spherical_jn(L, k * r)
 
         for l1 in range(nl - 1):
             for m1 in range(-l1, l1 + 1):
-                I = K_lm[f"{l1}{m1}"]
-                Y_l1m1 = sph_harms[I, :]
+                I = self.I_lm[f"{l1}{m1}"]
                 for l2 in range(nl - 1):
                     for m2 in range(-l2, l2 + 1):
-                        J = K_lm[f"{l2}{m2}"]
-                        Y_l2m2 = sph_harms[J, :]
+                        J = self.I_lm[f"{l2}{m2}"]
                         for L in range(2 * nl):
                             for M in range(-L, L + 1):
-                                K = K_lm[f"{L}{M}"]
-                                Y_LM = sph_harms[K, :]
                                 if arr_to_calc_dict["expph_costh"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2 + 1) and (
@@ -489,9 +509,17 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                     cond3 = ((l1 + L + l2 + 1) % 2) == 0
 
                                     if cond1 and cond2 and cond3:
-                                        F_r = f_r(r, k, L, M, theta_k, phi_k, sign=1)
+                                        F_r = f_r(
+                                            sph_jn[L, :],
+                                            k,
+                                            L,
+                                            M,
+                                            theta_k,
+                                            phi_k,
+                                            sign=1,
+                                        )
                                         F_W = self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                            Y_l1m1, Y_l2m2, Y_LM, l1, m1, l2, m2, L, M
+                                            l1, m1, l2, m2, L, M
                                         )
 
                                         self.arr["expph_costh"][I, J, :] += F_W * F_r
@@ -504,9 +532,17 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                     cond3 = ((l1 + L + l2 + 1) % 2) == 0
 
                                     if cond1 and cond2 and cond3:
-                                        F_r = f_r(r, k, L, M, theta_k, phi_k, sign=1)
+                                        F_r = f_r(
+                                            sph_jn[L, :],
+                                            k,
+                                            L,
+                                            M,
+                                            theta_k,
+                                            phi_k,
+                                            sign=1,
+                                        )
                                         F_W = self.l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(
-                                            Y_l1m1, Y_l2m2, Y_LM, l1, m1, l2, m2, L, M
+                                            l1, m1, l2, m2, L, M
                                         )
 
                                         self.arr["expph_sinth_ddtheta"][I, J, :] += (
@@ -520,10 +556,16 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
 
                                     if cond1 and cond2 and cond3:
                                         F_r = f_r(
-                                            r, 2 * k, L, M, theta_k, phi_k, sign=1
+                                            sph_jn[L, :],
+                                            2 * k,
+                                            L,
+                                            M,
+                                            theta_k,
+                                            phi_k,
+                                            sign=1,
                                         )
                                         F_W = self.l1m1_Y_star_l2m2_Lebedev(
-                                            Y_l1m1, Y_l2m2, Y_LM, l1, m1, l2, m2, L, M
+                                            l1, m1, l2, m2, L, M
                                         )
 
                                         self.arr["expph2"][I, J, :] += F_W * F_r
@@ -614,11 +656,10 @@ def A(l1, l2, l3):
     return np.sqrt((2 * l1 + 1) * (2 * l2 + 1) / (4 * np.pi * (2 * l3 + 1)))
 
 
-def f_r(r, k, L, M, theta_k, phi_k, sign):
+def f_r(sph_jn, k, L, M, theta_k, phi_k, sign):
     C = 4 * np.pi * (sign * 1j) ** L
-    j = spherical_jn(L, k * r)
     Y = sph_harm(M, L, phi_k, theta_k)
-    return C * Y * j
+    return C * Y * sph_jn
 
 
 def f_W(l1, m1, l2, m2, l3, m3):
