@@ -290,11 +290,13 @@ class V_psi_velocity_first(VPsi):
             return psi_new
 
 
-class V_psi_full_z(VPsi):
+class V_psi_full(VPsi):
     def __init__(
         self,
         angular_matrix_elements,
         radial_matrix_elements,
+        arr_contr_with_ddr,
+        arr_contr_with_r,
         a_field_z_p,
         a_field_z_m,
         a_field2_z_p,
@@ -314,14 +316,13 @@ class V_psi_full_z(VPsi):
         self.nr = radial_matrix_elements.nr
         self.n_lm = angular_matrix_elements.n_lm
 
-        self.expph_costh_p = self.angular_matrix_elements("expph_costh")
-        self.expph_costh_sinth_ddtheta_p = (
-            self.angular_matrix_elements("expph_sinth_ddtheta") + self.expph_costh_p
-        )
-        self.expph2_p = self.angular_matrix_elements("expph2")
+        self.arr_contr_with_r_p = arr_contr_with_r
+        self.arr_contr_with_r_m = arr_contr_with_r.conj()
 
-        self.expph_costh_m = self.expph_costh_p.conj()
-        self.expph_costh_sinth_ddtheta_m = self.expph_costh_sinth_ddtheta_p.conj()
+        self.arr_contr_with_ddr_p = arr_contr_with_ddr
+        self.arr_contr_with_ddr_m = arr_contr_with_ddr.conj()
+
+        self.expph2_p = self.angular_matrix_elements("expph2")
         self.expph2_m = self.expph2_p.conj()
 
     def __call__(self, psi, t, ravel=True):
@@ -333,12 +334,12 @@ class V_psi_full_z(VPsi):
         psi_new -= (
             (1j / 2)
             * self.a_field_z_m(t)
-            * contract("IJk, Jk->Ik", self.expph_costh_p, dpsi_dr)
+            * contract("IJk, Jk->Ik", self.arr_contr_with_ddr_p, dpsi_dr)
         )
         psi_new -= (
             (1j / 2)
             * self.a_field_z_p(t)
-            * contract("IJk, Jk->Ik", self.expph_costh_m, dpsi_dr)
+            * contract("IJk, Jk->Ik", self.arr_contr_with_ddr_m, dpsi_dr)
         )
 
         psi_r = contract("k, Ik->Ik", 1 / self.r, psi)
@@ -346,12 +347,12 @@ class V_psi_full_z(VPsi):
         psi_new += (
             (1j / 2)
             * self.a_field_z_m(t)
-            * contract("IJk, Jk->Ik", self.expph_costh_sinth_ddtheta_p, psi_r)
+            * contract("IJk, Jk->Ik", self.arr_contr_with_r_p, psi_r)
         )
         psi_new += (
             (1j / 2)
             * self.a_field_z_p(t)
-            * contract("IJk, Jk->Ik", self.expph_costh_sinth_ddtheta_m, psi_r)
+            * contract("IJk, Jk->Ik", self.arr_contr_with_r_m, psi_r)
         )
 
         psi_new += (
@@ -365,3 +366,53 @@ class V_psi_full_z(VPsi):
             return psi_new.ravel()
         else:
             return psi_new
+
+
+class V_psi_full_x(V_psi_full):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_z_p,
+        a_field_z_m,
+        a_field2_z_p,
+        a_field2_z_m,
+    ):
+        arr_contr_with_ddr = angular_matrix_elements("expph_cosph_sinth")
+        arr_contr_with_r = angular_matrix_elements("M_tilde_x")
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            arr_contr_with_ddr,
+            arr_contr_with_r,
+            a_field_z_p=a_field_z_p,
+            a_field_z_m=a_field_z_m,
+            a_field2_z_p=a_field2_z_p,
+            a_field2_z_m=a_field2_z_m,
+        )
+
+
+class V_psi_full_z(V_psi_full):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_z_p,
+        a_field_z_m,
+        a_field2_z_p,
+        a_field2_z_m,
+    ):
+        arr_contr_with_ddr = angular_matrix_elements("expph_costh")
+        arr_contr_with_r = (
+            angular_matrix_elements("expph_sinth_ddtheta") + arr_contr_with_ddr
+        )
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            arr_contr_with_ddr,
+            arr_contr_with_r,
+            a_field_z_p=a_field_z_p,
+            a_field_z_m=a_field_z_m,
+            a_field2_z_p=a_field2_z_p,
+            a_field2_z_m=a_field2_z_m,
+        )
