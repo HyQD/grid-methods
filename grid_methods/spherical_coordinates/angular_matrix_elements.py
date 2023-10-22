@@ -296,6 +296,34 @@ class AngularMatrixElements:
 
         return integral
 
+    def l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(self, l1, m1, l2, m2, L, M):
+        I = self.I_lm[f"{l1}{m1}"]
+        J = self.I_lm[f"{l2}{m2}"]
+        K = self.I_lm[f"{L}{M}"]
+
+        Y_l1m1 = self.sph_harms[I, :]
+        Y_l2m2 = self.sph_harms[J, :]
+        Y_LM = self.sph_harms[K, :]
+
+        integrand = Y_l1m1.conj() * Y_LM.conj() * self.cos_ph * self.sin_th * Y_l2m2
+        integral = np.sum(4 * np.pi * self.weights * integrand)
+
+        return integral
+
+    def l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(self, l1, m1, l2, m2, L, M):
+        I = self.I_lm[f"{l1}{m1}"]
+        J = self.I_lm[f"{l2}{m2}"]
+        K = self.I_lm[f"{L}{M}"]
+
+        Y_l1m1 = self.sph_harms[I, :]
+        Y_l2m2 = self.sph_harms[J, :]
+        Y_LM = self.sph_harms[K, :]
+
+        integrand = Y_l1m1.conj() * Y_LM.conj() * self.sin_ph * self.sin_th * Y_l2m2
+        integral = np.sum(4 * np.pi * self.weights * integrand)
+
+        return integral
+
     def __call__(self, name):
         return self.arr[name]
 
@@ -570,6 +598,53 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
 
                                         self.arr["expph2"][I, J, :] += F_W * F_r
 
+                                if arr_to_calc_dict["expph_cosph_sinth"]:
+                                    F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
+                                    F_W = (
+                                        self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
+                                        )
+                                    )
+
+                                    self.arr["expph_cosph_sinth"][I, J, :] += F_W * F_r
+
+                                if arr_to_calc_dict["M_tilde_x"]:
+                                    F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
+                                    F_W1 = (
+                                        self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
+                                        )
+                                    )
+                                    F_W2 = (
+                                        1j
+                                        * m2
+                                        * self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2, L, M
+                                        )
+                                    )
+                                    F_W3 = 0
+                                    F_W4 = 0
+                                    if abs(m2 + 1) <= l2:
+                                        F_W3 = (
+                                            -(1 / 2)
+                                            * coeff_c(l2, m2)
+                                            * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                                l1, m1, l2, m2 + 1, L, M
+                                            )
+                                        )
+                                    if abs(m2 - 1) <= l2:
+                                        F_W4 = (
+                                            (1 / 2)
+                                            * coeff_c(l2, m2 - 1)
+                                            * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                                l1, m1, l2, m2 - 1, L, M
+                                            )
+                                        )
+
+                                    self.arr["M_tilde_x"][I, J, :] += (
+                                        F_W1 + F_W2 + F_W3 + F_W4
+                                    ) * F_r
+
 
 def setup_lm_index_mapping_l(l_max, m=0):
     lm_I = []
@@ -629,6 +704,8 @@ def setup_lmr_arr_to_calc(arr_to_calc_list):
         "expph_costh": False,
         "expph_sinth_ddtheta": False,
         "expph2": False,
+        "expph_cosph_sinth": False,
+        "M_tilde_x": False,
     }
 
     return set_boolean_values_to_dict(arr_to_calc_dict, arr_to_calc_list)
@@ -664,3 +741,7 @@ def f_r(sph_jn, k, L, M, theta_k, phi_k, sign):
 
 def f_W(l1, m1, l2, m2, l3, m3):
     return A(l1, l2, l3) * Clebsch_Gordan(l1, m1, l2, m2, l3, m3)
+
+
+def coeff_c(l, m):
+    return np.sqrt(l * (l + 1) - m * (m + 1))
