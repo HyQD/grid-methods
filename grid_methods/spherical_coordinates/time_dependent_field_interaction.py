@@ -295,8 +295,10 @@ class V_psi_full(VPsi):
         self,
         angular_matrix_elements,
         radial_matrix_elements,
-        arr_contr_with_ddr,
-        arr_contr_with_r,
+        arr_contr_with_ddr_p,
+        arr_contr_with_ddr_m,
+        arr_contr_with_r_p,
+        arr_contr_with_r_m,
         a_field_z_p,
         a_field_z_m,
         a_field2_z_p,
@@ -316,11 +318,11 @@ class V_psi_full(VPsi):
         self.nr = radial_matrix_elements.nr
         self.n_lm = angular_matrix_elements.n_lm
 
-        self.arr_contr_with_r_p = arr_contr_with_r
-        self.arr_contr_with_r_m = arr_contr_with_r.conj()
+        self.arr_contr_with_r_p = arr_contr_with_r_p
+        self.arr_contr_with_r_m = arr_contr_with_r_m
 
-        self.arr_contr_with_ddr_p = arr_contr_with_ddr
-        self.arr_contr_with_ddr_m = arr_contr_with_ddr.conj()
+        self.arr_contr_with_ddr_p = arr_contr_with_ddr_p
+        self.arr_contr_with_ddr_m = arr_contr_with_ddr_m
 
         self.expph2_p = self.angular_matrix_elements("expph2")
         self.expph2_m = self.expph2_p.conj()
@@ -378,13 +380,46 @@ class V_psi_full_x(V_psi_full):
         a_field2_z_p,
         a_field2_z_m,
     ):
-        arr_contr_with_ddr = angular_matrix_elements("expph_cosph_sinth")
-        arr_contr_with_r = angular_matrix_elements("M_tilde_x")
+        arr_contr_with_ddr_p = angular_matrix_elements("expph_cosph_sinth")
+        arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
+        arr_contr_with_r_p = angular_matrix_elements("M_tilde_x")
+        arr_contr_with_r_m = arr_contr_with_r_p.conj()
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
-            arr_contr_with_ddr,
-            arr_contr_with_r,
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
+            a_field_z_p=a_field_z_p,
+            a_field_z_m=a_field_z_m,
+            a_field2_z_p=a_field2_z_p,
+            a_field2_z_m=a_field2_z_m,
+        )
+
+
+class V_psi_full_y(V_psi_full):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_z_p,
+        a_field_z_m,
+        a_field2_z_p,
+        a_field2_z_m,
+    ):
+        arr_contr_with_ddr_p = angular_matrix_elements("expph_sinph_sinth")
+        arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj().swapaxes(0, 1)
+        arr_contr_with_r_p = angular_matrix_elements("M_tilde_y")
+        arr_contr_with_r_m = -arr_contr_with_r_p.conj()
+
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
             a_field_z_p=a_field_z_p,
             a_field_z_m=a_field_z_m,
             a_field2_z_p=a_field2_z_p,
@@ -402,15 +437,19 @@ class V_psi_full_z(V_psi_full):
         a_field2_z_p,
         a_field2_z_m,
     ):
-        arr_contr_with_ddr = angular_matrix_elements("expph_costh")
-        arr_contr_with_r = (
-            angular_matrix_elements("expph_sinth_ddtheta") + arr_contr_with_ddr
+        arr_contr_with_ddr_p = angular_matrix_elements("expph_costh")
+        arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
+        arr_contr_with_r_p = (
+            angular_matrix_elements("expph_sinth_ddtheta") + arr_contr_with_ddr_p
         )
+        arr_contr_with_r_m = arr_contr_with_r_p.conj()
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
-            arr_contr_with_ddr,
-            arr_contr_with_r,
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
             a_field_z_p=a_field_z_p,
             a_field_z_m=a_field_z_m,
             a_field2_z_p=a_field2_z_p,
