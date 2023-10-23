@@ -601,6 +601,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                 if arr_to_calc_dict["expkr_cosph_sinth"]:
                                     cond1 = np.abs(-m1 - M + m2) == 1
                                     cond2 = ((l1 + L + l2 + 1) % 2) == 0
+
                                     if cond1 and cond2:
                                         F_r = f_r(
                                             sph_jn[L, :], k, L, M, theta_k, phi_k, 1
@@ -614,12 +615,16 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                         )
 
                                 if arr_to_calc_dict["expkr_sinph_sinth"]:
-                                    F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
-                                    F_W = (
-                                        self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                                    cond1 = np.abs(-m1 - M + m2) == 1
+                                    cond2 = ((l1 + L + l2 + 1) % 2) == 0
+
+                                    if cond1 and cond2:
+                                        F_r = f_r(
+                                            sph_jn[L, :], k, L, M, theta_k, phi_k, 1
+                                        )
+                                        F_W = self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
                                             l1, m1, l2, m2, L, M
                                         )
-                                    )
 
                                     self.arr["expkr_sinph_sinth"][I, J, :] += F_W * F_r
 
