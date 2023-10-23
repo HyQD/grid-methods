@@ -626,7 +626,93 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                             l1, m1, l2, m2, L, M
                                         )
 
-                                    self.arr["expkr_sinph_sinth"][I, J, :] += F_W * F_r
+                                        self.arr["expkr_sinph_sinth"][I, J, :] += (
+                                            F_W * F_r
+                                        )
+
+                                if arr_to_calc_dict["expkr_m2_sinph_sinth"]:
+                                    cond1 = np.abs(-m1 - M + m2) == 1
+                                    cond2 = ((l1 + L + l2 + 1) % 2) == 0
+                                    cond3 = m2 != 0
+
+                                    if cond1 and cond2 and cond3:
+                                        F_r = f_r(
+                                            sph_jn[L, :], k, L, M, theta_k, phi_k, 1
+                                        )
+                                        F_W = (
+                                            m2
+                                            * self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                                                l1, m1, l2, m2, L, M
+                                            )
+                                        )
+
+                                        self.arr["expkr_m2_sinph_sinth"][I, J, :] += (
+                                            F_W * F_r
+                                        )
+
+                                if arr_to_calc_dict["expkr_m2_cosph_sinth"]:
+                                    cond1 = np.abs(-m1 - M + m2) == 1
+                                    cond2 = ((l1 + L + l2 + 1) % 2) == 0
+                                    cond3 = m2 != 0
+
+                                    if cond1 and cond2 and cond3:
+                                        F_r = f_r(
+                                            sph_jn[L, :], k, L, M, theta_k, phi_k, 1
+                                        )
+                                        F_W = (
+                                            m2
+                                            * self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
+                                                l1, m1, l2, m2, L, M
+                                            )
+                                        )
+
+                                        self.arr["expkr_m2_cosph_sinth"][I, J, :] += (
+                                            F_W * F_r
+                                        )
+
+                                if arr_to_calc_dict["expkr_c_costh_(m+1)"]:
+                                    cond1 = -m1 - M + (m2 + 1) == 0
+                                    cond2 = (np.abs(l1 - L) <= l2 + 1) and (
+                                        l2 - 1 <= l1 + L
+                                    )
+                                    cond3 = ((l1 + L + l2 + 1) % 2) == 0
+                                    cond4 = abs(m2 + 1) <= l2
+
+                                    if cond1 and cond2 and cond3 and cond4:
+                                        F_r = f_r(
+                                            sph_jn[L, :], k, L, M, theta_k, phi_k, 1
+                                        )
+                                        F_W = coeff_c(
+                                            l2, m2
+                                        ) * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2 + 1, L, M
+                                        )
+
+                                        self.arr["expkr_c_costh_(m+1)"][I, J, :] += (
+                                            F_W * F_r
+                                        )
+
+                                if arr_to_calc_dict["expkr_c_costh_(m-1)"]:
+                                    cond1 = -m1 - M + (m2 - 1) == 0
+                                    cond2 = (np.abs(l1 - L) <= l2 + 1) and (
+                                        l2 - 1 <= l1 + L
+                                    )
+                                    cond3 = ((l1 + L + l2 + 1) % 2) == 0
+                                    cond4 = abs(m2 - 1) <= l2
+
+                                    if cond1 and cond2 and cond3 and cond4:
+                                        F_r = f_r(
+                                            sph_jn[L, :], k, L, M, theta_k, phi_k, 1
+                                        )
+                                        F_W = coeff_c(
+                                            l2, m2 - 1
+                                        ) * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                                            l1, m1, l2, m2 - 1, L, M
+                                        )
+
+                                        self.arr["expkr_c_costh_(m-1)"][I, J, :] += (
+                                            F_W * F_r
+                                        )
 
                                 if arr_to_calc_dict["M_tilde_x"]:
                                     F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
@@ -765,6 +851,10 @@ def setup_lmr_arr_to_calc(arr_to_calc_list):
         "expkr_sinph_sinth": False,
         "M_tilde_x": False,
         "M_tilde_y": False,
+        "expkr_m2_sinph_sinth": False,
+        "expkr_m2_cosph_sinth": False,
+        "expkr_c_costh_(m+1)": False,
+        "expkr_c_costh_(m-1)": False,
     }
 
     return set_boolean_values_to_dict(arr_to_calc_dict, arr_to_calc_list)
