@@ -324,8 +324,8 @@ class V_psi_full(VPsi):
         self.arr_contr_with_ddr_p = arr_contr_with_ddr_p
         self.arr_contr_with_ddr_m = arr_contr_with_ddr_m
 
-        self.expph2_p = self.angular_matrix_elements("expph2")
-        self.expph2_m = self.expph2_p.conj()
+        self.expkr2_p = self.angular_matrix_elements("expkr2")
+        self.expkr2_m = self.expkr2_p.conj()
 
     def __call__(self, psi, t, ravel=True):
         psi = psi.reshape((self.n_lm, self.nr))
@@ -358,10 +358,10 @@ class V_psi_full(VPsi):
         )
 
         psi_new += (
-            (1 / 8) * self.a_field2_z_m(t) * contract("IJk, Jk->Ik", self.expph2_p, psi)
+            (1 / 8) * self.a_field2_z_m(t) * contract("IJk, Jk->Ik", self.expkr2_p, psi)
         )
         psi_new += (
-            (1 / 8) * self.a_field2_z_p(t) * contract("IJk, Jk->Ik", self.expph2_m, psi)
+            (1 / 8) * self.a_field2_z_p(t) * contract("IJk, Jk->Ik", self.expkr2_m, psi)
         )
 
         if ravel:
@@ -380,7 +380,7 @@ class V_psi_full_x(V_psi_full):
         a_field2_z_p,
         a_field2_z_m,
     ):
-        arr_contr_with_ddr_p = angular_matrix_elements("expph_cosph_sinth")
+        arr_contr_with_ddr_p = angular_matrix_elements("expkr_cosph_sinth")
         arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
         arr_contr_with_r_p = angular_matrix_elements("M_tilde_x")
         arr_contr_with_r_m = arr_contr_with_r_p.conj()
@@ -408,7 +408,7 @@ class V_psi_full_y(V_psi_full):
         a_field2_z_p,
         a_field2_z_m,
     ):
-        arr_contr_with_ddr_p = angular_matrix_elements("expph_sinph_sinth")
+        arr_contr_with_ddr_p = angular_matrix_elements("expkr_sinph_sinth")
         arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj().swapaxes(0, 1)
         arr_contr_with_r_p = angular_matrix_elements("M_tilde_y")
         arr_contr_with_r_m = -arr_contr_with_r_p.conj()
@@ -437,10 +437,10 @@ class V_psi_full_z(V_psi_full):
         a_field2_z_p,
         a_field2_z_m,
     ):
-        arr_contr_with_ddr_p = angular_matrix_elements("expph_costh")
+        arr_contr_with_ddr_p = angular_matrix_elements("expkr_costh")
         arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
         arr_contr_with_r_p = (
-            angular_matrix_elements("expph_sinth_ddtheta") + arr_contr_with_ddr_p
+            angular_matrix_elements("expkr_sinth_ddtheta") + arr_contr_with_ddr_p
         )
         arr_contr_with_r_m = arr_contr_with_r_p.conj()
         super().__init__(
