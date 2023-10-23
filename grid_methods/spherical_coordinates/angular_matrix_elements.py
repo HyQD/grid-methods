@@ -529,7 +529,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                         J = self.I_lm[f"{l2}{m2}"]
                         for L in range(2 * nl):
                             for M in range(-L, L + 1):
-                                if arr_to_calc_dict["expph_costh"]:
+                                if arr_to_calc_dict["expkr_costh"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2 + 1) and (
                                         l2 - 1 <= l1 + L
@@ -550,9 +550,9 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                             l1, m1, l2, m2, L, M
                                         )
 
-                                        self.arr["expph_costh"][I, J, :] += F_W * F_r
+                                        self.arr["expkr_costh"][I, J, :] += F_W * F_r
 
-                                if arr_to_calc_dict["expph_sinth_ddtheta"]:
+                                if arr_to_calc_dict["expkr_sinth_ddtheta"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2 + 1) and (
                                         l2 - 1 <= l1 + L
@@ -573,11 +573,11 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                             l1, m1, l2, m2, L, M
                                         )
 
-                                        self.arr["expph_sinth_ddtheta"][I, J, :] += (
+                                        self.arr["expkr_sinth_ddtheta"][I, J, :] += (
                                             F_W * F_r
                                         )
 
-                                if arr_to_calc_dict["expph2"]:
+                                if arr_to_calc_dict["expkr2"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2) and (l2 <= l1 + L)
                                     cond3 = ((l1 + L + l2) % 2) == 0
@@ -596,9 +596,9 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                             l1, m1, l2, m2, L, M
                                         )
 
-                                        self.arr["expph2"][I, J, :] += F_W * F_r
+                                        self.arr["expkr2"][I, J, :] += F_W * F_r
 
-                                if arr_to_calc_dict["expph_cosph_sinth"]:
+                                if arr_to_calc_dict["expkr_cosph_sinth"]:
                                     F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
                                     F_W = (
                                         self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
@@ -606,9 +606,9 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                         )
                                     )
 
-                                    self.arr["expph_cosph_sinth"][I, J, :] += F_W * F_r
+                                    self.arr["expkr_cosph_sinth"][I, J, :] += F_W * F_r
 
-                                if arr_to_calc_dict["expph_sinph_sinth"]:
+                                if arr_to_calc_dict["expkr_sinph_sinth"]:
                                     F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
                                     F_W = (
                                         self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
@@ -616,7 +616,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                         )
                                     )
 
-                                    self.arr["expph_sinph_sinth"][I, J, :] += F_W * F_r
+                                    self.arr["expkr_sinph_sinth"][I, J, :] += F_W * F_r
 
                                 if arr_to_calc_dict["M_tilde_x"]:
                                     F_r = f_r(sph_jn[L, :], k, L, M, theta_k, phi_k, 1)
@@ -748,11 +748,11 @@ def setup_lm_arr_to_calc(arr_to_calc_list=[]):
 
 def setup_lmr_arr_to_calc(arr_to_calc_list):
     arr_to_calc_dict = {
-        "expph_costh": False,
-        "expph_sinth_ddtheta": False,
-        "expph2": False,
-        "expph_cosph_sinth": False,
-        "expph_sinph_sinth": False,
+        "expkr_costh": False,
+        "expkr_sinth_ddtheta": False,
+        "expkr2": False,
+        "expkr_cosph_sinth": False,
+        "expkr_sinph_sinth": False,
         "M_tilde_x": False,
         "M_tilde_y": False,
     }
