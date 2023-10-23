@@ -94,9 +94,9 @@ angular_matrix_elements = AngularMatrixElements_lm(
 )
 angular_matrix_elements_lmr = AngularMatrixElements_lmr(
     arr_to_calc=[
-        "expph_costh",
-        "expph_sinth_ddtheta",
-        "expph2",
+        "expkr_costh",
+        "expkr_sinth_ddtheta",
+        "expkr2",
     ],
     nr=nr,
     r=r,
