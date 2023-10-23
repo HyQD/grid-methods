@@ -382,8 +382,14 @@ class V_psi_full_x(V_psi_full):
     ):
         arr_contr_with_ddr_p = angular_matrix_elements("expkr_cosph_sinth")
         arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
-        arr_contr_with_r_p = angular_matrix_elements("M_tilde_x")
+        arr_contr_with_r_p = (
+            angular_matrix_elements("expkr_cosph_sinth")
+            + 1j * angular_matrix_elements("expkr_m2_sinph_sinth")
+            - (1 / 2) * angular_matrix_elements("expkr_c_costh_(m+1)")
+            + (1 / 2) * angular_matrix_elements("expkr_c_costh_(m-1)")
+        )
         arr_contr_with_r_m = arr_contr_with_r_p.conj()
+
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
@@ -410,7 +416,12 @@ class V_psi_full_y(V_psi_full):
     ):
         arr_contr_with_ddr_p = angular_matrix_elements("expkr_sinph_sinth")
         arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj().swapaxes(0, 1)
-        arr_contr_with_r_p = angular_matrix_elements("M_tilde_y")
+        arr_contr_with_r_p = (
+            angular_matrix_elements("expkr_sinph_sinth")
+            - 1j * angular_matrix_elements("expkr_m2_cosph_sinth")
+            + (1j / 2) * angular_matrix_elements("expkr_c_costh_(m+1)")
+            + (1j / 2) * angular_matrix_elements("expkr_c_costh_(m-1)")
+        )
         arr_contr_with_r_m = -arr_contr_with_r_p.conj()
 
         super().__init__(
