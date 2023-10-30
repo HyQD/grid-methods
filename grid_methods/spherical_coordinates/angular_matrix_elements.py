@@ -251,6 +251,36 @@ class AngularMatrixElements:
 
         return integral
 
+    def l1m1_z_px_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
+        ###############################################################################
+        """ """
+        integrand = (
+            0.5 * m2 * self.sin_th * (self.exp_m1j_p - self.exp_p1j_p) * Yl2m2
+        )
+
+        if abs(m2 + 1) <= l2:
+            integrand += (
+                0.5
+                * self.c_lm(l2, m2)
+                * self.cos_th
+                * sph_harm(m2 + 1, l2, self.phi, self.theta)
+            )
+
+        if abs(m2 - 1) <= l2:
+            integrand -= (
+                0.5
+                * self.c_lm(l2, m2 - 1)
+                * self.cos_th
+                * sph_harm(m2 - 1, l2, self.phi, self.theta)
+            )
+
+        ###############################################################################
+        integrand *= Yl1m1_cc * self.cos_th
+
+        integral = np.sum(4 * np.pi * self.weights * integrand)
+
+        return integral
+
     def l1m1_py_l2m2_Lebedev(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
         integral = -self.c_lm(l2, m2) * self.l1m1_costh_l2m2(
             l1, m1, l2, m2 + 1
@@ -294,6 +324,43 @@ class AngularMatrixElements:
 
         ###############################################################################
         integrand *= Yl1m1_cc * self.sin_th * self.cos_ph
+
+        integral = np.sum(4 * np.pi * self.weights * integrand)
+
+        return integral
+
+    def l1m1_z_py_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
+        ###############################################################################
+
+        integrand = (
+            1j
+            * 0.5
+            * m2
+            * self.sin_th
+            * (self.exp_m1j_p + self.exp_p1j_p)
+            * Yl2m2
+        )
+
+        if abs(m2 + 1) <= l2:
+            integrand -= (
+                1j
+                * 0.5
+                * self.c_lm(l2, m2)
+                * self.cos_th
+                * sph_harm(m2 + 1, l2, self.phi, self.theta)
+            )
+
+        if abs(m2 - 1) <= l2:
+            integrand -= (
+                1j
+                * 0.5
+                * self.c_lm(l2, m2 - 1)
+                * self.cos_th
+                * sph_harm(m2 - 1, l2, self.phi, self.theta)
+            )
+
+        ###############################################################################
+        integrand *= Yl1m1_cc * self.cos_th
 
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
@@ -528,12 +595,20 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     - self.arr["y_x_Omega"][I, J]
                                 )
 
-                            if arr_to_calc_dict["y_px_beta"]:
-                                self.arr["y_px_beta"][I, J] = (
-                                    self.l1m1_y_px_l2m2(
+                            if arr_to_calc_dict["z_py_beta"]:
+                                self.arr["z_py_beta"][I, J] = (
+                                    self.l1m1_z_py_l2m2(
                                         Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                     )
-                                    - self.arr["y_x_Omega"][I, J]
+                                    - self.arr["z_y_Omega"][I, J]
+                                )
+
+                            if arr_to_calc_dict["z_px_beta"]:
+                                self.arr["z_px_beta"][I, J] = (
+                                    self.l1m1_z_px_l2m2(
+                                        Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                    )
+                                    - self.arr["z_x_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["H_x_beta"]:
@@ -973,7 +1048,9 @@ def setup_lm_arr_to_calc(arr_to_calc_list=[]):
         "z_x_Omega": False,
         "z_y_Omega": False,
         "x_py_beta": False,
+        "z_py_beta": False,
         "y_px_beta": False,
+        "z_px_beta": False,
         "H_Bz_Omega": False,
     }
 
