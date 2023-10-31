@@ -563,21 +563,21 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                 self.arr["z_z_Omega"][
                                     I, J
                                 ] = self.l1m1_costh_sq_l2m2_Lebedev(
-                                    l1, m1, l2, m2
+                                    Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                 )
 
                             if arr_to_calc_dict["z_x_Omega"]:
                                 self.arr["z_x_Omega"][
                                     I, J
                                 ] = self.l1m1_costh_sinth_cosph_l2m2_Lebedev(
-                                    l1, m1, l2, m2
+                                    Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                 )
 
                             if arr_to_calc_dict["z_y_Omega"]:
                                 self.arr["z_y_Omega"][
                                     I, J
                                 ] = self.l1m1_costh_sinth_sinph_l2m2_Lebedev(
-                                    l1, m1, l2, m2
+                                    Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                 )
 
                             if arr_to_calc_dict["y_x_Omega"]:
@@ -585,6 +585,14 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     I, J
                                 ] = self.l1m1_sinph_cosph_sinthsq_l2m2(
                                     Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                )
+
+                            if arr_to_calc_dict["y_px_beta"]:
+                                self.arr["y_px_beta"][I, J] = (
+                                    self.l1m1_y_px_l2m2(
+                                        Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                    )
+                                    - self.arr["y_x_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["x_py_beta"]:
