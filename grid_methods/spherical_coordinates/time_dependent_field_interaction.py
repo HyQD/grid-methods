@@ -226,30 +226,47 @@ class V_psi_velocity_first(VPsi):
         self.y_propagation = False if k_y is None else True
         self.z_propagation = False if k_z is None else True
 
-        if self.x_polarized and self.y_propagation:
+        if self.x_polarized:
+
             self.x_Omega = self.angular_matrix_elements("x_Omega")
-            self.y_Omega = self.angular_matrix_elements("y_Omega")
-            self.y_x_Omega = self.angular_matrix_elements("y_x_Omega")
-            self.y_y_Omega = self.angular_matrix_elements("y_y_Omega")
             self.H_x_beta = self.angular_matrix_elements("H_x_beta")
-            self.y_px_beta = self.angular_matrix_elements("y_px_beta")
+
+            if self.y_propagation:
+                self.y_Omega = self.angular_matrix_elements("y_Omega")
+                self.y_y_Omega = self.angular_matrix_elements("y_y_Omega")
+                self.y_x_Omega = self.angular_matrix_elements("y_x_Omega")
+                self.y_px_beta = self.angular_matrix_elements("y_px_beta")
+
+            if self.z_propagation:
+                self.z_Omega = self.angular_matrix_elements("z_Omega")
+                self.z_z_Omega = self.angular_matrix_elements("z_z_Omega")
+                self.z_x_Omega = self.angular_matrix_elements("z_x_Omega")
+                self.z_px_beta = self.angular_matrix_elements("z_px_beta")
 
         if self.y_polarized and self.x_propagation:
-            self.x_Omega = self.angular_matrix_elements("x_Omega")
+
             self.y_Omega = self.angular_matrix_elements("y_Omega")
             self.H_y_beta = self.angular_matrix_elements("H_y_beta")
+
+            self.x_Omega = self.angular_matrix_elements("x_Omega")
             self.y_x_Omega = self.angular_matrix_elements("y_x_Omega")
             self.x_py_beta = self.angular_matrix_elements("x_py_beta")
             self.x_x_Omega = self.angular_matrix_elements("x_x_Omega")
 
+        """
         if self.z_propagation:
+
             self.z_Omega = self.angular_matrix_elements("z_Omega")
             self.z_z_Omega = self.angular_matrix_elements("z_z_Omega")
 
             if self.x_polarized:
-                self.z_px = self.angular_matrix_elements("z_px_Omega")
+                self.z_x_Omega = self.angular_matrix_elements("z_x_Omega")
+                self.z_px_beta = self.angular_matrix_elements("z_px_beta")
+
             if self.y_polarized:
-                self.z_py = self.angular_matrix_elements("z_py_Omega")
+                self.z_y_Omega = self.angular_matrix_elements("z_y_Omega")
+                self.z_py_beta = self.angular_matrix_elements("z_py_beta")
+        """
 
     def __call__(self, psi, t, ravel=True):
         psi = psi.reshape((self.n_lm, self.nr))
@@ -258,12 +275,11 @@ class V_psi_velocity_first(VPsi):
         dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
 
         if self.x_polarized:
-            A1_x_t, A2_x_t = self.a_field_x(t)
 
+            A1_x_t, A2_x_t = self.a_field_x(t)
             psi_new += A1_x_t * px_psi(
                 psi, dpsi_dr, self.x_Omega, self.H_x_beta, self.r_inv
             )
-
             psi_new += 0.5 * A1_x_t**2 * psi
 
             if self.y_propagation:
@@ -287,7 +303,6 @@ class V_psi_velocity_first(VPsi):
                     * self.k_y**2
                     * y_y_psi(psi, self.y_y_Omega, self.r)
                 )
-
             if self.z_propagation:
                 psi_new += (
                     A2_x_t
@@ -319,28 +334,23 @@ class V_psi_velocity_first(VPsi):
 
             psi_new += 0.5 * A1_y_t**2 * psi
 
-            if self.x_propagation:
-                psi_new += (
-                    A2_y_t
-                    * self.k_x
-                    * y_px_psi(
-                        psi, dpsi_dr, self.y_x_Omega, self.x_py_beta, self.r
-                    )
-                )
+            psi_new += (
+                A2_y_t
+                * self.k_x
+                * y_px_psi(psi, dpsi_dr, self.y_x_Omega, self.x_py_beta, self.r)
+            )
 
-                psi_new += (
-                    A1_y_t
-                    * A2_y_t
-                    * self.k_x
-                    * y_psi(psi, self.x_Omega, self.r)
-                )
-                psi_new += (
-                    0.5
-                    * A2_y_t**2
-                    * self.k_x**2
-                    * y_y_psi(psi, self.x_x_Omega, self.r)
-                )
+            psi_new += (
+                A1_y_t * A2_y_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
+            )
+            psi_new += (
+                0.5
+                * A2_y_t**2
+                * self.k_x**2
+                * y_y_psi(psi, self.x_x_Omega, self.r)
+            )
 
+            """
             if self.z_propagation:
                 psi_new += (
                     A2_y_t
@@ -362,6 +372,7 @@ class V_psi_velocity_first(VPsi):
                     * self.k_z**2
                     * y_y_psi(psi, self.z_z_Omega, self.r)
                 )
+            """
 
         if ravel:
             return psi_new.ravel()
