@@ -91,14 +91,18 @@ angular_matrix_elements = AngularMatrixElements_lm(
         "x_x_Omega",
         "y_x_Omega",
         "z_x_Omega",
+        "z_y_Omega",
         "y_y_Omega",
         "z_z_Omega",
         "H_x_beta",
         "H_y_beta",
         "H_z_beta",
-        "y_px_beta",
-        "z_px_beta",
         "x_py_beta",
+        "x_pz_beta",
+        "y_px_beta",
+        "y_pz_beta",
+        "z_px_beta",
+        "z_py_beta",
     ],
     l_max=l_max,
 )
@@ -122,7 +126,7 @@ psi_t0[0] /= np.sqrt(quadrature(weights, np.abs(psi_t0[0]) ** 2))
 t_cycle = 2 * np.pi / omega
 tfinal = ncycles * t_cycle
 
-a_field_x = square_velocity_first(
+a_field = square_velocity_first(
     field_strength=E0, omega=omega, ncycles=ncycles, phase=-np.pi / 2
 )
 
@@ -136,42 +140,75 @@ H0_psi = H0Psi(
 Vt_psi_Ex_ky = V_psi_velocity_first(
     angular_matrix_elements,
     radial_matrix_elements,
-    a_field_x=a_field_x,
+    a_field_x=a_field,
     k_y=k_y,
 )
 
 Vt_psi_Ex_kz = V_psi_velocity_first(
     angular_matrix_elements,
     radial_matrix_elements,
-    a_field_x=a_field_x,
+    a_field_x=a_field,
     k_z=k_y,
 )
 
 Vt_psi_Ey_kx = V_psi_velocity_first(
     angular_matrix_elements,
     radial_matrix_elements,
-    a_field_y=a_field_x,
+    a_field_y=a_field,
     k_x=k_y,
+)
+
+Vt_psi_Ey_kz = V_psi_velocity_first(
+    angular_matrix_elements,
+    radial_matrix_elements,
+    a_field_y=a_field,
+    k_z=k_y,
+)
+
+Vt_psi_Ez_kx = V_psi_velocity_first(
+    angular_matrix_elements,
+    radial_matrix_elements,
+    a_field_z=a_field,
+    k_x=k_y,
+)
+
+Vt_psi_Ez_ky = V_psi_velocity_first(
+    angular_matrix_elements,
+    radial_matrix_elements,
+    a_field_z=a_field,
+    k_y=k_y,
 )
 
 rhs_Ex_ky = HtPsi(
     angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi_Ex_ky]
 )
+
 rhs_Ex_kz = HtPsi(
     angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi_Ex_kz]
 )
+
 rhs_Ey_kx = HtPsi(
     angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi_Ey_kx]
 )
 
+rhs_Ey_kz = HtPsi(
+    angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi_Ey_kz]
+)
+
+rhs_Ez_kx = HtPsi(
+    angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi_Ez_kx]
+)
+
+rhs_Ez_ky = HtPsi(
+    angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi_Ez_ky]
+)
+
 
 propagator = BiCGstab(radial_matrix_elements, angular_matrix_elements)
+conv_tol = 1e-8
 
-dat_Ex_ky = propagator.run(rhs_Ex_ky, psi_t0, mask_r, tfinal, dt)
-dat_Ex_kz = propagator.run(rhs_Ex_kz, psi_t0, mask_r, tfinal, dt)
-dat_Ey_kx = propagator.run(rhs_Ey_kx, psi_t0, mask_r, tfinal, dt)
-
-time_points = dat_Ex_ky["time_points"]
+dat_Ex_ky = propagator.run(rhs_Ex_ky, psi_t0, mask_r, tfinal, dt, conv_tol=conv_tol)
+dat_Ex_kz = propagator.run(rhs_Ex_kz, psi_t0, mask_r, tfinal, dt, conv_tol=conv_tol)
 
 expec_x_Ex_ky = dat_Ex_ky["expec_x"]
 expec_y_Ex_ky = dat_Ex_ky["expec_y"]
@@ -181,28 +218,35 @@ expec_x_Ex_kz = dat_Ex_kz["expec_x"]
 expec_y_Ex_kz = dat_Ex_kz["expec_y"]
 expec_z_Ex_kz = dat_Ex_kz["expec_z"]
 
+assert np.linalg.norm(expec_x_Ex_ky - expec_x_Ex_kz) < conv_tol
+assert np.linalg.norm(expec_y_Ex_ky - expec_z_Ex_kz) < conv_tol
+
+dat_Ey_kx = propagator.run(rhs_Ey_kx, psi_t0, mask_r, tfinal, dt, conv_tol=conv_tol)
+dat_Ey_kz = propagator.run(rhs_Ey_kz, psi_t0, mask_r, tfinal, dt, conv_tol=conv_tol)
+
+time_points = dat_Ey_kx["time_points"]
 expec_x_Ey_kx = dat_Ey_kx["expec_x"]
 expec_y_Ey_kx = dat_Ey_kx["expec_y"]
 expec_z_Ey_kx = dat_Ey_kx["expec_z"]
 
-assert np.linalg.norm(expec_x_Ex_ky - expec_y_Ey_kx) < 1e-8
-assert np.linalg.norm(expec_y_Ex_ky - expec_x_Ey_kx) < 1e-8
-assert np.linalg.norm(expec_y_Ex_ky - expec_z_Ex_kz) < 1e-8
+expec_x_Ey_kz = dat_Ey_kz["expec_x"]
+expec_y_Ey_kz = dat_Ey_kz["expec_y"]
+expec_z_Ey_kz = dat_Ey_kz["expec_z"]
 
-from matplotlib import pyplot as plt
+assert np.max(np.abs(expec_y_Ey_kx - expec_y_Ey_kz)) < conv_tol
+assert np.max(np.abs(expec_x_Ey_kx - expec_z_Ey_kz)) < conv_tol
 
-plt.figure()
-plt.subplot(311)
-plt.plot(time_points, expec_x_Ex_ky.real)
-plt.plot(time_points, expec_y_Ey_kx.real, linestyle="dashed")
-plt.grid()
-plt.subplot(312)
-plt.plot(time_points, expec_y_Ex_ky.real)
-plt.plot(time_points, expec_x_Ey_kx.real, linestyle="dashed")
-plt.plot(time_points, expec_z_Ex_kz.real, linestyle="dotted")
-plt.grid()
-plt.subplot(313)
-plt.plot(time_points, expec_z_Ex_ky.real)
-plt.plot(time_points, expec_z_Ey_kx.real, linestyle="dashed")
-plt.grid()
-plt.show()
+dat_Ez_kx = propagator.run(rhs_Ez_kx, psi_t0, mask_r, tfinal, dt, conv_tol=conv_tol)
+dat_Ez_ky = propagator.run(rhs_Ez_ky, psi_t0, mask_r, tfinal, dt, conv_tol=conv_tol)
+
+time_points = dat_Ez_kx["time_points"]
+expec_x_Ez_kx = dat_Ez_kx["expec_x"]
+expec_y_Ez_kx = dat_Ez_kx["expec_y"]
+expec_z_Ez_kx = dat_Ez_kx["expec_z"]
+
+expec_x_Ez_ky = dat_Ez_ky["expec_x"]
+expec_y_Ez_ky = dat_Ez_ky["expec_y"]
+expec_z_Ez_ky = dat_Ez_ky["expec_z"]
+
+assert np.max(np.abs(expec_z_Ez_kx - expec_z_Ez_ky)) < conv_tol
+assert np.max(np.abs(expec_x_Ez_kx - expec_y_Ez_ky)) < conv_tol
