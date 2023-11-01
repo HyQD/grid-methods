@@ -251,6 +251,25 @@ class AngularMatrixElements:
 
         return integral
 
+    def l1m1_y_pz_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
+
+        sinth_ddtheta_l2m2 = (
+            m2 * self.cos_th * sph_harm(m2, l2, self.phi, self.theta)
+        )
+        if np.abs(m2 + 1) <= l2:
+            sinth_ddtheta_l2m2 += (
+                np.sqrt((l2 - m2) * (l2 + m2 + 1))
+                * self.sin_th
+                * self.exp_m1j_p
+                * sph_harm(m2 + 1, l2, self.phi, self.theta)
+            )
+
+        integrand = -sinth_ddtheta_l2m2
+        ###############################################################################
+        integrand *= Yl1m1_cc * self.sin_th * self.sin_ph
+        integral = np.sum(4 * np.pi * self.weights * integrand)
+        return integral
+
     def l1m1_z_px_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
         ###############################################################################
         """ """
@@ -327,6 +346,25 @@ class AngularMatrixElements:
 
         integral = np.sum(4 * np.pi * self.weights * integrand)
 
+        return integral
+
+    def l1m1_x_pz_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
+
+        sinth_ddtheta_l2m2 = (
+            m2 * self.cos_th * sph_harm(m2, l2, self.phi, self.theta)
+        )
+        if np.abs(m2 + 1) <= l2:
+            sinth_ddtheta_l2m2 += (
+                np.sqrt((l2 - m2) * (l2 + m2 + 1))
+                * self.sin_th
+                * self.exp_m1j_p
+                * sph_harm(m2 + 1, l2, self.phi, self.theta)
+            )
+
+        integrand = -sinth_ddtheta_l2m2
+        ###############################################################################
+        integrand *= Yl1m1_cc * self.sin_th * self.cos_ph
+        integral = np.sum(4 * np.pi * self.weights * integrand)
         return integral
 
     def l1m1_z_py_l2m2(self, Yl1m1_cc, Yl2m2, l1, m1, l2, m2):
@@ -595,12 +633,28 @@ class AngularMatrixElements_lm(AngularMatrixElements):
                                     - self.arr["y_x_Omega"][I, J]
                                 )
 
+                            if arr_to_calc_dict["y_pz_beta"]:
+                                self.arr["y_pz_beta"][I, J] = (
+                                    self.l1m1_y_pz_l2m2(
+                                        Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                    )
+                                    - self.arr["z_y_Omega"][I, J]
+                                )
+
                             if arr_to_calc_dict["x_py_beta"]:
                                 self.arr["x_py_beta"][I, J] = (
                                     self.l1m1_x_py_l2m2(
                                         Yl1m1_cc, Yl2m2, l1, m1, l2, m2
                                     )
                                     - self.arr["y_x_Omega"][I, J]
+                                )
+
+                            if arr_to_calc_dict["x_pz_beta"]:
+                                self.arr["x_pz_beta"][I, J] = (
+                                    self.l1m1_x_pz_l2m2(
+                                        Yl1m1_cc, Yl2m2, l1, m1, l2, m2
+                                    )
+                                    - self.arr["z_x_Omega"][I, J]
                                 )
 
                             if arr_to_calc_dict["z_py_beta"]:
@@ -1056,9 +1110,11 @@ def setup_lm_arr_to_calc(arr_to_calc_list=[]):
         "z_x_Omega": False,
         "z_y_Omega": False,
         "x_py_beta": False,
-        "z_py_beta": False,
+        "x_pz_beta": False,
         "y_px_beta": False,
+        "y_pz_beta": False,
         "z_px_beta": False,
+        "z_py_beta": False,
         "H_Bz_Omega": False,
     }
 
