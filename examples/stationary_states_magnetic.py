@@ -89,7 +89,7 @@ for m in m_list:
     # Print binding energy as defined in Ref.[1] and groundstate energy.
     # The resulting binding energies for m=0,-1,-2 and B=1.0 are in reasonable agreement with
     # the values reported in Ref.[1] (Table 1,2, and 3).
-    print(f"Lowest eigenvalue (l=0,m={m}): {eps[0]}")
-    print(f"Binding energy    (l=0,m={m}): {0.5 * B * (abs(m) + m + 1) - eps[0]}")
+    print(f"Lowest eigenvalue m={m}: {eps[0]}")
+    print(f"Binding energy    m={m}: {0.5 * B * (abs(m) + m + 1) - eps[0]}")
     print()
     
