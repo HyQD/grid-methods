@@ -23,10 +23,6 @@ from grid_methods.spherical_coordinates.lasers import (
 
 
 from grid_methods.spherical_coordinates.utils import mask_function
-from grid_methods.spherical_coordinates.Hpsi_components import (
-    H0_psi,
-)
-
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
 
 from grid_methods.spherical_coordinates.rhs import (
@@ -55,7 +51,7 @@ from grid_methods.spherical_coordinates.ground_state import compute_ground_state
 # pulse inputs
 E0 = 0.03
 omega = 0.057
-ncycles = 3
+ncycles = 1
 dt = 0.25
 speed_of_light = 137
 k_y = omega / speed_of_light
@@ -143,8 +139,8 @@ H0_psi = H0Psi(
 Vt_psi = V_psi_velocity_first(
     angular_matrix_elements,
     radial_matrix_elements,
-    a_field_y=a_field_x,
-    k_x=k_y,
+    a_field_x=a_field_x,
+    k_y=k_y,
 )
 
 rhs = HtPsi(angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi])
@@ -193,12 +189,21 @@ for i in tqdm.tqdm(range(num_steps - 1)):
     expec_py[i + 1] = expec_p_i(psi_t, dpsi_t_dr, weights, r, y_Omega, H_y_beta)
 
 
-samples = {
-    "time_points": time_points,
-    "expec_x": expec_x,
-    "expec_px": expec_px,
-    "expec_y": expec_y,
-    "expec_py": expec_py,
-}
+from matplotlib import pyplot as plt
 
-np.savez("output_velocity_first_order", **samples)
+plt.figure()
+plt.plot(time_points, expec_x.real)
+
+plt.figure()
+plt.plot(time_points, expec_px.real)
+
+plt.show()
+# samples = {
+#    "time_points": time_points,
+#    "expec_x": expec_x,
+#    "expec_px": expec_px,
+#    "expec_y": expec_y,
+#    "expec_py": expec_py,
+# }
+
+# np.savez("output_velocity_first_order", **samples)
