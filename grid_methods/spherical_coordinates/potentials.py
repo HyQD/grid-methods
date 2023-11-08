@@ -10,6 +10,15 @@ class Coulomb:
         return -self.Z / r
 
 
+class Gaussian:
+    def __init__(self, V0, alpha):
+        self.V0 = V0
+        self.alpha = alpha
+
+    def __call__(self, r):
+        return -self.V0 * np.exp(-alpha * r**2)
+
+
 class Gaussian_charge_distribution:
     def __init__(self, mu):
         self.mu = mu
@@ -41,5 +50,9 @@ class SAE:
         return (
             -1
             / r
-            * (1 + self.A * np.exp(-r) + (self.Z - 1 - self.A) * np.exp(-self.B * r))
+            * (
+                1
+                + self.A * np.exp(-r)
+                + (self.Z - 1 - self.A) * np.exp(-self.B * r)
+            )
         )
