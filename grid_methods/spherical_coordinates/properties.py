@@ -33,7 +33,7 @@ def expec_p_i(psi, dpsi_dr, weights, r, xi_Omega, H_xi_beta):
     return expec_pi
 
 
-def norm(psi, weights):
+def compute_norm(psi, weights):
     n_lm = psi.shape[0]
     norm = 0 + 0j
     for I in range(n_lm):
@@ -41,7 +41,7 @@ def norm(psi, weights):
     return norm
 
 
-def compute_ionization_probability(psi, r, radius=20):
+def compute_ionization_probability(psi, r, radius=20, weights):
     """
     Here the (single) ionization probaility is taken as the probability of finding an electron outside a sphere
     of a given radius.
