@@ -496,7 +496,7 @@ class AngularMatrixElements_l(AngularMatrixElements):
         super().__init__(l_max, N)
 
         self.n_lm = l_max + 1
-        self.lm_I, self.I_lm = setup_lm_index_mapping_l(l_max)
+        self.lm_I, self.I_lm = setup_lm_index_mapping_l(l_max, m)
         self.m = m
 
         for el in arr_to_calc:
@@ -519,27 +519,30 @@ class AngularMatrixElements_l(AngularMatrixElements):
                         l1, m, l2, m
                     )
                 if arr_to_calc_dict["H_z_beta"] and arr_to_calc_dict["z_Omega"]:
-                    self.arr["H_z_beta"][l1, l2] = (
-                        -self.l1m1_sinth_ddtheta_l2m2(l1, m, l2, m)
-                        - self.arr["z_Omega"][l1, l2]
-                    )
+                    if abs(m) <= l1 and abs(m) <= l2:
+                        self.arr["H_z_beta"][l1, l2] = (
+                            -self.l1m1_sinth_ddtheta_l2m2(l1, m, l2, m)
+                            - self.arr["z_Omega"][l1, l2]
+                        )
                 elif (
                     arr_to_calc_dict["H_z_beta"]
                     and arr_to_calc_dict["z_Omega"] == False
                 ):
-                    self.arr["H_z_beta"][
-                        l1, l2
-                    ] = -self.l1m1_sinth_ddtheta_l2m2(
-                        l1, m, l2, m
-                    ) - self.l1m1_costh_l2m2(
-                        l1, m, l2, m
-                    )
+                    if abs(m) <= l1 and abs(m) <= l2:
+                        self.arr["H_z_beta"][
+                            l1, l2
+                        ] = -self.l1m1_sinth_ddtheta_l2m2(
+                            l1, m, l2, m
+                        ) - self.l1m1_costh_l2m2(
+                            l1, m, l2, m
+                        )
                 if arr_to_calc_dict["H_Bz_Omega"]:
-                    self.arr["H_Bz_Omega"][
-                        l1, l2
-                    ] = self.l1m1_sinth_sq_l2m2_Lebedev(
-                        Yl1m_cc, Yl2m, l1, m, l2, m
-                    )
+                    if abs(m) <= l1 and abs(m) <= l2:
+                        self.arr["H_Bz_Omega"][
+                            l1, l2
+                        ] = self.l1m1_sinth_sq_l2m2_Lebedev(
+                            Yl1m_cc, Yl2m, l1, m, l2, m
+                        )
 
 
 class AngularMatrixElements_lm(AngularMatrixElements):
