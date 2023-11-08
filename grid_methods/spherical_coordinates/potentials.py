@@ -16,7 +16,7 @@ class Gaussian:
         self.alpha = alpha
 
     def __call__(self, r):
-        return -self.V0 * np.exp(-alpha * r**2)
+        return -self.V0 * np.exp(-self.alpha * r**2)
 
 
 class Gaussian_charge_distribution:
