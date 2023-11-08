@@ -20,9 +20,6 @@ from grid_methods.spherical_coordinates.lasers import (
     square_velocity_first,
 )
 from grid_methods.spherical_coordinates.utils import mask_function
-from grid_methods.spherical_coordinates.Hpsi_components import (
-    H0_psi,
-)
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
 from grid_methods.spherical_coordinates.rhs import (
     H0Psi,

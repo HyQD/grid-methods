@@ -26,10 +26,6 @@ from grid_methods.spherical_coordinates.lasers import (
 
 
 from grid_methods.spherical_coordinates.utils import mask_function
-from grid_methods.spherical_coordinates.Hpsi_components import (
-    H0_psi,
-)
-
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
 
 from grid_methods.spherical_coordinates.rhs import (
@@ -125,11 +121,19 @@ psi0 = psi_t[0].copy()
 t_cycle = 2 * np.pi / omega
 tfinal = ncycles * t_cycle
 
-a_field_z_p = square_velocity_exp_p(field_strength=E0, omega=omega, ncycles=ncycles)
-a_field_z_m = square_velocity_exp_m(field_strength=E0, omega=omega, ncycles=ncycles)
+a_field_z_p = square_velocity_exp_p(
+    field_strength=E0, omega=omega, ncycles=ncycles
+)
+a_field_z_m = square_velocity_exp_m(
+    field_strength=E0, omega=omega, ncycles=ncycles
+)
 
-a_field2_z_p = square_velocity_exp2_p(field_strength=E0, omega=omega, ncycles=ncycles)
-a_field2_z_m = square_velocity_exp2_m(field_strength=E0, omega=omega, ncycles=ncycles)
+a_field2_z_p = square_velocity_exp2_p(
+    field_strength=E0, omega=omega, ncycles=ncycles
+)
+a_field2_z_m = square_velocity_exp2_m(
+    field_strength=E0, omega=omega, ncycles=ncycles
+)
 
 
 # # sampling arrays

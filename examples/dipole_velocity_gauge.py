@@ -22,10 +22,6 @@ from grid_methods.spherical_coordinates.lasers import (
 
 
 from grid_methods.spherical_coordinates.utils import mask_function
-from grid_methods.spherical_coordinates.Hpsi_components import (
-    H0_psi,
-)
-
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
 
 from grid_methods.spherical_coordinates.rhs import (
@@ -43,7 +39,11 @@ from grid_methods.spherical_coordinates.utils import (
     quadrature,
 )
 
-from grid_methods.spherical_coordinates.properties import expec_x_i, expec_p_i
+from grid_methods.spherical_coordinates.properties import (
+    expec_x_i,
+    expec_p_i,
+    norm,
+)
 
 from grid_methods.spherical_coordinates.ground_state import compute_ground_state
 
@@ -53,14 +53,14 @@ from grid_methods.spherical_coordinates.ground_state import compute_ground_state
 # pulse inputs
 E0 = 0.03
 omega = 0.057
-ncycles = 3
+ncycles = 1
 dt = 0.25
 
 # grid inputs
 N = 200
 nr = N - 1
 r_max = 100
-l_max = 3
+l_max = 20
 alpha = 0.4
 
 ### SETUP ########################
@@ -111,9 +111,9 @@ num_steps = int(tfinal / dt) + 1
 time_points = np.linspace(0, tfinal, num_steps)
 expec_z = np.zeros(num_steps, dtype=np.complex128)
 expec_pz = np.zeros(num_steps, dtype=np.complex128)
-
+norm_t = np.zeros(num_steps, dtype=np.complex128)
+norm_t[0] = norm(psi_t, weights)
 nr_its_conv = np.zeros(num_steps - 1)
-
 
 # right-hand side
 H0_psi = H0Psi(
@@ -165,8 +165,26 @@ for i in tqdm.tqdm(range(num_steps - 1)):
 
     expec_z[i + 1] = expec_x_i(psi_t, weights, r, z_Omega)
     expec_pz[i + 1] = expec_p_i(psi_t, dpsi_t_dr, weights, r, z_Omega, H_z_beta)
+    norm_t[i + 1] = norm(psi_t, weights)
 
 
-samples = {"time_points": time_points, "expec_z": expec_z, "expec_pz": expec_pz}
+from matplotlib import pyplot as plt
 
-np.savez("output_velocity_gauge", **samples)
+plt.figure()
+plt.plot(time_points, expec_z.real)
+
+plt.figure()
+plt.subplot(211)
+plt.plot(time_points, expec_pz.real)
+plt.plot(time_points, a_field_z(time_points))
+plt.subplot(212)
+plt.plot(time_points, expec_pz.real + a_field_z(time_points) * norm_t.real)
+
+plt.figure()
+plt.plot(time_points, norm_t.real)
+
+plt.show()
+
+
+# samples = {"time_points": time_points, "expec_z": expec_z, "expec_pz": expec_pz}
+# np.savez("output_velocity_gauge", **samples)

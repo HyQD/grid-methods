@@ -20,35 +20,24 @@ import tqdm
 from opt_einsum import contract
 from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab
 from grid_methods.spherical_coordinates.utils import mask_function
-from grid_methods.spherical_coordinates.Hpsi_components import (
-    H0_psi,
-    pz_psi,
-)
-
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
-
 from grid_methods.spherical_coordinates.rhs import (
     H0Psi,
     HtPsi,
 )
-
 from grid_methods.spherical_coordinates.time_dependent_field_interaction import (
     V_psi_length_z,
     V_psi_length,
     V_psi_velocity,
 )
-
 from opt_einsum import contract
-
 from grid_methods.spherical_coordinates.utils import (
     Counter,
     quadrature,
 )
-
 from grid_methods.spherical_coordinates.properties import (
     expec_x_i,
 )
-
 from grid_methods.spherical_coordinates.ground_state import compute_ground_state
 
 
@@ -82,7 +71,9 @@ D1 = radial_matrix_elements.D1
 T_D2 = -(1 / 2) * radial_matrix_elements.D2
 
 # setup angular matrix elements
-angular_matrix_elements = AngularMatrixElements_l(arr_to_calc=["z_Omega"], l_max=l_max)
+angular_matrix_elements = AngularMatrixElements_l(
+    arr_to_calc=["z_Omega"], l_max=l_max
+)
 # angular_matrix_elements = AngularMatrixElements_lm(arr_to_calc=["z_Omega"], l_max=l_max)
 n_lm = angular_matrix_elements.n_lm
 
@@ -129,7 +120,9 @@ H0_psi = H0Psi(
     potential,
 )
 
-Vt_psi = V_psi_length_z(angular_matrix_elements, radial_matrix_elements, e_field_z)
+Vt_psi = V_psi_length_z(
+    angular_matrix_elements, radial_matrix_elements, e_field_z
+)
 # Vt_psi = V_psi_length(angular_matrix_elements, radial_matrix_elements, e_field_z=e_field_z)
 
 rhs = HtPsi(angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi])
