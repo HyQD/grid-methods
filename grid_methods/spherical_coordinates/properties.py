@@ -41,7 +41,7 @@ def compute_norm(psi, weights):
     return norm
 
 
-def compute_ionization_probability(psi, r, radius=20, weights):
+def compute_ionization_probability(psi, weights, r, radius=20):
     """
     Here the (single) ionization probaility is taken as the probability of finding an electron outside a sphere
     of a given radius.
