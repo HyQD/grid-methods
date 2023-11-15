@@ -17,9 +17,7 @@ from grid_methods.spherical_coordinates.Hpsi_components import (
 
 
 class V_psi_length_z(VPsi):
-    def __init__(
-        self, angular_matrix_elements, radial_matrix_elements, e_field_z
-    ):
+    def __init__(self, angular_matrix_elements, radial_matrix_elements, e_field_z):
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
@@ -295,17 +293,10 @@ class V_psi_velocity_first(VPsi):
                 psi_new += (
                     A2_x_t
                     * self.k_y
-                    * y_px_psi(
-                        psi, dpsi_dr, self.y_x_Omega, self.y_px_beta, self.r
-                    )
+                    * y_px_psi(psi, dpsi_dr, self.y_x_Omega, self.y_px_beta, self.r)
                 )
 
-                psi_new += (
-                    A1_x_t
-                    * A2_x_t
-                    * self.k_y
-                    * y_psi(psi, self.y_Omega, self.r)
-                )
+                psi_new += A1_x_t * A2_x_t * self.k_y * y_psi(psi, self.y_Omega, self.r)
                 psi_new += (
                     0.5
                     * A2_x_t**2
@@ -316,17 +307,10 @@ class V_psi_velocity_first(VPsi):
                 psi_new += (
                     A2_x_t
                     * self.k_z
-                    * y_px_psi(
-                        psi, dpsi_dr, self.z_x_Omega, self.z_px_beta, self.r
-                    )
+                    * y_px_psi(psi, dpsi_dr, self.z_x_Omega, self.z_px_beta, self.r)
                 )
 
-                psi_new += (
-                    A1_x_t
-                    * A2_x_t
-                    * self.k_z
-                    * y_psi(psi, self.z_Omega, self.r)
-                )
+                psi_new += A1_x_t * A2_x_t * self.k_z * y_psi(psi, self.z_Omega, self.r)
                 psi_new += (
                     0.5
                     * A2_x_t**2
@@ -350,9 +334,7 @@ class V_psi_velocity_first(VPsi):
                     * y_px_psi(psi, dpsi_dr, self.x_y_Omega, self.x_py_beta, self.r)
                 )
 
-                psi_new += (
-                    A1_y_t * A2_y_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
-                )
+                psi_new += A1_y_t * A2_y_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
                 psi_new += (
                     0.5
                     * A2_y_t**2
@@ -360,22 +342,14 @@ class V_psi_velocity_first(VPsi):
                     * y_y_psi(psi, self.x_x_Omega, self.r)
                 )
 
-            
             if self.z_propagation:
                 psi_new += (
                     A2_y_t
                     * self.k_z
-                    * y_px_psi(
-                        psi, dpsi_dr, self.z_y_Omega, self.z_py_beta, self.r
-                    )
+                    * y_px_psi(psi, dpsi_dr, self.z_y_Omega, self.z_py_beta, self.r)
                 )
 
-                psi_new += (
-                    A1_y_t
-                    * A2_y_t
-                    * self.k_z
-                    * y_psi(psi, self.z_Omega, self.r)
-                )
+                psi_new += A1_y_t * A2_y_t * self.k_z * y_psi(psi, self.z_Omega, self.r)
                 psi_new += (
                     0.5
                     * A2_y_t**2
@@ -400,9 +374,7 @@ class V_psi_velocity_first(VPsi):
                     * y_px_psi(psi, dpsi_dr, self.x_z_Omega, self.x_pz_beta, self.r)
                 )
 
-                psi_new += (
-                    A1_z_t * A2_z_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
-                )
+                psi_new += A1_z_t * A2_z_t * self.k_x * y_psi(psi, self.x_Omega, self.r)
                 psi_new += (
                     0.5
                     * A2_z_t**2
@@ -414,17 +386,10 @@ class V_psi_velocity_first(VPsi):
                 psi_new += (
                     A2_z_t
                     * self.k_y
-                    * y_px_psi(
-                        psi, dpsi_dr, self.y_z_Omega, self.y_pz_beta, self.r
-                    )
+                    * y_px_psi(psi, dpsi_dr, self.y_z_Omega, self.y_pz_beta, self.r)
                 )
 
-                psi_new += (
-                    A1_z_t
-                    * A2_z_t
-                    * self.k_y
-                    * y_psi(psi, self.y_Omega, self.r)
-                )
+                psi_new += A1_z_t * A2_z_t * self.k_y * y_psi(psi, self.y_Omega, self.r)
                 psi_new += (
                     0.5
                     * A2_z_t**2
@@ -432,7 +397,99 @@ class V_psi_velocity_first(VPsi):
                     * y_y_psi(psi, self.y_y_Omega, self.r)
                 )
 
-            
+        if ravel:
+            return psi_new.ravel()
+        else:
+            return psi_new
+
+
+class V_psi_full_orders(VPsi):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        a_field_z_p,
+        a_field_z_m,
+        a_field2_z_p,
+        a_field2_z_m,
+        NL,
+    ):
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            a_field_z_p=a_field_z_p,
+            a_field_z_m=a_field_z_m,
+            a_field2_z_p=a_field2_z_p,
+            a_field2_z_m=a_field2_z_m,
+            NL=NL,
+        )
+
+        self.D1 = radial_matrix_elements.D1
+        self.r = radial_matrix_elements.r
+        self.nr = radial_matrix_elements.nr
+        self.n_lm = angular_matrix_elements.n_lm
+
+        self.sph_jn = self.angular_matrix_elements.sph_jn
+        self.sph_jn2 = self.angular_matrix_elements.sph_jn2
+
+        self.arr_contr_with_ddr_p = angular_matrix_elements("expkr_costh")
+        self.arr_contr_with_ddr_m = self.arr_contr_with_ddr_p.conj()
+        self.arr_contr_with_r_p = (
+            angular_matrix_elements("expkr_sinth_ddtheta") + self.arr_contr_with_ddr_p
+        )
+        self.arr_contr_with_r_m = self.arr_contr_with_r_p.conj()
+
+        self.expkr2_p = self.angular_matrix_elements("expkr2")
+        self.expkr2_m = self.expkr2_p.conj()
+
+    def __call__(self, psi, t, ravel=True):
+        psi = psi.reshape((self.n_lm, self.nr))
+        psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
+
+        for L in range(self.NL):
+            sph_jn = self.sph_jn[L, :]
+            sph_jn2 = self.sph_jn2[L, :]
+
+            dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
+            dpsi_dr_sph_jn = contract("k, Ik->Ik", sph_jn, dpsi_dr)
+
+            psi_new -= (
+                (1j / 2)
+                * self.a_field_z_m(t)
+                * contract("IJ, Jk->Ik", self.arr_contr_with_ddr_p[L], dpsi_dr_sph_jn)
+            )
+            psi_new -= (
+                (1j / 2)
+                * self.a_field_z_p(t)
+                * contract("IJ, Jk->Ik", self.arr_contr_with_ddr_m[L], dpsi_dr_sph_jn)
+            )
+
+            psi_r = contract("k, Ik->Ik", 1 / self.r, psi)
+            psi_r_sph_jn = contract("k, Ik->Ik", sph_jn, psi_r)
+
+            psi_new += (
+                (1j / 2)
+                * self.a_field_z_m(t)
+                * contract("IJ, Jk->Ik", self.arr_contr_with_r_p[L], psi_r_sph_jn)
+            )
+            psi_new += (
+                (1j / 2)
+                * self.a_field_z_p(t)
+                * contract("IJ, Jk->Ik", self.arr_contr_with_r_m[L], psi_r_sph_jn)
+            )
+
+            psi_sph_jn2 = contract("k, Ik->Ik", sph_jn2, psi)
+
+            psi_new += (
+                (1 / 8)
+                * self.a_field2_z_m(t)
+                * contract("IJ, Jk->Ik", self.expkr2_p[L], psi_sph_jn2)
+            )
+            psi_new += (
+                (1 / 8)
+                * self.a_field2_z_p(t)
+                * contract("IJ, Jk->Ik", self.expkr2_m[L], psi_sph_jn2)
+            )
 
         if ravel:
             return psi_new.ravel()
@@ -508,14 +565,10 @@ class V_psi_full(VPsi):
         )
 
         psi_new += (
-            (1 / 8)
-            * self.a_field2_z_m(t)
-            * contract("IJk, Jk->Ik", self.expkr2_p, psi)
+            (1 / 8) * self.a_field2_z_m(t) * contract("IJk, Jk->Ik", self.expkr2_p, psi)
         )
         psi_new += (
-            (1 / 8)
-            * self.a_field2_z_p(t)
-            * contract("IJk, Jk->Ik", self.expkr2_m, psi)
+            (1 / 8) * self.a_field2_z_p(t) * contract("IJk, Jk->Ik", self.expkr2_m, psi)
         )
 
         if ravel:
@@ -605,8 +658,7 @@ class V_psi_full_z(V_psi_full):
         arr_contr_with_ddr_p = angular_matrix_elements("expkr_costh")
         arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
         arr_contr_with_r_p = (
-            angular_matrix_elements("expkr_sinth_ddtheta")
-            + arr_contr_with_ddr_p
+            angular_matrix_elements("expkr_sinth_ddtheta") + arr_contr_with_ddr_p
         )
         arr_contr_with_r_m = arr_contr_with_r_p.conj()
         super().__init__(
