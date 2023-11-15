@@ -63,12 +63,11 @@ N = 200
 nr = N - 1
 r_max = 100
 l_max = 3
-alpha = 0.4
 
 ### SETUP ########################
 
 # setup Legendre-Lobatto grid
-gll = GaussLegendreLobatto(N, Rational_map(r_max=r_max, alpha=alpha))
+gll = GaussLegendreLobatto(N, Linear_map(r_max=r_max))
 weights = gll.weights
 
 # setup radial matrix elements
