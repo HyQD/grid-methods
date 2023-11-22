@@ -15,6 +15,8 @@ from grid_methods.spherical_coordinates.Hpsi_components import (
     y_px_psi,
 )
 
+import time
+
 
 class V_psi_length_z(VPsi):
     def __init__(self, angular_matrix_elements, radial_matrix_elements, e_field_z):
@@ -225,7 +227,6 @@ class V_psi_velocity_first(VPsi):
         self.z_propagation = False if k_z is None else True
 
         if self.x_polarized:
-
             self.x_Omega = self.angular_matrix_elements("x_Omega")
             self.H_x_beta = self.angular_matrix_elements("H_x_beta")
 
@@ -242,7 +243,6 @@ class V_psi_velocity_first(VPsi):
                 self.z_px_beta = self.angular_matrix_elements("z_px_beta")
 
         if self.y_polarized:
-
             self.y_Omega = self.angular_matrix_elements("y_Omega")
             self.H_y_beta = self.angular_matrix_elements("H_y_beta")
 
@@ -259,7 +259,6 @@ class V_psi_velocity_first(VPsi):
                 self.z_py_beta = self.angular_matrix_elements("z_py_beta")
 
         if self.z_polarized:
-
             self.z_Omega = self.angular_matrix_elements("z_Omega")
             self.H_z_beta = self.angular_matrix_elements("H_z_beta")
 
@@ -282,7 +281,6 @@ class V_psi_velocity_first(VPsi):
         dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
 
         if self.x_polarized:
-
             A1_x_t, A2_x_t = self.a_field_x(t)
             psi_new += A1_x_t * px_psi(
                 psi, dpsi_dr, self.x_Omega, self.H_x_beta, self.r_inv
@@ -358,7 +356,6 @@ class V_psi_velocity_first(VPsi):
                 )
 
         if self.z_polarized:
-
             A1_z_t, A2_z_t = self.a_field_z(t)
 
             psi_new += A1_z_t * px_psi(
@@ -453,43 +450,31 @@ class V_psi_full_orders(VPsi):
             dpsi_dr = contract("ij, Ij->Ii", self.D1, psi)
             dpsi_dr_sph_jn = contract("k, Ik->Ik", sph_jn, dpsi_dr)
 
-            psi_new -= (
-                (1j / 2)
-                * self.a_field_z_m(t)
-                * contract("IJ, Jk->Ik", self.arr_contr_with_ddr_p[L], dpsi_dr_sph_jn)
+            arr_contr_with_ddr = (1j / 2) * (
+                self.a_field_z_m(t) * self.arr_contr_with_ddr_p[L]
+                + self.a_field_z_p(t) * self.arr_contr_with_ddr_m[L]
             )
-            psi_new -= (
-                (1j / 2)
-                * self.a_field_z_p(t)
-                * contract("IJ, Jk->Ik", self.arr_contr_with_ddr_m[L], dpsi_dr_sph_jn)
-            )
+
+            psi_new -= contract("IJ, Jk->Ik", arr_contr_with_ddr, dpsi_dr_sph_jn)
 
             psi_r = contract("k, Ik->Ik", 1 / self.r, psi)
             psi_r_sph_jn = contract("k, Ik->Ik", sph_jn, psi_r)
 
-            psi_new += (
-                (1j / 2)
-                * self.a_field_z_m(t)
-                * contract("IJ, Jk->Ik", self.arr_contr_with_r_p[L], psi_r_sph_jn)
+            arr_contr_with_r = (1j / 2) * (
+                self.a_field_z_m(t) * self.arr_contr_with_r_p[L]
+                + self.a_field_z_p(t) * self.arr_contr_with_r_m[L]
             )
-            psi_new += (
-                (1j / 2)
-                * self.a_field_z_p(t)
-                * contract("IJ, Jk->Ik", self.arr_contr_with_r_m[L], psi_r_sph_jn)
-            )
+
+            psi_new += contract("IJ, Jk->Ik", arr_contr_with_r, psi_r_sph_jn)
 
             psi_sph_jn2 = contract("k, Ik->Ik", sph_jn2, psi)
 
-            psi_new += (
-                (1 / 8)
-                * self.a_field2_z_m(t)
-                * contract("IJ, Jk->Ik", self.expkr2_p[L], psi_sph_jn2)
+            arr_contr = (1 / 8) * (
+                self.a_field2_z_m(t) * self.expkr2_p[L]
+                + self.a_field2_z_p(t) * self.expkr2_m[L]
             )
-            psi_new += (
-                (1 / 8)
-                * self.a_field2_z_p(t)
-                * contract("IJ, Jk->Ik", self.expkr2_m[L], psi_sph_jn2)
-            )
+
+            psi_new += contract("IJ, Jk->Ik", arr_contr, psi_sph_jn2)
 
         if ravel:
             return psi_new.ravel()
