@@ -190,7 +190,7 @@ for i in tqdm.tqdm(range(num_steps - 1)):
         z,
         M=M_linear,
         x0=psi_t.ravel(),
-        tol=1e-10,
+        tol=1e-14,
         callback=local_counter,
     )
     nr_its_conv[i] = local_counter.counter
