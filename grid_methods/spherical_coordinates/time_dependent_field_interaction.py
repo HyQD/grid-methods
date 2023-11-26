@@ -727,3 +727,29 @@ def get_contr_arr_z(angular_matrix_elements):
         arr_contr_with_r_p,
         arr_contr_with_r_m,
     )
+
+
+def contr_expkr_Ax(
+    psi,
+    dpsi_dr,
+    psi_r,
+    psi_r_sph_jn,
+    psi_sph_jn2,
+    angular_matrix_elements,
+    radial_matrix_elements,
+):
+    arr = angular_matrix_elements("expkr_cosph_sinth")
+    return contract("IJ, Jk->Ik", arr, psi_r_sph_jn)
+
+
+def contr_expkr_Ay(
+    psi,
+    dpsi_dr,
+    psi_r,
+    psi_r_sph_jn,
+    psi_sph_jn2,
+    angular_matrix_elements,
+    radial_matrix_elements,
+):
+    arr = angular_matrix_elements("expkr_sinph_sinth")
+    return -contract("IJ, Jk->Ik", arr, psi_r_sph_jn)
