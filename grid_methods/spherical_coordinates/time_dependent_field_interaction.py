@@ -413,6 +413,7 @@ class V_psi_PlaneWaveExpansion(VPsi):
         a_field_z_m,
         a_field2_z_p,
         a_field2_z_m,
+        add_contr_funcs=[],
     ):
         super().__init__(
             angular_matrix_elements,
@@ -438,6 +439,12 @@ class V_psi_PlaneWaveExpansion(VPsi):
         self.expkr2_p = self.angular_matrix_elements("expkr2")
         self.expkr2_m = self.expkr2_p.conj()
 
+        self.add_contr_funcs = add_contr_funcs
+        if len(add_contr_funcs) > 0:
+            self.add_contr = True
+        else:
+            self.add_contr = False
+
 
 class V_psi_full_orders(V_psi_PlaneWaveExpansion):
     def __init__(
@@ -453,6 +460,7 @@ class V_psi_full_orders(V_psi_PlaneWaveExpansion):
         a_field2_z_p,
         a_field2_z_m,
         NL,
+        add_contr_funcs=[],
     ):
         super().__init__(
             angular_matrix_elements,
@@ -465,12 +473,8 @@ class V_psi_full_orders(V_psi_PlaneWaveExpansion):
             a_field_z_m,
             a_field2_z_p,
             a_field2_z_m,
+            add_contr_funcs=add_contr_funcs,
         )
-
-        print(arr_contr_with_ddr_p.shape)
-        print(arr_contr_with_ddr_m.shape)
-        print(arr_contr_with_r_p.shape)
-        print(arr_contr_with_r_m.shape)
 
         self.NL = NL
 
@@ -511,6 +515,18 @@ class V_psi_full_orders(V_psi_PlaneWaveExpansion):
 
             psi_new += contract("IJ, Jk->Ik", arr_contr, psi_sph_jn2)
 
+            if self.add_contr:
+                for el in self.add_contr_functions:
+                    psi_new += el(
+                        psi,
+                        dpsi_dr,
+                        psi_r,
+                        psi_r_sph_jn,
+                        psi_sph_jn2,
+                        self.angular_matrix_elements,
+                        self.radial_matrix_elements,
+                    )
+
         if ravel:
             return psi_new.ravel()
         else:
@@ -530,6 +546,7 @@ class V_psi_full(V_psi_PlaneWaveExpansion):
         a_field_z_m,
         a_field2_z_p,
         a_field2_z_m,
+        add_contr_funcs=[],
     ):
         super().__init__(
             angular_matrix_elements,
@@ -542,6 +559,7 @@ class V_psi_full(V_psi_PlaneWaveExpansion):
             a_field_z_m,
             a_field2_z_p,
             a_field2_z_m,
+            add_contr_funcs=add_contr_funcs,
         )
 
     def __call__(self, psi, t, ravel=True):
