@@ -36,6 +36,7 @@ from grid_methods.spherical_coordinates.rhs import (
 
 from grid_methods.spherical_coordinates.time_dependent_field_interaction import (
     V_psi_full_orders,
+    setup_V_psi_PlaneWaveExpansion,
 )
 
 
@@ -64,7 +65,7 @@ N = 200
 nr = N - 1
 r_max = 100
 l_max = 3
-NL = 1
+NL = 2
 
 ### SETUP ########################
 
@@ -150,13 +151,14 @@ H0_psi = H0Psi(
     potential,
 )
 
-Vt_psi = V_psi_full_orders(
+Vt_psi = setup_V_psi_PlaneWaveExpansion(
     angular_matrix_elements_lmr,
     radial_matrix_elements,
     a_field_z_p=a_field_z_p,
     a_field_z_m=a_field_z_m,
     a_field2_z_p=a_field2_z_p,
     a_field2_z_m=a_field2_z_m,
+    polarization="z",
     NL=NL,
 )
 
