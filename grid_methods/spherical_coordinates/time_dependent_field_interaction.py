@@ -400,25 +400,31 @@ class V_psi_velocity_first(VPsi):
             return psi_new
 
 
-class V_psi_full_orders(VPsi):
+class V_psi_PlaneWaveExpansion(VPsi):
     def __init__(
         self,
         angular_matrix_elements,
         radial_matrix_elements,
+        arr_contr_with_ddr_p,
+        arr_contr_with_ddr_m,
+        arr_contr_with_r_p,
+        arr_contr_with_r_m,
         a_field_z_p,
         a_field_z_m,
         a_field2_z_p,
         a_field2_z_m,
-        NL,
     ):
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
+            arr_contr_with_ddr_p=arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m=arr_contr_with_ddr_m,
+            arr_contr_with_r_p=arr_contr_with_r_p,
+            arr_contr_with_r_m=arr_contr_with_r_m,
             a_field_z_p=a_field_z_p,
             a_field_z_m=a_field_z_m,
             a_field2_z_p=a_field2_z_p,
             a_field2_z_m=a_field2_z_m,
-            NL=NL,
         )
 
         self.D1 = radial_matrix_elements.D1
@@ -429,15 +435,44 @@ class V_psi_full_orders(VPsi):
         self.sph_jn = self.angular_matrix_elements.sph_jn
         self.sph_jn2 = self.angular_matrix_elements.sph_jn2
 
-        self.arr_contr_with_ddr_p = angular_matrix_elements("expkr_costh")
-        self.arr_contr_with_ddr_m = self.arr_contr_with_ddr_p.conj()
-        self.arr_contr_with_r_p = (
-            angular_matrix_elements("expkr_sinth_ddtheta") + self.arr_contr_with_ddr_p
-        )
-        self.arr_contr_with_r_m = self.arr_contr_with_r_p.conj()
-
         self.expkr2_p = self.angular_matrix_elements("expkr2")
         self.expkr2_m = self.expkr2_p.conj()
+
+
+class V_psi_full_orders(V_psi_PlaneWaveExpansion):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+        arr_contr_with_ddr_p,
+        arr_contr_with_ddr_m,
+        arr_contr_with_r_p,
+        arr_contr_with_r_m,
+        a_field_z_p,
+        a_field_z_m,
+        a_field2_z_p,
+        a_field2_z_m,
+        NL,
+    ):
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
+            a_field_z_p,
+            a_field_z_m,
+            a_field2_z_p,
+            a_field2_z_m,
+        )
+
+        print(arr_contr_with_ddr_p.shape)
+        print(arr_contr_with_ddr_m.shape)
+        print(arr_contr_with_r_p.shape)
+        print(arr_contr_with_r_m.shape)
+
+        self.NL = NL
 
     def __call__(self, psi, t, ravel=True):
         psi = psi.reshape((self.n_lm, self.nr))
@@ -482,7 +517,7 @@ class V_psi_full_orders(VPsi):
             return psi_new
 
 
-class V_psi_full(VPsi):
+class V_psi_full(V_psi_PlaneWaveExpansion):
     def __init__(
         self,
         angular_matrix_elements,
@@ -499,25 +534,15 @@ class V_psi_full(VPsi):
         super().__init__(
             angular_matrix_elements,
             radial_matrix_elements,
-            a_field_z_p=a_field_z_p,
-            a_field_z_m=a_field_z_m,
-            a_field2_z_p=a_field2_z_p,
-            a_field2_z_m=a_field2_z_m,
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
+            a_field_z_p,
+            a_field_z_m,
+            a_field2_z_p,
+            a_field2_z_m,
         )
-
-        self.D1 = radial_matrix_elements.D1
-        self.r = radial_matrix_elements.r
-        self.nr = radial_matrix_elements.nr
-        self.n_lm = angular_matrix_elements.n_lm
-
-        self.arr_contr_with_r_p = arr_contr_with_r_p
-        self.arr_contr_with_r_m = arr_contr_with_r_m
-
-        self.arr_contr_with_ddr_p = arr_contr_with_ddr_p
-        self.arr_contr_with_ddr_m = arr_contr_with_ddr_m
-
-        self.expkr2_p = self.angular_matrix_elements("expkr2")
-        self.expkr2_m = self.expkr2_p.conj()
 
     def __call__(self, psi, t, ravel=True):
         psi = psi.reshape((self.n_lm, self.nr))
@@ -562,99 +587,125 @@ class V_psi_full(VPsi):
             return psi_new
 
 
-class V_psi_full_x(V_psi_full):
-    def __init__(
-        self,
-        angular_matrix_elements,
-        radial_matrix_elements,
-        a_field_z_p,
-        a_field_z_m,
-        a_field2_z_p,
-        a_field2_z_m,
-    ):
-        arr_contr_with_ddr_p = angular_matrix_elements("expkr_cosph_sinth")
-        arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
-        arr_contr_with_r_p = (
-            angular_matrix_elements("expkr_cosph_sinth")
-            + 1j * angular_matrix_elements("expkr_m2_sinph_sinth")
-            - (1 / 2) * angular_matrix_elements("expkr_c_costh_(m+1)")
-            + (1 / 2) * angular_matrix_elements("expkr_c_costh_(m-1)")
-        )
-        arr_contr_with_r_m = arr_contr_with_r_p.conj()
+def setup_V_psi_PlaneWaveExpansion(
+    angular_matrix_elements,
+    radial_matrix_elements,
+    a_field_z_p,
+    a_field_z_m,
+    a_field2_z_p,
+    a_field2_z_m,
+    polarization,
+    NL=2,
+    orders=True,
+):
+    if polarization == "x":
+        (
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
+        ) = get_contr_arr_x(angular_matrix_elements)
+    elif polarization == "y":
+        if orders:
+            swapaxes = (1, 2)
+        else:
+            swapaxes = (0, 1)
+        (
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
+        ) = get_contr_arr_y(angular_matrix_elements, swapaxes=swapaxes)
+    elif polarization == "z":
+        (
+            arr_contr_with_ddr_p,
+            arr_contr_with_ddr_m,
+            arr_contr_with_r_p,
+            arr_contr_with_r_m,
+        ) = get_contr_arr_z(angular_matrix_elements)
+    else:
+        raise NotImplementedError("")
 
-        super().__init__(
+    if orders:
+        return V_psi_full_orders(
             angular_matrix_elements,
             radial_matrix_elements,
             arr_contr_with_ddr_p,
             arr_contr_with_ddr_m,
             arr_contr_with_r_p,
             arr_contr_with_r_m,
-            a_field_z_p=a_field_z_p,
-            a_field_z_m=a_field_z_m,
-            a_field2_z_p=a_field2_z_p,
-            a_field2_z_m=a_field2_z_m,
+            a_field_z_p,
+            a_field_z_m,
+            a_field2_z_p,
+            a_field2_z_m,
+            NL,
         )
-
-
-class V_psi_full_y(V_psi_full):
-    def __init__(
-        self,
-        angular_matrix_elements,
-        radial_matrix_elements,
-        a_field_z_p,
-        a_field_z_m,
-        a_field2_z_p,
-        a_field2_z_m,
-    ):
-        arr_contr_with_ddr_p = angular_matrix_elements("expkr_sinph_sinth")
-        arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj().swapaxes(0, 1)
-        arr_contr_with_r_p = (
-            angular_matrix_elements("expkr_sinph_sinth")
-            - 1j * angular_matrix_elements("expkr_m2_cosph_sinth")
-            + (1j / 2) * angular_matrix_elements("expkr_c_costh_(m+1)")
-            + (1j / 2) * angular_matrix_elements("expkr_c_costh_(m-1)")
-        )
-        arr_contr_with_r_m = -arr_contr_with_r_p.conj()
-
-        super().__init__(
+    else:
+        return V_psi_full(
             angular_matrix_elements,
             radial_matrix_elements,
             arr_contr_with_ddr_p,
             arr_contr_with_ddr_m,
             arr_contr_with_r_p,
             arr_contr_with_r_m,
-            a_field_z_p=a_field_z_p,
-            a_field_z_m=a_field_z_m,
-            a_field2_z_p=a_field2_z_p,
-            a_field2_z_m=a_field2_z_m,
+            a_field_z_p,
+            a_field_z_m,
+            a_field2_z_p,
+            a_field2_z_m,
         )
 
 
-class V_psi_full_z(V_psi_full):
-    def __init__(
-        self,
-        angular_matrix_elements,
-        radial_matrix_elements,
-        a_field_z_p,
-        a_field_z_m,
-        a_field2_z_p,
-        a_field2_z_m,
-    ):
-        arr_contr_with_ddr_p = angular_matrix_elements("expkr_costh")
-        arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
-        arr_contr_with_r_p = (
-            angular_matrix_elements("expkr_sinth_ddtheta") + arr_contr_with_ddr_p
-        )
-        arr_contr_with_r_m = arr_contr_with_r_p.conj()
-        super().__init__(
-            angular_matrix_elements,
-            radial_matrix_elements,
-            arr_contr_with_ddr_p,
-            arr_contr_with_ddr_m,
-            arr_contr_with_r_p,
-            arr_contr_with_r_m,
-            a_field_z_p=a_field_z_p,
-            a_field_z_m=a_field_z_m,
-            a_field2_z_p=a_field2_z_p,
-            a_field2_z_m=a_field2_z_m,
-        )
+def get_contr_arr_x(angular_matrix_elements):
+    arr_contr_with_ddr_p = angular_matrix_elements("expkr_cosph_sinth")
+    arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
+    arr_contr_with_r_p = (
+        angular_matrix_elements("expkr_cosph_sinth")
+        + 1j * angular_matrix_elements("expkr_m2_sinph_sinth")
+        - (1 / 2) * angular_matrix_elements("expkr_c_costh_(m+1)")
+        + (1 / 2) * angular_matrix_elements("expkr_c_costh_(m-1)")
+    )
+    arr_contr_with_r_m = arr_contr_with_r_p.conj()
+
+    return (
+        arr_contr_with_ddr_p,
+        arr_contr_with_ddr_m,
+        arr_contr_with_r_p,
+        arr_contr_with_r_m,
+    )
+
+
+def get_contr_arr_y(angular_matrix_elements, swapaxes=(1, 2)):
+    arr_contr_with_ddr_p = angular_matrix_elements("expkr_sinph_sinth")
+    arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj().swapaxes(
+        swapaxes[0], swapaxes[1]
+    )
+    arr_contr_with_r_p = (
+        angular_matrix_elements("expkr_sinph_sinth")
+        - 1j * angular_matrix_elements("expkr_m2_cosph_sinth")
+        + (1j / 2) * angular_matrix_elements("expkr_c_costh_(m+1)")
+        + (1j / 2) * angular_matrix_elements("expkr_c_costh_(m-1)")
+    )
+    arr_contr_with_r_m = -arr_contr_with_r_p.conj()
+
+    return (
+        arr_contr_with_ddr_p,
+        arr_contr_with_ddr_m,
+        arr_contr_with_r_p,
+        arr_contr_with_r_m,
+    )
+
+
+def get_contr_arr_z(angular_matrix_elements):
+    arr_contr_with_ddr_p = angular_matrix_elements("expkr_costh")
+    arr_contr_with_ddr_m = arr_contr_with_ddr_p.conj()
+    arr_contr_with_r_p = (
+        angular_matrix_elements("expkr_sinth_ddtheta") + arr_contr_with_ddr_p
+    )
+    arr_contr_with_r_m = arr_contr_with_r_p.conj()
+
+    return (
+        arr_contr_with_ddr_p,
+        arr_contr_with_ddr_m,
+        arr_contr_with_r_p,
+        arr_contr_with_r_m,
+    )
