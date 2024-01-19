@@ -494,11 +494,22 @@ class AngularMatrixElements_l(AngularMatrixElements):
 
 
 class AngularMatrixElements_lm(AngularMatrixElements):
-    def __init__(self, arr_to_calc=[], lmr_arr_to_calc=[], l_max=5, N=101, nr=None):
+    def __init__(
+        self, arr_to_calc=[], lmr_arr_to_calc=[], l_max=5, m_max=None, N=101, nr=None
+    ):
         super().__init__(l_max, N)
 
-        self.n_lm = (l_max + 1) ** 2
-        self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max)
+        if m_max == None:
+            m_max = l_max
+
+        if m_max > l_max:
+            m_max = l_max
+
+        self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
+        self.lm_I, self.I_lm = setup_lm_index_mapping_lm_mrestricted(
+            l_max=l_max, m_max=m_max
+        )
+        self.m_max = m_max
 
         for el in arr_to_calc:
             self.arr[el] = np.zeros((self.n_lm, self.n_lm), dtype=np.complex128)
@@ -515,12 +526,14 @@ class AngularMatrixElements_lm(AngularMatrixElements):
         l_max = self.n_l - 1
 
         for l1 in range(l_max + 1):
-            for m1 in range(-l1, l1 + 1):
+            temp_m1_max = min(l1, self.m_max)
+            for m1 in range(-temp_m1_max, temp_m1_max + 1):
                 I = self.I_lm[f"{l1}{m1}"]
                 Yl1m1_cc = sph_harm(m1, l1, self.phi, self.theta).conj()
                 for l2 in range(l1 - 2, l1 + 3):
                     if l2 >= 0 and l2 <= l_max:
-                        for m2 in range(-l2, l2 + 1):
+                        temp_m2_max = min(l2, self.m_max)
+                        for m2 in range(-temp_m2_max, temp_m2_max + 1):
                             J = self.I_lm[f"{l2}{m2}"]
                             Yl2m2 = sph_harm(m2, l2, self.phi, self.theta)
 
@@ -650,13 +663,27 @@ class AngularMatrixElements_lm(AngularMatrixElements):
 
 
 class AngularMatrixElements_lmr(AngularMatrixElements):
-    def __init__(self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, N=101):
+    def __init__(
+        self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, m_max=None, N=101
+    ):
         super().__init__(l_max, N)
 
+        if m_max == None:
+            m_max = l_max
+
+        if m_max > l_max:
+            m_max = l_max
+
         self.n_l = l_max + 1
-        self.n_lm = (l_max + 1) ** 2
+        self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
         self.nr = nr
         self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max=2 * l_max + 2)
+        self.lm_I_, self.I_lm_ = setup_lm_index_mapping_lm_mrestricted(
+            l_max=2 * l_max + 2, m_max=m_max
+        )
+        self.m_max = m_max
+
+        print(self.I_lm)
 
         self.r = r
         self.k = k
@@ -683,7 +710,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         phi_k = self.phi_k
 
         self.sph_harms = np.zeros(
-            ((2 * self.n_l) ** 2, len(self.weights)), dtype=np.complex128
+            (4 * self.n_l**2, len(self.weights)), dtype=np.complex128
         )
 
         for L in range(2 * nl):
@@ -697,14 +724,20 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
             sph_jn[L, :] = spherical_jn(L, k * r)
             sph_jn2[L, :] = spherical_jn(L, 2 * k * r)
 
+        self.sph_jn = sph_jn
+        self.sph_jn2 = sph_jn2
+
         for l1 in range(nl - 1):
-            for m1 in range(-l1, l1 + 1):
-                I = self.I_lm[f"{l1}{m1}"]
+            temp_m1_max = min(l1, self.m_max)
+            for m1 in range(-temp_m1_max, temp_m1_max + 1):
+                I = self.I_lm_[f"{l1}{m1}"]
                 for l2 in range(nl - 1):
-                    for m2 in range(-l2, l2 + 1):
-                        J = self.I_lm[f"{l2}{m2}"]
+                    temp_m2_max = min(l2, self.m_max)
+                    for m2 in range(-temp_m2_max, temp_m2_max + 1):
+                        J = self.I_lm_[f"{l2}{m2}"]
                         for L in range(2 * nl):
-                            for M in range(-L, L + 1):
+                            temp_M_max = min(L, self.m_max)
+                            for M in range(-temp_M_max, temp_M_max + 1):
                                 if arr_to_calc_dict["expkr_costh"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2 + 1) and (
@@ -1284,6 +1317,20 @@ def setup_lm_index_mapping_lm(l_max):
     I = 0
     for l in range(l_max + 1):
         for m in range(-l, l + 1):
+            I_lm[f"{l}{m}"] = I
+            lm_I.append((l, m))
+            I += 1
+
+    return lm_I, I_lm
+
+
+def setup_lm_index_mapping_lm_mrestricted(l_max, m_max):
+    lm_I = []
+    I_lm = dict()
+    I = 0
+    for l in range(l_max + 1):
+        temp_m_max = min(l, m_max)
+        for m in range(-temp_m_max, temp_m_max + 1):
             I_lm[f"{l}{m}"] = I
             lm_I.append((l, m))
             I += 1
