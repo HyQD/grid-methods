@@ -683,8 +683,6 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         )
         self.m_max = m_max
 
-        print(self.I_lm)
-
         self.r = r
         self.k = k
         self.phi_k = phi_k
