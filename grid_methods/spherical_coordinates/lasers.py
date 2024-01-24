@@ -166,11 +166,12 @@ class square_velocity_first:
 
 
 class square_velocity_exp_p:
-    def __init__(self, field_strength, omega, ncycles, t0=0.0, **kwargs):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
         self.tprime = 2 * ncycles * np.pi / omega
+        self.phase = phase
         self.t0 = t0
 
     def __call__(self, t):
@@ -179,18 +180,19 @@ class square_velocity_exp_p:
             (np.sin(np.pi * dt / self.tprime) ** 2)
             * np.heaviside(dt, 1.0)
             * np.heaviside(self.tprime - dt, 1.0)
-            * np.exp(1j * self.omega * dt)
+            * np.exp(1j * (self.omega * dt + self.phase))
             * self.A0
         )
         return pulse
 
 
 class square_velocity_exp_m:
-    def __init__(self, field_strength, omega, ncycles, t0=0.0, **kwargs):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
         self.tprime = 2 * ncycles * np.pi / omega
+        self.phase = phase
         self.t0 = t0
 
     def __call__(self, t):
@@ -199,18 +201,19 @@ class square_velocity_exp_m:
             (np.sin(np.pi * dt / self.tprime) ** 2)
             * np.heaviside(dt, 1.0)
             * np.heaviside(self.tprime - dt, 1.0)
-            * np.exp(-1j * self.omega * dt)
+            * np.exp(-1j * (self.omega * dt + self.phase))
             * self.A0
         )
         return pulse
 
 
 class square_velocity_exp2_p:
-    def __init__(self, field_strength, omega, ncycles, t0=0.0, **kwargs):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
         self.tprime = 2 * ncycles * np.pi / omega
+        self.phase = phase
         self.t0 = t0
 
     def __call__(self, t):
@@ -219,18 +222,19 @@ class square_velocity_exp2_p:
             (np.sin(np.pi * dt / self.tprime) ** 2) ** 2
             * np.heaviside(dt, 1.0)
             * np.heaviside(self.tprime - dt, 1.0)
-            * np.exp(1j * 2 * self.omega * dt)
+            * np.exp(1j * 2 * (self.omega * dt + self.phase))
             * self.A0**2
         )
         return pulse
 
 
 class square_velocity_exp2_m:
-    def __init__(self, field_strength, omega, ncycles, t0=0.0, **kwargs):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
         self.tprime = 2 * ncycles * np.pi / omega
+        self.phase = phase
         self.t0 = t0
 
     def __call__(self, t):
@@ -239,7 +243,7 @@ class square_velocity_exp2_m:
             (np.sin(np.pi * dt / self.tprime) ** 2) ** 2
             * np.heaviside(dt, 1.0)
             * np.heaviside(self.tprime - dt, 1.0)
-            * np.exp(-1j * 2 * self.omega * dt)
+            * np.exp(-1j * 2 * (self.omega * dt + self.phase))
             * self.A0**2
         )
         return pulse

@@ -494,11 +494,22 @@ class AngularMatrixElements_l(AngularMatrixElements):
 
 
 class AngularMatrixElements_lm(AngularMatrixElements):
-    def __init__(self, arr_to_calc=[], lmr_arr_to_calc=[], l_max=5, N=101, nr=None):
+    def __init__(
+        self, arr_to_calc=[], lmr_arr_to_calc=[], l_max=5, m_max=None, N=101, nr=None
+    ):
         super().__init__(l_max, N)
 
-        self.n_lm = (l_max + 1) ** 2
-        self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max)
+        if m_max == None:
+            m_max = l_max
+
+        if m_max > l_max:
+            m_max = l_max
+
+        self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
+        self.lm_I, self.I_lm = setup_lm_index_mapping_lm_mrestricted(
+            l_max=l_max, m_max=m_max
+        )
+        self.m_max = m_max
 
         for el in arr_to_calc:
             self.arr[el] = np.zeros((self.n_lm, self.n_lm), dtype=np.complex128)
@@ -515,12 +526,14 @@ class AngularMatrixElements_lm(AngularMatrixElements):
         l_max = self.n_l - 1
 
         for l1 in range(l_max + 1):
-            for m1 in range(-l1, l1 + 1):
+            temp_m1_max = min(l1, self.m_max)
+            for m1 in range(-temp_m1_max, temp_m1_max + 1):
                 I = self.I_lm[f"{l1}{m1}"]
                 Yl1m1_cc = sph_harm(m1, l1, self.phi, self.theta).conj()
                 for l2 in range(l1 - 2, l1 + 3):
                     if l2 >= 0 and l2 <= l_max:
-                        for m2 in range(-l2, l2 + 1):
+                        temp_m2_max = min(l2, self.m_max)
+                        for m2 in range(-temp_m2_max, temp_m2_max + 1):
                             J = self.I_lm[f"{l2}{m2}"]
                             Yl2m2 = sph_harm(m2, l2, self.phi, self.theta)
 
@@ -650,13 +663,25 @@ class AngularMatrixElements_lm(AngularMatrixElements):
 
 
 class AngularMatrixElements_lmr(AngularMatrixElements):
-    def __init__(self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, N=101):
+    def __init__(
+        self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, m_max=None, N=101
+    ):
         super().__init__(l_max, N)
 
+        if m_max == None:
+            m_max = l_max
+
+        if m_max > l_max:
+            m_max = l_max
+
         self.n_l = l_max + 1
-        self.n_lm = (l_max + 1) ** 2
+        self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
         self.nr = nr
         self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max=2 * l_max + 2)
+        self.lm_I_, self.I_lm_ = setup_lm_index_mapping_lm_mrestricted(
+            l_max=2 * l_max + 2, m_max=m_max
+        )
+        self.m_max = m_max
 
         self.r = r
         self.k = k
@@ -683,7 +708,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         phi_k = self.phi_k
 
         self.sph_harms = np.zeros(
-            ((2 * self.n_l) ** 2, len(self.weights)), dtype=np.complex128
+            (4 * self.n_l**2, len(self.weights)), dtype=np.complex128
         )
 
         for L in range(2 * nl):
@@ -697,14 +722,20 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
             sph_jn[L, :] = spherical_jn(L, k * r)
             sph_jn2[L, :] = spherical_jn(L, 2 * k * r)
 
+        self.sph_jn = sph_jn
+        self.sph_jn2 = sph_jn2
+
         for l1 in range(nl - 1):
-            for m1 in range(-l1, l1 + 1):
-                I = self.I_lm[f"{l1}{m1}"]
+            temp_m1_max = min(l1, self.m_max)
+            for m1 in range(-temp_m1_max, temp_m1_max + 1):
+                I = self.I_lm_[f"{l1}{m1}"]
                 for l2 in range(nl - 1):
-                    for m2 in range(-l2, l2 + 1):
-                        J = self.I_lm[f"{l2}{m2}"]
+                    temp_m2_max = min(l2, self.m_max)
+                    for m2 in range(-temp_m2_max, temp_m2_max + 1):
+                        J = self.I_lm_[f"{l2}{m2}"]
                         for L in range(2 * nl):
-                            for M in range(-L, L + 1):
+                            temp_M_max = min(L, self.m_max)
+                            for M in range(-temp_M_max, temp_M_max + 1):
                                 if arr_to_calc_dict["expkr_costh"]:
                                     cond1 = -m1 - M + m2 == 0
                                     cond2 = (np.abs(l1 - L) <= l2 + 1) and (
@@ -992,7 +1023,169 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
                                     ) * F_r
 
 
-class AngularMatrixElements_lmr_orders(AngularMatrixElements):
+class AngularMatrixElements_orders(AngularMatrixElements):
+    def __init__(self, l_max, N):
+        super().__init__(l_max, N)
+
+    def compute_matrix_elements(self, l1, m1, l2, m2, I, J, L, M, arr_to_calc_dict):
+        theta_k = self.theta_k
+        phi_k = self.phi_k
+
+        Y_k = sph_harm(M, L, phi_k, theta_k) * (1j) ** L
+        if arr_to_calc_dict["expkr_costh"]:
+            cond1 = -m1 - M + m2 == 0
+            cond2 = (np.abs(l1 - L) <= l2 + 1) and (l2 - 1 <= l1 + L)
+            cond3 = ((l1 + L + l2 + 1) % 2) == 0
+
+            if cond1 and cond2 and cond3:
+                F_W = self.l1m1_Y_star_cos_theta_l2m2_Lebedev(l1, m1, l2, m2, L, M)
+
+                self.arr["expkr_costh"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_sinth_ddtheta"]:
+            cond1 = -m1 - M + m2 == 0
+            cond2 = (np.abs(l1 - L) <= l2 + 1) and (l2 - 1 <= l1 + L)
+            cond3 = ((l1 + L + l2 + 1) % 2) == 0
+
+            if cond1 and cond2 and cond3:
+                F_W = self.l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(
+                    l1, m1, l2, m2, L, M
+                )
+
+                self.arr["expkr_sinth_ddtheta"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr2"]:
+            cond1 = -m1 - M + m2 == 0
+            cond2 = (np.abs(l1 - L) <= l2) and (l2 <= l1 + L)
+            cond3 = ((l1 + L + l2) % 2) == 0
+
+            if cond1 and cond2 and cond3:
+                F_W = self.l1m1_Y_star_l2m2_Lebedev(l1, m1, l2, m2, L, M)
+
+                self.arr["expkr2"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_cosph_sinth"]:
+            cond1 = np.abs(-m1 - M + m2) == 1
+            cond2 = ((l1 + L + l2 + 1) % 2) == 0
+
+            if cond1 and cond2:
+                F_W = self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
+                    l1, m1, l2, m2, L, M
+                )
+
+                self.arr["expkr_cosph_sinth"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_sinph_sinth"]:
+            cond1 = np.abs(-m1 - M + m2) == 1
+            cond2 = ((l1 + L + l2 + 1) % 2) == 0
+
+            if cond1 and cond2:
+                F_W = self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                    l1, m1, l2, m2, L, M
+                )
+
+                self.arr["expkr_sinph_sinth"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_m2_sinph_sinth"]:
+            cond1 = np.abs(-m1 - M + m2) == 1
+            cond2 = ((l1 + L + l2 + 1) % 2) == 0
+            cond3 = m2 != 0
+
+            if cond1 and cond2 and cond3:
+                F_W = m2 * self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
+                    l1, m1, l2, m2, L, M
+                )
+
+                self.arr["expkr_m2_sinph_sinth"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_m2_cosph_sinth"]:
+            cond1 = np.abs(-m1 - M + m2) == 1
+            cond2 = ((l1 + L + l2 + 1) % 2) == 0
+            cond3 = m2 != 0
+
+            if cond1 and cond2 and cond3:
+                F_W = m2 * self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
+                    l1, m1, l2, m2, L, M
+                )
+
+                self.arr["expkr_m2_cosph_sinth"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_c_costh_(m+1)"]:
+            cond1 = -m1 - M + (m2 + 1) == 0
+            cond2 = (np.abs(l1 - L) <= l2 + 1) and (l2 - 1 <= l1 + L)
+            cond3 = ((l1 + L + l2 + 1) % 2) == 0
+            cond4 = abs(m2 + 1) <= l2
+
+            if cond1 and cond2 and cond3 and cond4:
+                F_W = coeff_c(l2, m2) * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                    l1, m1, l2, m2 + 1, L, M
+                )
+
+                self.arr["expkr_c_costh_(m+1)"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["expkr_c_costh_(m-1)"]:
+            cond1 = -m1 - M + (m2 - 1) == 0
+            cond2 = (np.abs(l1 - L) <= l2 + 1) and (l2 - 1 <= l1 + L)
+            cond3 = ((l1 + L + l2 + 1) % 2) == 0
+            cond4 = abs(m2 - 1) <= l2
+
+            if cond1 and cond2 and cond3 and cond4:
+                F_W = coeff_c(l2, m2 - 1) * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
+                    l1, m1, l2, m2 - 1, L, M
+                )
+
+                self.arr["expkr_c_costh_(m-1)"][L, I, J] += F_W * Y_k
+
+        if arr_to_calc_dict["M_tilde_x"]:
+            F_W1 = self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(l1, m1, l2, m2, L, M)
+            F_W2 = (
+                1j
+                * m2
+                * self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(l1, m1, l2, m2, L, M)
+            )
+            F_W3 = 0
+            F_W4 = 0
+            if abs(m2 + 1) <= l2:
+                F_W3 = (
+                    -(1 / 2)
+                    * coeff_c(l2, m2)
+                    * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(l1, m1, l2, m2 + 1, L, M)
+                )
+            if abs(m2 - 1) <= l2:
+                F_W4 = (
+                    (1 / 2)
+                    * coeff_c(l2, m2 - 1)
+                    * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(l1, m1, l2, m2 - 1, L, M)
+                )
+
+            self.arr["M_tilde_x"][L, I, J] += (F_W1 + F_W2 + F_W3 + F_W4) * Y_k
+
+        if arr_to_calc_dict["M_tilde_y"]:
+            F_W1 = self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(l1, m1, l2, m2, L, M)
+            F_W2 = (
+                -1j
+                * m2
+                * self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(l1, m1, l2, m2, L, M)
+            )
+            F_W3 = 0
+            F_W4 = 0
+            if abs(m2 + 1) <= l2:
+                F_W3 = (
+                    (1j / 2)
+                    * coeff_c(l2, m2)
+                    * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(l1, m1, l2, m2 + 1, L, M)
+                )
+            if abs(m2 - 1) <= l2:
+                F_W4 = (
+                    (1j / 2)
+                    * coeff_c(l2, m2 - 1)
+                    * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(l1, m1, l2, m2 - 1, L, M)
+                )
+
+            self.arr["M_tilde_y"][L, I, J] += (F_W1 + F_W2 + F_W3 + F_W4) * Y_k
+
+
+class AngularMatrixElements_lmr_orders(AngularMatrixElements_orders):
     def __init__(self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, N=101, NL=1):
         super().__init__(l_max, N)
 
@@ -1032,11 +1225,7 @@ class AngularMatrixElements_lmr_orders(AngularMatrixElements):
     def setup_matrix_elements(self, arr_to_calc_dict, L):
         r = self.r
         nl = self.n_l
-        theta = self.theta
-        phi = self.phi
         k = self.k
-        theta_k = self.theta_k
-        phi_k = self.phi_k
 
         self.sph_jn[L, :] = 4 * np.pi * spherical_jn(L, k * r)
         self.sph_jn2[L, :] = 4 * np.pi * spherical_jn(L, 2 * k * r)
@@ -1048,216 +1237,115 @@ class AngularMatrixElements_lmr_orders(AngularMatrixElements):
                     for m2 in range(-l2, l2 + 1):
                         J = self.I_lm[f"{l2}{m2}"]
                         for M in range(-L, L + 1):
-                            Y_k = sph_harm(M, L, phi_k, theta_k) * (1j) ** L
-                            if arr_to_calc_dict["expkr_costh"]:
-                                cond1 = -m1 - M + m2 == 0
-                                cond2 = (np.abs(l1 - L) <= l2 + 1) and (
-                                    l2 - 1 <= l1 + L
-                                )
-                                cond3 = ((l1 + L + l2 + 1) % 2) == 0
+                            self.compute_matrix_elements(
+                                l1, m1, l2, m2, I, J, L, M, arr_to_calc_dict
+                            )
 
-                                if cond1 and cond2 and cond3:
-                                    F_W = self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                        l1, m1, l2, m2, L, M
-                                    )
 
-                                    self.arr["expkr_costh"][L, I, J] += F_W * Y_k
+class AngularMatrixElements_lr_orders(AngularMatrixElements_orders):
+    def __init__(self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, N=101):
+        super().__init__(l_max, N)
 
-                            if arr_to_calc_dict["expkr_sinth_ddtheta"]:
-                                cond1 = -m1 - M + m2 == 0
-                                cond2 = (np.abs(l1 - L) <= l2 + 1) and (
-                                    l2 - 1 <= l1 + L
-                                )
-                                cond3 = ((l1 + L + l2 + 1) % 2) == 0
+        self.n_l = l_max + 1
+        self.n_lm = self.n_l
+        self.nr = nr
+        self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max=2 * l_max + 2)
 
-                                if cond1 and cond2 and cond3:
-                                    F_W = (
-                                        self.l1m1_Y_star_sin_theta_ddtheta_l2m2_Lebedev(
-                                            l1, m1, l2, m2, L, M
-                                        )
-                                    )
+        self.NL = 1
 
-                                    self.arr["expkr_sinth_ddtheta"][L, I, J] += (
-                                        F_W * Y_k
-                                    )
+        self.r = r
+        self.k = k
+        self.phi_k = phi_k
+        self.theta_k = theta_k
 
-                            if arr_to_calc_dict["expkr2"]:
-                                cond1 = -m1 - M + m2 == 0
-                                cond2 = (np.abs(l1 - L) <= l2) and (l2 <= l1 + L)
-                                cond3 = ((l1 + L + l2) % 2) == 0
+        for el in arr_to_calc:
+            self.arr[el] = np.zeros(
+                (self.NL, self.n_lm, self.n_lm), dtype=np.complex128
+            )
 
-                                if cond1 and cond2 and cond3:
-                                    F_W = self.l1m1_Y_star_l2m2_Lebedev(
-                                        l1, m1, l2, m2, L, M
-                                    )
+        arr_to_calc_dict = setup_lmr_arr_to_calc(arr_to_calc)
 
-                                    self.arr["expkr2"][L, I, J] += F_W * Y_k
+        self.sph_harms = np.zeros(
+            ((2 * self.n_l) ** 2, len(self.weights)), dtype=np.complex128
+        )
 
-                            if arr_to_calc_dict["expkr_cosph_sinth"]:
-                                cond1 = np.abs(-m1 - M + m2) == 1
-                                cond2 = ((l1 + L + l2 + 1) % 2) == 0
+        for L_ in range(2 * self.n_l):
+            for M in range(-L_, L_ + 1):
+                I = self.I_lm[f"{L_}{M}"]
+                self.sph_harms[I, :] = sph_harm(M, L_, self.phi, self.theta)
 
-                                if cond1 and cond2:
-                                    F_W = (
-                                        self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2, L, M
-                                        )
-                                    )
+        self.sph_jn = np.zeros((self.NL, self.nr))
+        self.sph_jn2 = np.zeros((self.NL, self.nr))
 
-                                    self.arr["expkr_cosph_sinth"][L, I, J] += F_W * Y_k
+        if True in arr_to_calc_dict.values():
+            self.setup_matrix_elements(arr_to_calc_dict, 0)
 
-                            if arr_to_calc_dict["expkr_sinph_sinth"]:
-                                cond1 = np.abs(-m1 - M + m2) == 1
-                                cond2 = ((l1 + L + l2 + 1) % 2) == 0
+    def setup_matrix_elements(self, arr_to_calc_dict, L):
+        r = self.r
+        nl = self.n_l
+        k = self.k
 
-                                if cond1 and cond2:
-                                    F_W = (
-                                        self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2, L, M
-                                        )
-                                    )
+        self.sph_jn[L, :] = 4 * np.pi * spherical_jn(L, k * r)
+        self.sph_jn2[L, :] = 4 * np.pi * spherical_jn(L, 2 * k * r)
 
-                                    self.arr["expkr_sinph_sinth"][L, I, J] += F_W * Y_k
+        for l1 in range(nl - 1):
+            I = self.I_lm[f"{l1}{0}"]
+            for l2 in range(nl - 1):
+                J = self.I_lm[f"{l2}{0}"]
+                self.compute_matrix_elements(
+                    l1, 0, l2, 0, l1, l2, L, 0, arr_to_calc_dict
+                )
 
-                            if arr_to_calc_dict["expkr_m2_sinph_sinth"]:
-                                cond1 = np.abs(-m1 - M + m2) == 1
-                                cond2 = ((l1 + L + l2 + 1) % 2) == 0
-                                cond3 = m2 != 0
 
-                                if cond1 and cond2 and cond3:
-                                    F_W = (
-                                        m2
-                                        * self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2, L, M
-                                        )
-                                    )
+class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
+    def __init__(self, arr_to_calc, nr, r, l_max=5, m=0, L_max=5, a=1.0, N=101):
+        super().__init__(l_max, N)
 
-                                    self.arr["expkr_m2_sinph_sinth"][L, I, J] += (
-                                        F_W * Y_k
-                                    )
+        n_sph_harms = max(l_max + 1, L_max + 1)
 
-                            if arr_to_calc_dict["expkr_m2_cosph_sinth"]:
-                                cond1 = np.abs(-m1 - M + m2) == 1
-                                cond2 = ((l1 + L + l2 + 1) % 2) == 0
-                                cond3 = m2 != 0
+        self.n_lm = l_max + 1
+        self.L_max = L_max
+        self.lm_I, self.I_lm = setup_lm_index_mapping_l(n_sph_harms, m)
+        self.m = m
+        self.nr = nr
+        self.r = r
 
-                                if cond1 and cond2 and cond3:
-                                    F_W = (
-                                        m2
-                                        * self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2, L, M
-                                        )
-                                    )
+        for el in arr_to_calc:
+            self.arr[el] = np.zeros(
+                (self.n_lm, self.n_lm, self.nr), dtype=np.complex128
+            )
 
-                                    self.arr["expkr_m2_cosph_sinth"][L, I, J] += (
-                                        F_W * Y_k
-                                    )
+        self.r_inv_l = np.zeros((L_max + 1, nr))
+        for L in range(L_max + 1):
+            self.r_inv_l[L, :] = compute_r_inv_l(r, a, L)
 
-                            if arr_to_calc_dict["expkr_c_costh_(m+1)"]:
-                                cond1 = -m1 - M + (m2 + 1) == 0
-                                cond2 = (np.abs(l1 - L) <= l2 + 1) and (
-                                    l2 - 1 <= l1 + L
-                                )
-                                cond3 = ((l1 + L + l2 + 1) % 2) == 0
-                                cond4 = abs(m2 + 1) <= l2
+        arr_to_calc_dict = setup_lmr_arr_to_calc(arr_to_calc)
 
-                                if cond1 and cond2 and cond3 and cond4:
-                                    F_W = coeff_c(
-                                        l2, m2
-                                    ) * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                        l1, m1, l2, m2 + 1, L, M
-                                    )
+        self.sph_harms = np.zeros((n_sph_harms, len(self.weights)), dtype=np.complex128)
 
-                                    self.arr["expkr_c_costh_(m+1)"][L, I, J] += (
-                                        F_W * Y_k
-                                    )
+        for L_ in range(n_sph_harms):
+            self.sph_harms[L, :] = sph_harm(0, L_, self.phi, self.theta)
 
-                            if arr_to_calc_dict["expkr_c_costh_(m-1)"]:
-                                cond1 = -m1 - M + (m2 - 1) == 0
-                                cond2 = (np.abs(l1 - L) <= l2 + 1) and (
-                                    l2 - 1 <= l1 + L
-                                )
-                                cond3 = ((l1 + L + l2 + 1) % 2) == 0
-                                cond4 = abs(m2 - 1) <= l2
+        if True in arr_to_calc_dict.values():
+            self.setup_l_matrix_elements(arr_to_calc_dict, m)
 
-                                if cond1 and cond2 and cond3 and cond4:
-                                    F_W = coeff_c(
-                                        l2, m2 - 1
-                                    ) * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                        l1, m1, l2, m2 - 1, L, M
-                                    )
+    def setup_l_matrix_elements(self, arr_to_calc_dict, m=0, M=0):
+        n_l = self.n_l
+        L_max = self.L_max
 
-                                    self.arr["expkr_c_costh_(m-1)"][L, I, J] += (
-                                        F_W * Y_k
-                                    )
+        for l1 in range(n_l):
+            for l2 in range(n_l):
+                for L in range(L_max + 1):
+                    if arr_to_calc_dict["1/(r-a)"]:
+                        self.arr["1/(r-a)"][l1, l2, :] = self.l1m1_Y_star_l2m2_Lebedev(
+                            l1, m, l2, m, L, M
+                        )
 
-                            if arr_to_calc_dict["M_tilde_x"]:
-                                F_W1 = self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
-                                    l1, m1, l2, m2, L, M
-                                )
-                                F_W2 = (
-                                    1j
-                                    * m2
-                                    * self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
-                                        l1, m1, l2, m2, L, M
-                                    )
-                                )
-                                F_W3 = 0
-                                F_W4 = 0
-                                if abs(m2 + 1) <= l2:
-                                    F_W3 = (
-                                        -(1 / 2)
-                                        * coeff_c(l2, m2)
-                                        * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2 + 1, L, M
-                                        )
-                                    )
-                                if abs(m2 - 1) <= l2:
-                                    F_W4 = (
-                                        (1 / 2)
-                                        * coeff_c(l2, m2 - 1)
-                                        * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2 - 1, L, M
-                                        )
-                                    )
 
-                                self.arr["M_tilde_x"][L, I, J] += (
-                                    F_W1 + F_W2 + F_W3 + F_W4
-                                ) * Y_k
-
-                            if arr_to_calc_dict["M_tilde_y"]:
-                                F_W1 = self.l1m1_Y_star_sin_phi_sin_theta_l2m2_Lebedev(
-                                    l1, m1, l2, m2, L, M
-                                )
-                                F_W2 = (
-                                    -1j
-                                    * m2
-                                    * self.l1m1_Y_star_cos_phi_sin_theta_l2m2_Lebedev(
-                                        l1, m1, l2, m2, L, M
-                                    )
-                                )
-                                F_W3 = 0
-                                F_W4 = 0
-                                if abs(m2 + 1) <= l2:
-                                    F_W3 = (
-                                        (1j / 2)
-                                        * coeff_c(l2, m2)
-                                        * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2 + 1, L, M
-                                        )
-                                    )
-                                if abs(m2 - 1) <= l2:
-                                    F_W4 = (
-                                        (1j / 2)
-                                        * coeff_c(l2, m2 - 1)
-                                        * self.l1m1_Y_star_cos_theta_l2m2_Lebedev(
-                                            l1, m1, l2, m2 - 1, L, M
-                                        )
-                                    )
-
-                                self.arr["M_tilde_y"][L, I, J] += (
-                                    F_W1 + F_W2 + F_W3 + F_W4
-                                ) * Y_k
+def compute_r_inv_l(r, a, l):
+    r_min = np.minimum(r, a)
+    r_max = np.maximum(r, a)
+    return (4 * np.pi / (2 * l + 1)) * r_min**l / r_max ** (l + 1)
 
 
 def setup_lm_index_mapping_l(l_max, m=0):
@@ -1278,6 +1366,20 @@ def setup_lm_index_mapping_lm(l_max):
     I = 0
     for l in range(l_max + 1):
         for m in range(-l, l + 1):
+            I_lm[f"{l}{m}"] = I
+            lm_I.append((l, m))
+            I += 1
+
+    return lm_I, I_lm
+
+
+def setup_lm_index_mapping_lm_mrestricted(l_max, m_max):
+    lm_I = []
+    I_lm = dict()
+    I = 0
+    for l in range(l_max + 1):
+        temp_m_max = min(l, m_max)
+        for m in range(-temp_m_max, temp_m_max + 1):
             I_lm[f"{l}{m}"] = I
             lm_I.append((l, m))
             I += 1
@@ -1334,6 +1436,7 @@ def setup_lmr_arr_to_calc(arr_to_calc_list):
         "expkr_m2_cosph_sinth": False,
         "expkr_c_costh_(m+1)": False,
         "expkr_c_costh_(m-1)": False,
+        "1/(r-a)": False,
     }
 
     return set_boolean_values_to_dict(arr_to_calc_dict, arr_to_calc_list)
