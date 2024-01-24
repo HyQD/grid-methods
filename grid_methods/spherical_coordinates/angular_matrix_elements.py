@@ -1298,7 +1298,7 @@ class AngularMatrixElements_lr_orders(AngularMatrixElements_orders):
 
 
 class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
-    def __init__(self, arr_to_calc, nr, r, l_max=5, m=0, L_max=5, a=1.0, N=101):
+    def __init__(self, arr_to_calc, nr, r, l_max=5, m=0, L_max=5, a=2.0, N=101):
         super().__init__(l_max, N)
 
         n_sph_harms = max(l_max + 1, L_max + 1)
@@ -1309,11 +1309,11 @@ class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
         self.m = m
         self.nr = nr
         self.r = r
+        self.a = a
 
-        for el in arr_to_calc:
-            self.arr[el] = np.zeros(
-                (self.n_lm, self.n_lm, self.nr), dtype=np.complex128
-            )
+        self.arr["1/(r-a)"] = np.zeros(
+            (self.n_lm, self.n_lm, self.nr), dtype=np.complex128
+        )
 
         self.r_inv_l = np.zeros((L_max + 1, nr))
         for L in range(L_max + 1):
@@ -1324,7 +1324,7 @@ class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
         self.sph_harms = np.zeros((n_sph_harms, len(self.weights)), dtype=np.complex128)
 
         for L_ in range(n_sph_harms):
-            self.sph_harms[L, :] = sph_harm(0, L_, self.phi, self.theta)
+            self.sph_harms[L_, :] = sph_harm(0, L_, self.phi, self.theta)
 
         if True in arr_to_calc_dict.values():
             self.setup_l_matrix_elements(arr_to_calc_dict, m)
@@ -1332,20 +1332,21 @@ class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
     def setup_l_matrix_elements(self, arr_to_calc_dict, m=0, M=0):
         n_l = self.n_l
         L_max = self.L_max
+        nr = self.nr
 
         for l1 in range(n_l):
             for l2 in range(n_l):
                 for L in range(L_max + 1):
                     if arr_to_calc_dict["1/(r-a)"]:
-                        self.arr["1/(r-a)"][l1, l2, :] = self.l1m1_Y_star_l2m2_Lebedev(
+                        self.arr["1/(r-a)"][l1, l2, :] += self.l1m1_Y_star_l2m2_Lebedev(
                             l1, m, l2, m, L, M
-                        )
+                        ) * compute_r_inv_l(self.r, self.a, L)
 
 
 def compute_r_inv_l(r, a, l):
     r_min = np.minimum(r, a)
     r_max = np.maximum(r, a)
-    return (4 * np.pi / (2 * l + 1)) * r_min**l / r_max ** (l + 1)
+    return np.sqrt(4 * np.pi / (2 * l + 1)) * r_min**l / r_max ** (l + 1)
 
 
 def setup_lm_index_mapping_l(l_max, m=0):
