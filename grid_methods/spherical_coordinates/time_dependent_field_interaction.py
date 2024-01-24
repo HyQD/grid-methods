@@ -605,6 +605,31 @@ class V_psi_full(V_psi_PlaneWaveExpansion):
             return psi_new
 
 
+class V_Coulomb(VPsi):
+    def __init__(
+        self,
+        angular_matrix_elements,
+        radial_matrix_elements,
+    ):
+        super().__init__(
+            angular_matrix_elements,
+            radial_matrix_elements,
+        )
+
+        self.V = angular_matrix_elements("1/(r-a)")
+
+    def __call__(self, psi, t, ravel=True):
+        psi = psi.reshape((self.n_lm, self.nr))
+        psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
+
+        psi_new -= contract("IJk, Jk->Ik", self.V, psi)
+
+        if ravel:
+            return psi_new.ravel()
+        else:
+            return psi_new
+
+
 def setup_V_psi_PlaneWaveExpansion(
     angular_matrix_elements,
     radial_matrix_elements,
