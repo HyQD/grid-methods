@@ -42,7 +42,7 @@ from grid_methods.spherical_coordinates.utils import (
 from grid_methods.spherical_coordinates.properties import (
     expec_x_i,
     expec_p_i,
-    norm,
+    compute_norm,
 )
 
 from grid_methods.spherical_coordinates.ground_state import compute_ground_state
@@ -112,7 +112,7 @@ time_points = np.linspace(0, tfinal, num_steps)
 expec_z = np.zeros(num_steps, dtype=np.complex128)
 expec_pz = np.zeros(num_steps, dtype=np.complex128)
 norm_t = np.zeros(num_steps, dtype=np.complex128)
-norm_t[0] = norm(psi_t, weights)
+norm_t[0] = compute_norm(psi_t, weights)
 nr_its_conv = np.zeros(num_steps - 1)
 
 # right-hand side
@@ -165,7 +165,7 @@ for i in tqdm.tqdm(range(num_steps - 1)):
 
     expec_z[i + 1] = expec_x_i(psi_t, weights, r, z_Omega)
     expec_pz[i + 1] = expec_p_i(psi_t, dpsi_t_dr, weights, r, z_Omega, H_z_beta)
-    norm_t[i + 1] = norm(psi_t, weights)
+    norm_t[i + 1] = compute_norm(psi_t, weights)
 
 
 from matplotlib import pyplot as plt
