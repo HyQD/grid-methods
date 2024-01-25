@@ -11,6 +11,8 @@ class AngularMatrixElements:
         current_file_location = Path(__file__).parent
         coord = np.loadtxt(current_file_location / ("Lebedev/lebedev_%03d.txt" % N))
 
+        self.N = N
+
         self.theta = coord[:, 1] * np.pi / 180
         self.phi = coord[:, 0] * np.pi / 180 + np.pi
         self.weights = coord[:, 2]
@@ -499,10 +501,7 @@ class AngularMatrixElements_lm(AngularMatrixElements):
     ):
         super().__init__(l_max, N)
 
-        if m_max == None:
-            m_max = l_max
-
-        if m_max > l_max:
+        if (m_max is None) or (m_max > l_max):
             m_max = l_max
 
         self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
@@ -668,10 +667,7 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
     ):
         super().__init__(l_max, N)
 
-        if m_max == None:
-            m_max = l_max
-
-        if m_max > l_max:
+        if (m_max is None) or (m_max > l_max):
             m_max = l_max
 
         self.n_l = l_max + 1
@@ -1339,6 +1335,82 @@ class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
                 for L in range(L_max + 1):
                     if arr_to_calc_dict["1/(r-a)"]:
                         self.arr["1/(r-a)"][l1, l2, :] += self.l1m1_Y_star_l2m2_Lebedev(
+                            l1, m, l2, m, L, M
+                        ) * compute_r_inv_l(self.r, self.a, L)
+
+    def convert_to_lmr(self, m_max=None):
+        l_max = self.n_l - 1
+
+        if (m_max is None) or (m_max >= self.n_l):
+            m_max = l_max
+
+        ret = AngularMatrixElements_lmr_Coulomb(
+            arr_to_calc=[],
+            nr=self.nr,
+            r=self.r,
+            l_max=l_max,
+            m_max=m_max,
+            L_max=self.L_max,
+            a=self.a,
+            N=self.N,
+        )
+
+        for l1 in range(ret.n_l):
+            I = ret.I_lm[f"{l1}{self.m}"]
+            for l2 in range(ret.n_l):
+                J = ret.I_lm[f"{l2}{self.m}"]
+                ret.arr["1/(r-a)"][I, J, :] = self.arr["1/(r-a)"][l1, l2, :]
+
+        return ret
+
+
+class AngularMatrixElements_lmr_Coulomb(AngularMatrixElements):
+    def __init__(self, arr_to_calc, nr, r, l_max=5, m_max=5, L_max=5, a=2.0, N=101):
+        super().__init__(l_max, N)
+
+        if (m_max is None) or (m_max > l_max):
+            m_max = l_max
+
+        n_sph_harms = max(l_max + 1, L_max + 1)
+
+        self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
+        self.L_max = L_max
+        self.lm_I, self.I_lm = setup_lm_index_mapping_lm_mrestricted(n_sph_harms, m_max)
+        self.nr = nr
+        self.r = r
+        self.a = a
+
+        self.arr["1/(r-a)"] = np.zeros(
+            (self.n_lm, self.n_lm, self.nr), dtype=np.complex128
+        )
+
+        self.r_inv_l = np.zeros((L_max + 1, nr))
+        for L in range(L_max + 1):
+            self.r_inv_l[L, :] = compute_r_inv_l(r, a, L)
+
+        arr_to_calc_dict = setup_lmr_arr_to_calc(arr_to_calc)
+
+        self.sph_harms = np.zeros((self.n_lm, len(self.weights)), dtype=np.complex128)
+
+        for L_ in range(n_sph_harms):
+            I = self.I_lm[f"{L_}{0}"]
+            self.sph_harms[I, :] = sph_harm(0, L_, self.phi, self.theta)
+
+        if True in arr_to_calc_dict.values():
+            self.setup_lm_matrix_elements(arr_to_calc_dict)
+
+    def setup_lm_matrix_elements(self, arr_to_calc_dict, m=0, M=0):
+        n_l = self.n_l
+        L_max = self.L_max
+        nr = self.nr
+
+        for l1 in range(n_l):
+            I = self.I_lm[f"{l1}{m}"]
+            for l2 in range(n_l):
+                J = self.I_lm[f"{l2}{m}"]
+                for L in range(L_max + 1):
+                    if arr_to_calc_dict["1/(r-a)"]:
+                        self.arr["1/(r-a)"][I, J, :] += self.l1m1_Y_star_l2m2_Lebedev(
                             l1, m, l2, m, L, M
                         ) * compute_r_inv_l(self.r, self.a, L)
 
