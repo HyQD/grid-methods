@@ -28,7 +28,7 @@ class Linear_map:
 
 
 class GaussLegendreLobatto:
-    def __init__(self, N, Mapping):
+    def __init__(self, N, Mapping, symmetrize=True):
         # Get inner nodes
         c = np.zeros((N + 1,))
         c[-1] = 1
@@ -47,8 +47,11 @@ class GaussLegendreLobatto:
         self.D1 = np.zeros((N + 1, N + 1))
         self.D2 = np.zeros((N + 1, N + 1))
         self.PN_x = legendre.legval(self.x[1:-1], c)
+        self.PN_x2 = legendre.legval(self.x, c)
 
         self.weights = 2 / (N * (N + 1))
+        if not symmetrize:
+            self.weights /= self.PN_x**2
 
         self.r = Mapping.r_x(self.x)
         self.r_dot = Mapping.dr_dx(self.x)
@@ -69,6 +72,8 @@ class GaussLegendreLobatto:
                     self.D1[i, j] = 1 / (
                         (self.x[i] - self.x[j]) * np.sqrt(self.r_dot[i] * self.r_dot[j])
                     )
+                    if not symmetrize:
+                        self.D1[i, j] *= self.PN_x2[i] / self.PN_x2[j]
 
         for i in range(1, N - 1):
             for j in range(1, N - 1):
@@ -87,3 +92,5 @@ class GaussLegendreLobatto:
                         / (self.x[i] - self.x[j]) ** 2
                         / (self.r_dot[i] * self.r_dot[j])
                     )
+                    if not symmetrize:
+                        self.D2[i, j] *= self.PN_x[i] / self.PN_x[j]
