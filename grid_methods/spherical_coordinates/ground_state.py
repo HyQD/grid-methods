@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def compute_ground_state(angular_matrix_elements, radial_matrix_elements, potential):
+def compute_ground_state(
+    angular_matrix_elements, radial_matrix_elements, potential, hermitian=True
+):
     nr = radial_matrix_elements.nr
     r = radial_matrix_elements.r
     T_D2 = -(1 / 2) * radial_matrix_elements.D2
@@ -12,15 +14,18 @@ def compute_ground_state(angular_matrix_elements, radial_matrix_elements, potent
     V = np.diag(potential)
 
     H0 = T + V
-    assert np.allclose(H0, H0.T)
 
-    eps, phi_n = np.linalg.eigh(H0)
+    if hermitian:
+        assert np.allclose(H0, H0.T)
+        eps, phi_n = np.linalg.eigh(H0)
+    else:
+        eps, phi_n = np.linalg.eig(H0)
 
     return eps, phi_n
 
 
 def compute_ground_state_diatomic(
-    angular_matrix_elements, radial_matrix_elements, potential, l_max
+    angular_matrix_elements, radial_matrix_elements, potential, l_max, hermitian=True
 ):
     nl = l_max + 1
     nr = radial_matrix_elements.nr
@@ -39,9 +44,13 @@ def compute_ground_state_diatomic(
         V = np.diag(potential)
 
         H0[l * nr : ((l + 1) * nr), l * nr : ((l + 1) * nr)] = T + V
-    assert np.allclose(H0, H0.T)
 
     H0 = H0 - clmb
-    eps, phi_n = np.linalg.eigh(H0)
+
+    if hermitian:
+        assert np.allclose(H0, H0.T)
+        eps, phi_n = np.linalg.eigh(H0)
+    else:
+        eps, phi_n = np.linalg.eig(H0)
 
     return eps, phi_n
