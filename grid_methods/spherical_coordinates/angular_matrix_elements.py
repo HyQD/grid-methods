@@ -1182,13 +1182,23 @@ class AngularMatrixElements_orders(AngularMatrixElements):
 
 
 class AngularMatrixElements_lmr_orders(AngularMatrixElements_orders):
-    def __init__(self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, N=101, NL=1):
+    def __init__(
+        self, arr_to_calc, nr, r, k, phi_k, theta_k, l_max=5, m_max=None, N=101, NL=1
+    ):
         super().__init__(l_max, N)
 
+        if (m_max is None) or (m_max > l_max):
+            m_max = l_max
+
         self.n_l = l_max + 1
-        self.n_lm = (l_max + 1) ** 2
+        self.n_lm = (m_max + 1) ** 2 + (l_max - m_max) * (2 * m_max + 1)
         self.nr = nr
         self.lm_I, self.I_lm = setup_lm_index_mapping_lm(l_max=2 * l_max + 2)
+        self.lm_I_, self.I_lm_ = setup_lm_index_mapping_lm_mrestricted(
+            l_max=2 * l_max + 2, m_max=m_max
+        )
+
+        self.m_max = m_max
 
         self.NL = NL
 
@@ -1227,11 +1237,13 @@ class AngularMatrixElements_lmr_orders(AngularMatrixElements_orders):
         self.sph_jn2[L, :] = 4 * np.pi * spherical_jn(L, 2 * k * r)
 
         for l1 in range(nl - 1):
-            for m1 in range(-l1, l1 + 1):
-                I = self.I_lm[f"{l1}{m1}"]
+            temp_m1_max = min(l1, self.m_max)
+            for m1 in range(-temp_m1_max, temp_m1_max + 1):
+                I = self.I_lm_[f"{l1}{m1}"]
                 for l2 in range(nl - 1):
-                    for m2 in range(-l2, l2 + 1):
-                        J = self.I_lm[f"{l2}{m2}"]
+                    temp_m2_max = min(l2, self.m_max)
+                    for m2 in range(-temp_m2_max, temp_m2_max + 1):
+                        J = self.I_lm_[f"{l2}{m2}"]
                         for M in range(-L, L + 1):
                             self.compute_matrix_elements(
                                 l1, m1, l2, m2, I, J, L, M, arr_to_calc_dict
@@ -1365,7 +1377,7 @@ class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
 
 
 class AngularMatrixElements_lmr_Coulomb(AngularMatrixElements):
-    def __init__(self, arr_to_calc, nr, r, l_max=5, m_max=5, L_max=5, a=2.0, N=101):
+    def __init__(self, arr_to_calc, nr, r, l_max=5, m_max=None, L_max=5, a=2.0, N=101):
         super().__init__(l_max, N)
 
         if (m_max is None) or (m_max > l_max):
