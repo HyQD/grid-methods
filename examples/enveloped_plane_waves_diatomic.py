@@ -10,7 +10,6 @@ from grid_methods.spherical_coordinates.radial_matrix_elements import (
 from grid_methods.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_lm,
     AngularMatrixElements_lmr,
-    AngularMatrixElements_lr_Coulomb,
     AngularMatrixElements_lmr_Coulomb,
 )
 from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
@@ -67,7 +66,8 @@ k = omega / speed_of_light
 N = 200
 nr = N - 1
 r_max = 100
-l_max = 5
+l_max = 6
+m_max = 1
 L_max = l_max  # max l number in partial wave expansion of the Coulomb potential
 a = 2.0  # H2+ bond length
 
@@ -93,6 +93,7 @@ angular_matrix_elements = AngularMatrixElements_lm(
         "H_z_beta",
     ],
     l_max=l_max,
+    m_max=m_max,
 )
 angular_matrix_elements_lmr = AngularMatrixElements_lmr(
     arr_to_calc=[
@@ -106,12 +107,14 @@ angular_matrix_elements_lmr = AngularMatrixElements_lmr(
     phi_k=0,
     theta_k=np.pi / 2,
     l_max=l_max,
+    m_max=m_max,
 )
-angular_matrix_elements_Coulomb = AngularMatrixElements_lr_Coulomb(
+angular_matrix_elements_Coulomb = AngularMatrixElements_lmr_Coulomb(
     arr_to_calc=["1/(r-a)"],
     nr=nr,
     r=r,
     l_max=l_max,
+    m_max=m_max,
     a=a,
     L_max=L_max,
 )
@@ -129,7 +132,7 @@ eps, phi_n = compute_ground_state_diatomic(
 psi_t_temp = phi_n[:, 0] / np.sqrt(quadrature(weights, np.abs(phi_n[:, 0]) ** 2))
 psi_t = np.zeros((n_lm, nr), dtype=np.complex128)
 for l in range(l_max + 1):
-    I = angular_matrix_elements_lmr.I_lm[f"{l}{0}"]
+    I = angular_matrix_elements_lmr.I_lm_[f"{l}{0}"]
     psi_t[I, :] = psi_t_temp[l * nr : (l + 1) * nr]
 
 # setup pulses
@@ -174,9 +177,7 @@ Vt_psi = setup_V_psi_PlaneWaveExpansion(
     orders=False,
 )
 
-V_Coulomb = V_Coulomb(
-    angular_matrix_elements_Coulomb.convert_to_lmr(), radial_matrix_elements
-)
+V_Coulomb = V_Coulomb(angular_matrix_elements_Coulomb, radial_matrix_elements)
 
 rhs = HtPsi(
     angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi, V_Coulomb]
@@ -242,4 +243,4 @@ samples = {
     "expec_pz": expec_pz,
 }
 
-np.savez("output_enveloped_plane_waves_diatomic", **samples)
+np.savez(f"output_enveloped_plane_waves_diatomic", **samples)
