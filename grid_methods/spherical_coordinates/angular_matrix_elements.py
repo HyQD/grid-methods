@@ -721,11 +721,11 @@ class AngularMatrixElements_lmr(AngularMatrixElements):
         self.sph_jn = sph_jn
         self.sph_jn2 = sph_jn2
 
-        for l1 in range(nl - 1):
+        for l1 in range(nl):
             temp_m1_max = min(l1, self.m_max)
             for m1 in range(-temp_m1_max, temp_m1_max + 1):
                 I = self.I_lm_[f"{l1}{m1}"]
-                for l2 in range(nl - 1):
+                for l2 in range(nl):
                     temp_m2_max = min(l2, self.m_max)
                     for m2 in range(-temp_m2_max, temp_m2_max + 1):
                         J = self.I_lm_[f"{l2}{m2}"]
@@ -1236,11 +1236,11 @@ class AngularMatrixElements_lmr_orders(AngularMatrixElements_orders):
         self.sph_jn[L, :] = 4 * np.pi * spherical_jn(L, k * r)
         self.sph_jn2[L, :] = 4 * np.pi * spherical_jn(L, 2 * k * r)
 
-        for l1 in range(nl - 1):
+        for l1 in range(nl):
             temp_m1_max = min(l1, self.m_max)
             for m1 in range(-temp_m1_max, temp_m1_max + 1):
                 I = self.I_lm_[f"{l1}{m1}"]
-                for l2 in range(nl - 1):
+                for l2 in range(nl):
                     temp_m2_max = min(l2, self.m_max)
                     for m2 in range(-temp_m2_max, temp_m2_max + 1):
                         J = self.I_lm_[f"{l2}{m2}"]
@@ -1296,9 +1296,9 @@ class AngularMatrixElements_lr_orders(AngularMatrixElements_orders):
         self.sph_jn[L, :] = 4 * np.pi * spherical_jn(L, k * r)
         self.sph_jn2[L, :] = 4 * np.pi * spherical_jn(L, 2 * k * r)
 
-        for l1 in range(nl - 1):
+        for l1 in range(nl):
             I = self.I_lm[f"{l1}{0}"]
-            for l2 in range(nl - 1):
+            for l2 in range(nl):
                 J = self.I_lm[f"{l2}{0}"]
                 self.compute_matrix_elements(
                     l1, 0, l2, 0, l1, l2, L, 0, arr_to_calc_dict
