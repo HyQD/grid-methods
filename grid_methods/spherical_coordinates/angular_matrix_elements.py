@@ -1350,31 +1350,6 @@ class AngularMatrixElements_lr_Coulomb(AngularMatrixElements):
                             l1, m, l2, m, L, M
                         ) * compute_r_inv_l(self.r, self.a, L)
 
-    def convert_to_lmr(self, m_max=None):
-        l_max = self.n_l - 1
-
-        if (m_max is None) or (m_max >= self.n_l):
-            m_max = l_max
-
-        ret = AngularMatrixElements_lmr_Coulomb(
-            arr_to_calc=[],
-            nr=self.nr,
-            r=self.r,
-            l_max=l_max,
-            m_max=m_max,
-            L_max=self.L_max,
-            a=self.a,
-            N=self.N,
-        )
-
-        for l1 in range(ret.n_l):
-            I = ret.I_lm[f"{l1}{self.m}"]
-            for l2 in range(ret.n_l):
-                J = ret.I_lm[f"{l2}{self.m}"]
-                ret.arr["1/(r-a)"][I, J, :] = self.arr["1/(r-a)"][l1, l2, :]
-
-        return ret
-
 
 class AngularMatrixElements_lmr_Coulomb(AngularMatrixElements):
     def __init__(self, arr_to_calc, nr, r, l_max=5, m_max=None, L_max=5, a=2.0, N=101):
@@ -1392,6 +1367,13 @@ class AngularMatrixElements_lmr_Coulomb(AngularMatrixElements):
         self.r = r
         self.a = a
 
+        self.m_max = m_max
+
+        self.mask_m0 = np.zeros(self.n_lm, dtype=bool)
+        for l in range(self.n_l):
+            I = self.I_lm[f"{l}{0}"]
+            self.mask_m0[I] = True
+
         self.arr["1/(r-a)"] = np.zeros(
             (self.n_lm, self.n_lm, self.nr), dtype=np.complex128
         )
@@ -1405,26 +1387,34 @@ class AngularMatrixElements_lmr_Coulomb(AngularMatrixElements):
         self.sph_harms = np.zeros((self.n_lm, len(self.weights)), dtype=np.complex128)
 
         for L_ in range(n_sph_harms):
-            I = self.I_lm[f"{L_}{0}"]
-            self.sph_harms[I, :] = sph_harm(0, L_, self.phi, self.theta)
+            temp_M_max = min(L_, m_max)
+            for M_ in range(-temp_M_max, temp_M_max + 1):
+                I = self.I_lm[f"{L_}{M_}"]
+                self.sph_harms[I, :] = sph_harm(M_, L_, self.phi, self.theta)
 
         if True in arr_to_calc_dict.values():
             self.setup_lm_matrix_elements(arr_to_calc_dict)
 
-    def setup_lm_matrix_elements(self, arr_to_calc_dict, m=0, M=0):
+    def setup_lm_matrix_elements(self, arr_to_calc_dict, M=0):
         n_l = self.n_l
         L_max = self.L_max
         nr = self.nr
 
         for l1 in range(n_l):
-            I = self.I_lm[f"{l1}{m}"]
             for l2 in range(n_l):
-                J = self.I_lm[f"{l2}{m}"]
-                for L in range(L_max + 1):
-                    if arr_to_calc_dict["1/(r-a)"]:
-                        self.arr["1/(r-a)"][I, J, :] += self.l1m1_Y_star_l2m2_Lebedev(
-                            l1, m, l2, m, L, M
-                        ) * compute_r_inv_l(self.r, self.a, L)
+                temp_m_max = min(l1, l2, self.m_max)
+                for m in range(-temp_m_max, temp_m_max + 1):
+                    I = self.I_lm[f"{l1}{m}"]
+                    J = self.I_lm[f"{l2}{m}"]
+                    for L in range(L_max + 1):
+                        if arr_to_calc_dict["1/(r-a)"]:
+                            self.arr["1/(r-a)"][
+                                I, J, :
+                            ] += self.l1m1_Y_star_l2m2_Lebedev(
+                                l1, m, l2, m, L, M
+                            ) * compute_r_inv_l(
+                                self.r, self.a, L
+                            )
 
 
 def compute_r_inv_l(r, a, l):
