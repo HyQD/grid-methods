@@ -41,9 +41,10 @@ class M2Psi:
         Identity = np.complex128(np.eye(self.nr))
         self.M_l = np.zeros((self.n_lm, self.nr, self.nr), dtype=np.complex128)
 
-        for l in range(self.n_lm):
+        for I in range(self.n_lm):
+            l = angular_matrix_elements.lm_I[I][0]
             T_l = T_D2 + np.diag(l * (l + 1) / (2 * r**2))
-            self.M_l[l] = np.linalg.inv(Identity + 1j * dt / 2 * T_l)
+            self.M_l[I] = np.linalg.inv(Identity + 1j * dt / 2 * T_l)
 
     def __call__(self, psi):
         psi = psi.reshape((self.n_lm, self.nr))
