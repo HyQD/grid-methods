@@ -19,7 +19,6 @@ def expec_x_i(psi, weights, r, xi_Omega):
 
 
 def expec_p_i(psi, dpsi_dr, weights, r, xi_Omega, H_xi_beta):
-
     n_lm = psi.shape[0]
     tmp_alpha = contract("IJ, Jk->Ik", xi_Omega, dpsi_dr)
     tmp_beta = contract("IJ, Jk->Ik", H_xi_beta, psi)
@@ -31,6 +30,44 @@ def expec_p_i(psi, dpsi_dr, weights, r, xi_Omega, H_xi_beta):
         expec_pi -= 1j * quadrature(weights, (psi[I].conj() / r) * tmp_beta[I])
 
     return expec_pi
+
+
+def expec_kinetic_energy(psi, T_D2psi, weights, r, lm_I):
+    n_lm = psi.shape[0]
+
+    expec_k = 0 + 0j
+
+    for I in range(n_lm):
+        l = lm_I[I][0]
+        expec_k += quadrature(weights, psi[I].conj() * T_D2psi[I])
+        expec_k += (l * (l + 1) / 2) * quadrature(
+            weights, (psi[I].conj() / r**2) * psi[I]
+        )
+
+    return expec_k
+
+
+def expec_potential_energy_rinv(psi, weights, r, Z=1):
+    n_lm = psi.shape[0]
+
+    expec_v = 0 + 0j
+
+    for I in range(n_lm):
+        expec_v -= Z * quadrature(weights, (psi[I].conj() / r) * psi[I])
+
+    return expec_v
+
+
+def expec_potential_energy_expansion(psi, weights, V, Z=1):
+    n_lm = psi.shape[0]
+    Vpsi = -Z * contract("IJk, Jk->Ik", V, psi)
+
+    expec_v = 0 + 0j
+
+    for I in range(n_lm):
+        expec_v += quadrature(weights, psi[I].conj() * Vpsi[I])
+
+    return expec_v
 
 
 def compute_norm(psi, weights):
