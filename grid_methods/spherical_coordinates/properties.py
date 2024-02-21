@@ -47,6 +47,17 @@ def expec_kinetic_energy(psi, T_D2psi, weights, r, lm_I):
     return expec_k
 
 
+def expec_potential_energy_spherical(psi, weights, potential):
+    n_lm = psi.shape[0]
+
+    expec_v = 0 + 0j
+
+    for I in range(n_lm):
+        expec_v += quadrature(weights, (psi[I].conj() * potential) * psi[I])
+
+    return expec_v
+
+
 def expec_potential_energy_rinv(psi, weights, r, Z=1):
     n_lm = psi.shape[0]
 
@@ -75,6 +86,14 @@ def compute_norm(psi, weights):
     norm = 0 + 0j
     for I in range(n_lm):
         norm += quadrature(weights, np.abs(psi[I]) ** 2)
+    return norm
+
+
+def compute_overlap(psi1, psi2, weights):
+    n_lm = psi1.shape[0]
+    norm = 0 + 0j
+    for I in range(n_lm):
+        norm += quadrature(weights, psi1[I].conj() * psi2[I])
     return norm
 
 
