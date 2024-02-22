@@ -56,3 +56,17 @@ class SAE:
                 + (self.Z - 1 - self.A) * np.exp(-self.B * r)
             )
         )
+
+
+class Erfgau:
+    def __init__(self, Z, mu):
+        self.Z = Z
+        self.mu = mu
+
+    def __call__(self, r):
+        c = 0.923 + 1.568 * self.mu
+        alpha = 0.2411 + 1.405 * self.mu
+        long_range = erf(self.mu * self.Z * r) / (self.Z * r)
+        return -self.Z**2 * (
+            c * np.exp(-(alpha**2) * self.Z**2 * r**2) + long_range
+        )
