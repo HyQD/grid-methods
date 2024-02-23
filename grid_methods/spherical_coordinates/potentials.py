@@ -58,6 +58,32 @@ class SAE:
         )
 
 
+class SAE2:
+    """
+    Ref: 10.1088/2399-6528/ab9a68
+
+    Params: See Table 1 in Ref.
+    """
+
+    def __init__(self, C0, Zc, c, a, b):
+        self.C0 = C0
+        self.Zc = Zc
+        self.c = c
+        self.a = a
+        self.b = b
+        self.n_a = len(a)
+
+    def __call__(self, r):
+        T1 = -self.C0 / r
+        T2 = -self.Zc * np.exp(-self.c * r) / r
+        T3 = np.zeros_like(r)
+
+        for i in range(self.n_a):
+            T3 -= self.a[i] * np.exp(-self.b[i] * r)
+
+        return T1 + T2 + T3
+
+
 class Erfgau:
     def __init__(self, Z, mu):
         self.Z = Z
