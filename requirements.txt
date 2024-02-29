@@ -1,0 +1,10 @@
+h5py
+mpi4py
+networkx
+numpy<1.25
+sympy
+tomli
+cython<3
+mpsort
+pfft-python
+pmesh
