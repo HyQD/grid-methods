@@ -46,4 +46,4 @@ The time-independent Schrödinger equation
 
 .. math::
 
-    -\frac{1}{2}\frac{\partial^2 u_{l,m}}{\partial r^2}+\frac{l(l+1)}{2 r^2} u_{l,m} = \epsilon_{l,m} u_{l,m}
+    -\frac{1}{2}\frac{\partial^2 u_{l,m}}{\partial r^2}+\frac{l(l+1)}{2 r^2} u_{l,m} = \epsilon_{l,m} u_{l,m}.
