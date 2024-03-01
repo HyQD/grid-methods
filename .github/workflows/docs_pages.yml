@@ -1,50 +1,27 @@
-name: docs
+name: documentation
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: write
 
 jobs:
-  build_docs_job:
+  docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/docs/buildDocs.sh') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-          ${{ runner.os }}-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y python3-mpi4py python3-numpy
-        sudo apt-get install -y libhdf5-openmpi-dev
-    - name: Install python dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install --upgrade wheel numpy mpi4py "cython<3"
-        python3 -m pip install "pmesh @ git+https://github.com/rainwoodman/pmesh"
-        python3 -m pip install -r requirements.txt
-    - name: Install package
-      run: |
-        python3 -m pip install .
-    - name: Build docs
-      shell: bash
-      run: |
-        docs/buildDocs.sh
-    - name: Publish docs to gh-pages
-      if: github.event_name == 'push'
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        docs/publishDocs.sh
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - name: Install dependencies
+        run: |
+          pip install sphinx sphinx_rtd_theme myst_parser sphinx-tabs sphinx-panels
+      - name: Sphinx build
+        run: |
+          sphinx-build doc _build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/
+          force_orphan: true
