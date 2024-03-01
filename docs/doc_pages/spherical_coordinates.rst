@@ -10,7 +10,7 @@ Spherical coordinate system
     y &= r \sin \theta \sin \phi \\
     z &= r \cos \theta
 
-where :math:`r \in [0,\infty)`, :math:`\theta \in [0,\pi]` and :math:`\phi \in [0,2\pi]`. 
+where :math:`r \in [0,\infty)`, :math:`\theta \in [0,\pi]` and :math:`\phi \in [0,2\pi)`. 
 
 Furthermore, the volume element is given by 
 
@@ -46,4 +46,4 @@ The time-independent Schrödinger equation
 
 .. math::
 
-    -\frac{1}{2}\frac{\partial^2 u_{l,m}}{\partial r^2}+\frac{l(l+1)}{2 r^2} u_{l,m} = \epsilon_{l,m} u_{l,m}.
+    -\frac{1}{2}\frac{\partial^2 u_{n,l}}{\partial r^2}+\frac{l(l+1)}{2 r^2} u_{n,l} + V(r)u_{n,l} = \epsilon_{n,l} u_{n,l}.
