@@ -39,7 +39,7 @@ where :math:`Y_{l,m}(\theta, \phi)` are the spherical harmonics and :math:`l_{ma
 
 .. math::
 
-    \nabla^2 \Psi(\mathbf{r}) = \sum_{l,m} \frac{1}{r} \left(\frac{\partial^2 u_{l,m}}{\partial r^2} - \frac{l(l+1)}{r^2} u_{l,m} \right) Y_{l,m}
+    \nabla^2 \Psi(\mathbf{r}) = \sum_{l,m} \frac{1}{r} \left(\frac{d^2 u_{l,m}(r)}{d r^2} - \frac{l(l+1)}{r^2} u_{l,m}(r) \right) Y_{l,m}(\theta, \phi)
 
 The time-independent Schrödinger equation
 =========================================
@@ -59,3 +59,22 @@ and the (radial) TISE becomes
 .. math::
 
     -\frac{1}{2}\frac{d^2 u_{n,l}(r)}{d r^2}+\frac{l(l+1)}{2 r^2} u_{n,l}(r) + V(r)u_{n,l} = \epsilon_{n,l} u_{n,l}(r).
+
+Gauss-Legendre-Lobatto quadrature is defined on :math:`x \in [-1,1]`. 
+We need to map the grid/Lobatto points :math:`x_i \in [-1,1]` into radial points :math:`r(x): [-1,1] \rightarrow [0, r_{\text{max}}]`. 
+In that case, :math:`\psi(r) = \psi(r(x))`.
+
+The (rational) mapping 
+
+.. math::
+    
+    r(x) = L \frac{1+x}{1-x+\alpha}, \ \ \alpha = \frac{2L}{r_{\text{max}}} \label{x_to_r},
+
+has often been used in earlier work. 
+The parameters :math:`L` and :math:`\alpha` control the length of the grid and the density of points near :math:`r=0`. 
+
+Another option is to use the linear mapping given by 
+
+.. math::
+
+    r(x) = \frac{r_{\text{max}}(x+1)}{2}.
