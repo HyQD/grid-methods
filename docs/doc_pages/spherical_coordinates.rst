@@ -45,6 +45,7 @@ The time-independent Schrödinger equation
 =========================================
 
 The time-independent Schrödinger equation
+
 .. math::
     \left(-\frac{1}{2}\nabla^2 + V(\mathbf{r}) \right) \Psi_k(\mathbf{r}) = E_k \Psi_k(\mathbf{r}), \ \ k=1,2,3,\cdots
 
@@ -53,8 +54,8 @@ For a spherical symmetric potential :math:`V(r)`, the eigenfunctions can be take
 .. math::
     \Psi_{n,l,m}(\mathbf{r}) = r^{-1} u_{n,l}(r) Y_{l,m}(\theta, \phi),
 
-and the TDSE becomes 
+and the (radial) TISE becomes 
 
 .. math::
 
-    -\frac{1}{2}\frac{\partial^2 u_{n,l}}{\partial r^2}+\frac{l(l+1)}{2 r^2} u_{n,l} + V(r)u_{n,l} = \epsilon_{n,l} u_{n,l}.
+    -\frac{1}{2}\frac{d^2 u_{n,l}(r)}{d r^2}+\frac{l(l+1)}{2 r^2} u_{n,l}(r) + V(r)u_{n,l} = \epsilon_{n,l} u_{n,l}(r).
