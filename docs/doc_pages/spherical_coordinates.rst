@@ -78,3 +78,23 @@ Another option is to use the linear mapping given by
 .. math::
 
     r(x) = \frac{r_{\text{max}}(x+1)}{2}.
+
+In order to use the Gauss-Legendre-Lobatto pseudospectral method, we must first formulate 
+the radial TISE with respecto to :math:`x`.
+
+By the chain rule we find 
+
+.. math::
+    
+    \frac{d \psi}{dr} &= \frac{1}{\dot{r}(x)} \frac{d \psi}{dx},
+    \frac{d^2 \psi}{dr^2} &= \frac{1}{\dot{r}(x)^2} \frac{d^2 \psi}{dx^2} - \frac{\ddot{r}(x)}{\dot{r}(x)^3} \frac{d \psi}{dx},
+
+and the radial TISE becomes
+
+.. math::
+
+    -\frac{1}{2} \left( \frac{1}{\dot{r}(x)^2} \frac{d^2 \psi}{dx^2} - \frac{\ddot{r}(x)}{\dot{r}(x)^3} \frac{d \psi}{dx} \right) + V_l(r(x)) \psi(r(x)) = \epsilon \psi(r(x)),
+
+where :math:`V_l(r(x)) \equiv V(r(x)) + \frac{l(l+1)}{2 r(x)^2}`.
+     
+
