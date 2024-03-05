@@ -30,7 +30,7 @@ Multiplying through with :math:`r` and :math:`Y_{l}^{m *}(\Omega)` and integrati
 
 .. math::
     
-    i \dot{u}_{l,m(r,t)  = \left( -\frac{1}{2}  \frac{\partial^2}{\partial r^2} + \frac{l(l+1)}{2r^2} -\frac{Z}{r} \right) u_{l,m}(r,t)  
+    i \dot{u}_{l,m(r,t)  = \left( -\frac{1}{2}  \frac{\partial^2}{\partial r^2} + V_l(r) \right) u_{l,m}(r,t)  
     + r\int Y_l^{m *}(\Omega) \left( A(\mathbf{r},t) \cdot \hat{p} + \frac{1}{2}A(\mathbf{r},t)^2 \right) \Psi(\mathbf{r}, t) d\Omega, 
 
 
