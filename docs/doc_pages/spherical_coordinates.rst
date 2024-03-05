@@ -154,10 +154,10 @@ Furthermore, dividing through with :math:`P_N(x_i)`, we have that
 
 .. math::
 
-     \sum_{j=1}^{N-1} \left(-\frac{1}{2}  \frac{\tilde{g}^{\prime \prime}_j(x_i)}{\dot{r}(x_i) \dot{r}(x_j)} \tilde{\phi_{n,l}}(x_j) \right) +   V(r(x_i))\tilde{\phi_{n,l}}(x_i)  = \epsilon_{n,l}  \tilde{\phi_{n,l}}(x_i),
+     \sum_{j=1}^{N-1} \left(-\frac{1}{2}  \frac{\tilde{g}^{\prime \prime}_j(x_i)}{\dot{r}(x_i) \dot{r}(x_j)} \tilde{\phi}_{n,l}(x_j) \right) +   V(r(x_i))\tilde{\phi}_{n,l}(x_i)  = \epsilon_{n,l}  \tilde{\phi}_{n,l}(x_i),
 
 where we have defined 
 
 .. math::
     
-    \tilde{\phi_{n,l}}(x_i) \equiv \frac{\phi_{n,l}(x_i)}{P_N(x_i)}.
+    \tilde{\phi}_{n,l}(x_i) \equiv \frac{\phi_{n,l}(x_i)}{P_N(x_i)}.
