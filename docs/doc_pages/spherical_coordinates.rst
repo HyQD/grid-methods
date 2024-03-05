@@ -92,14 +92,14 @@ By the chain rule we find
 and the radial TISE becomes
 
 .. math::
-
+    :name: eq:symmetric_radial_TISE
     -\frac{1}{2} \left( \frac{1}{\dot{r}(x)^2} \frac{d^2 \psi}{dx^2} - \frac{\ddot{r}(x)}{\dot{r}(x)^3} \frac{d \psi}{dx} \right) + V_l(r(x)) \psi(r(x)) = \epsilon \psi(r(x)),
-
+    
 where we have defined :math:`V_l(r(x)) \equiv V(r(x)) + \frac{l(l+1)}{2 r(x)^2}`. Note that this is, in general, an unsymmetric eigenvalue problem 
 due to the presence of the term :math:`\frac{\ddot{r}(x)}{\dot{r}(x)^3}`.
 
 In order to reformulate the above as a symmetric eigenvalue problem, we define the new wavefunction :math:`f(x) = \dot{r}(x)^{1/2} \psi(r(x))`.
-Insertion of this into the radial TISE yields 
+Insertion of this into Eq. :ref:`Link title <eq:symmetric_radial_TISE>` yields 
 
 .. math::
     \left(-\frac{1}{2} \frac{1}{\dot{r}(x)} \frac{d^2}{dx^2} \frac{1}{\dot{r}(x)} + V_l(r(x))+\tilde{V}(r(x)) \right) f(x) = \epsilon f(x),
