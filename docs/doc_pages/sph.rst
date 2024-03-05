@@ -44,9 +44,10 @@ Properties
     \sum_{m=-l}^l |Y_l^m(\Omega)|^2 = \frac{2l+1}{4 \pi}
 
 The product of two spherical harmonics can be expressed as 
+
 .. math::
 
-    Y_{l',m'}(\Omega)Y_{l,m}(\Omega) = \sqrt{\frac{(2l'+1)(2l+1)}{4\pi}}\sum_{L=0}^{\infty}\sum_{M=-L}^{L}(-1)^M\sqrt{2L+1}
+    Y_{l^\prime,m^\prime}(\Omega)Y_{l,m}(\Omega) = \sqrt{\frac{(2l^\prime+1)(2l+1)}{4\pi}}\sum_{L=0}^{\infty}\sum_{M=-L}^{L}(-1)^M\sqrt{2L+1}
     \begin{pmatrix}
         l^\prime & l & L \\
         m^\prime & m & -M 
