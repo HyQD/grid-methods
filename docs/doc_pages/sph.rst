@@ -141,11 +141,11 @@ Using the product formula for the spherical harmonics it follows that
 
 .. math:: 
 
-    \int Y_{l^\prime, m^\prime}^*(\Omega) x Y_{l,m}(\Omega) d\Omega &= \frac{1}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
+    \int Y_{l^\prime, m^\prime}^*(\Omega) x Y_{l,m}(\Omega) d\Omega &= \frac{1}{2}r\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
     - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1} 
     - b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1}
     + b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1}\Bigl. \Bigr], \\
-    \int Y_{l^\prime, m^\prime}^*(\Omega) y Y_{l,m}(\Omega) d\Omega &= \frac{i}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1}
+    \int Y_{l^\prime, m^\prime}^*(\Omega) y Y_{l,m}(\Omega) d\Omega &= \frac{i}{2}r\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1}
     - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1}
     + b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1} 
     - b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1} \Bigl. \Bigr], \\
