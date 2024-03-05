@@ -42,7 +42,7 @@ where :math:`Y_{l,m}(\theta, \phi)` are the spherical harmonics and :math:`l_{ma
     \nabla^2 \Psi(\mathbf{r}) = \sum_{l,m} \frac{1}{r} \left(\frac{d^2 u_{l,m}(r)}{d r^2} - \frac{l(l+1)}{r^2} u_{l,m}(r) \right) Y_{l,m}(\theta, \phi)
 
 The time-independent Schrödinger equation
-=========================================
+#########################################
 
 The time-independent Schrödinger equation
 
