@@ -32,3 +32,4 @@ Indices and tables
 
    ./doc_pages/theory
    ./doc_pages/spherical_coordinates
+   ./doc_pages/tise
