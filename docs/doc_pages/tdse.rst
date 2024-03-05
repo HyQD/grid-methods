@@ -26,12 +26,12 @@ Inserting this ansatz into to TDSE yields
     i \sum_{l,m} \frac{1}{r} \dot{u}_{l,m}(r,t) Y_l^m(\Omega) = \sum_{l,m} \left( \frac{1}{r}\left( -\frac{1}{2}\frac{d^2u_{l,m}(r,t)}{dr^2} + V_l(r)u_{l,m}(r,t) \right)  Y_l^m(\Omega) \right) 
     + \left( A(\mathbf{r},t) \cdot \hat{p} + \frac{1}{2}A(\mathbf{r},t)^2 \right) \Psi(\mathbf{r}, t)
 
-Multiplying through with :math:`r` and :math:`Y_{l}^{m *}(\Omega)` and integrating over $\Omega$ yields equations of motion for :math:`u_{l,m}(r,t)`,
+Multiplying through with :math:`r` and :math:`Y_{l}^{m *}(\Omega)` and integrating over :math:`\Omega` yields equations of motion for :math:`u_{l,m}(r,t)`,
 
 .. math::
     
-    i \dot{u}_{l,m(r,t)  = \left( -\frac{1}{2}  \frac{\partial^2}{\partial r^2} + V_l(r) \right) u_{l,m}(r,t)  
-    + r\int Y_l^{m *}(\Omega) \left( A(\mathbf{r},t) \cdot \hat{p} + \frac{1}{2}A(\mathbf{r},t)^2 \right) \Psi(\mathbf{r}, t) d\Omega, 
+    i \dot{u}_{l,m}(r,t)  = \left( -\frac{1}{2}  \frac{d^2}{dr^2} + V_l(r) \right) u_{l,m}(r,t)  
+    + r \int Y_l^{m *}(\Omega) \left( A(\mathbf{r},t) \cdot \hat{p} + \frac{1}{2}A(\mathbf{r},t)^2 \right) \Psi(\mathbf{r}, t) d\Omega, 
 
 
 Electromagnetic fields
