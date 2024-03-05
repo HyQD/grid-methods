@@ -103,9 +103,10 @@ In order to reformulate the above as a symmetric eigenvalue problem, we define t
 Insertion of this into Eq. :ref:`Link title <eq:unsymmetric_radial_TISE>` yields 
 
 .. math::
+    :label: symmetric_radial_TISE
     
     \left(-\frac{1}{2} \frac{1}{\dot{r}(x)} \frac{d^2}{dx^2} \frac{1}{\dot{r}(x)} + V_l(r(x))+\tilde{V}(r(x)) \right) f(x) = \epsilon f(x),
-    :label: symmetric_radial_TISE
+    
 
 where we have introduced the new potential :math:`\tilde{V}(x) \equiv \frac{2\dddot{r}(x)\dot{r}(x)-3\ddot{r}(x)^2}{4\dot{r}(x)^4}`.
      
