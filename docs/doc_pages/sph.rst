@@ -82,8 +82,8 @@ The action of the Cartesian position and derivativte operators on the spherical 
 
 .. math::
 
-    xY_{l,m} &= \frac{1}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} - b_{l-1,m-1}Y_{l-1,m-1} + b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
-    yY_{l,m} &= \frac{i}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} + b_{l-1,m-1}Y_{l-1,m-1} - b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
+    xY_{l,m} &= \frac{1}{2}r\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} - b_{l-1,m-1}Y_{l-1,m-1} + b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
+    yY_{l,m} &= \frac{i}{2}r\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} + b_{l-1,m-1}Y_{l-1,m-1} - b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
     zY_{l,m} &= r\Bigl[a_{l,m}Y_{l+1,m} + a_{l-1,m}Y_{l-1,m}\Bigr],
 
 and
