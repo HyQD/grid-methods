@@ -50,7 +50,7 @@ Properties
 
 .. math::
 
-    Y_{l',m'}Y_{l,m} = \sqrt{\frac{(2l'+1)(2l+1)}{4\pi}}\sum_{L=0}^{\infty}\sum_{M=-L}^{L}(-1)^M\sqrt{2L+1}
+    Y_{l',m'}(\Omega)Y_{l,m}(\Omega) = \sqrt{\frac{(2l'+1)(2l+1)}{4\pi}}\sum_{L=0}^{\infty}\sum_{M=-L}^{L}(-1)^M\sqrt{2L+1}
     \begin{pmatrix}
         l^\prime & l & L \\
         m^\prime & m & -M 
@@ -59,6 +59,7 @@ Properties
         l^\prime & l & L \\
         0 & 0 & 0 
     \end{pmatrix}
+    Y_{L,M}(\Omega)
 
 Integrals over spherical harmonics 
 ==================================
