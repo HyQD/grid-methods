@@ -25,6 +25,20 @@ and the Laplacian is given by
     \nabla^2 &= \frac{1}{r^2} \frac{\partial}{\partial r}\left( r^2 \frac{\partial}{\partial r} \right) + \frac{1}{r^2} \left[\frac{1}{\sin(\theta)}\frac{\partial}{\partial \theta}\left(\sin(\theta) \frac{\partial}{\partial \theta}\right) +\frac{1}{\sin^2(\theta)}\frac{\partial^2}{\partial \phi^2}\right] \\
     &= \frac{1}{r} \frac{\partial^2}{\partial r^2} r - \frac{\hat{L}^2}{r^2}
 
+Furthermore, the cartesian derivative operators are given by 
+
+.. math::
+    
+    \frac{\partial}{\partial x} &= \cos{\phi} \sin{\theta}\frac{\partial}{\partial r} 
+    - \frac{\sin{\phi}}{r\sin{\theta}}\frac{\partial}{\partial \phi} 
+    - + \frac{\cos{\phi}\cos{\theta}}{r}\frac{\partial}{\partial \theta} \\
+    \frac{\partial}{\partial y} &= \sin{\phi} \sin{\theta}\frac{\partial}{\partial r} 
+    + \frac{\cos{\phi}}{r\sin{\theta}}\frac{\partial}{\partial \phi} 
+    + + \frac{\sin{\phi}\cos{\theta}}{r}\frac{\partial}{\partial \theta} \\
+    \frac{\partial}{\partial z} &= \cos{\theta}\frac{\partial}{\partial r} 
+    - \frac{\sin{\theta}}{r}\frac{\partial}{\partial \theta}
+
+
 
 Wavefunction paramtetrization
 =============================
