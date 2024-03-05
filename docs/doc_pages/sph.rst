@@ -11,7 +11,7 @@ where :math:`P_l^m(x)` are the associated Legendre functions
 
 .. math::
 
-    P_l^m(x) = (1-x^2)^{|m|/2} \left(\frac{d}{dx}\right)^|m| P_l(x)
+    P_l^m(x) = (1-x^2)^{|m|/2} \left(\frac{d}{dx}\right)^{|m|} P_l(x)
 
 and :math:`P_l(x)` are the Legendre polynomials
 
@@ -26,6 +26,23 @@ In the following we use the notation
     Y_l^m(\theta, \phi) = Y_l^m(\Omega)
 
 where :math:`\Omega = (\theta, \phi)`.
+
+Wigner 3j symbols
+=================
+
+Trigonometric operators can typically be expressed in terms of spherical harmonics with small quantum numbers. 
+In these cases the Wigner coefficients can be evaluated explicitly. We give closed form expressions to some simplified Wigner coefficients that can be useful. 
+First, we repeat equation (13) in https://mathworld.wolfram.com/Wigner3j-Symbol.html in relevant notation:
+
+.. math::
+    
+   \begin{pmatrix}
+        l^\prime & l & l^\prime+l \\
+        m^\prime & m & -M 
+    \end{pmatrix} 
+    = (-1)^{l'-l+M}\Biggl[ \frac{(2l')!(2l)!}{(2l'+2l+1)!}\frac{(l'+l+M)!(l'+l-M)!}{(l'+m')!(l'-m')!(l+m)!(l-m)!} \Biggr]^{1/2}
+
+
 
 Properties
 ==========
@@ -44,8 +61,8 @@ Properties
 
 .. math::
 
-    \frac{\partial}{\partial \phi}Y_{l,m} = imY_{l,m}, \\
-    \frac{\partial}{\partial \theta}Y_{l,m} = m \frac{\cos{\theta}}{\sin{\theta}}Y_{l,m} + \sqrt{(l-m)(l+m+1)}e^{-i\phi}Y_{l,m+1}
+    \frac{\partial}{\partial \phi}Y_{l,m}(\Omega) &= imY_{l,m}(\Omega), \\
+    \frac{\partial}{\partial \theta}Y_{l,m}(\Omega) &= m \frac{\cos{\theta}}{\sin{\theta}}Y_{l,m}(\Omega) + \sqrt{(l-m)(l+m+1)}e^{-i\phi}Y_{l,m+1}(\Omega)
 
 
 .. math::
@@ -68,7 +85,7 @@ Using the product formula for the spherical harmonics it follows that
 
 .. math::
 
-    \int Y_{l',m'}(\Omega) Y_{l,m}(\Omega) Y_{L,M}^*(\Omega) d\Omega = \sqrt{\frac{(2l'+1)(2l+1)}{4\pi}}(-1)^M\sqrt{2L+1}
+    \int Y_{l',m'}(\Omega) Y_{l,m}(\Omega) Y_{L,M}^*(\Omega) d\Omega = (-1)^M \sqrt{\frac{(2l'+1)(2l+1)(2L+1)}{4\pi}}
     \begin{pmatrix}
         l^\prime & l & L \\
         m^\prime & m & -M 
