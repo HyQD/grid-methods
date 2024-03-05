@@ -32,5 +32,6 @@ Indices and tables
 
    ./doc_pages/theory
    ./doc_pages/spherical_coordinates
+   ./doc_pages/sph 
    ./doc_pages/tise
    ./doc_pages/tdse
