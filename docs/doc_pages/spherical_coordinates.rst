@@ -126,5 +126,5 @@ Next, we multiply through with :math:`g_i(x)` and integrate over :math:`x`,
 
 .. math::
 
-     \sum_{j=0}^N \left(-\frac{1}{2}  \frac{f(x_j)}{\dot{r}(x_j)} \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx +  f(x_j) \int g_i(x) V(r(x)) g_j(x) dx \right) = \epsilon &\sum_{j=0}^N f(x_j) \int g_i(x) g_j(x) dx
+     \sum_{j=0}^N \left(-\frac{1}{2}  \frac{f(x_j)}{\dot{r}(x_j)} \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx +  f(x_j) \int g_i(x) V(r(x)) g_j(x) dx \right) = \epsilon \sum_{j=0}^N f(x_j) \int g_i(x) g_j(x) dx
 
