@@ -82,8 +82,8 @@ The action of the Cartesian position and derivativte operators on the spherical 
 
 .. math::
 
-    xY_{l,m} &= \frac{1}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} \nonumber \\ &- b_{l-1,m-1}Y_{l-1,m-1} + b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
-    yY_{l,m} &= \frac{i}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} \nonumber \\ &+ b_{l-1,m-1}Y_{l-1,m-1} - b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
+    xY_{l,m} &= \frac{1}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} - b_{l-1,m-1}Y_{l-1,m-1} + b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
+    yY_{l,m} &= \frac{i}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}Y_{l-1,m+1} - b_{l,m}Y_{l+1,m+1} + b_{l-1,m-1}Y_{l-1,m-1} - b_{l,-m}Y_{l+1,m-1}\Bigl. \Bigr], \\
     zY_{l,m} &= r\Bigl[a_{l,m}Y_{l+1,m} + a_{l-1,m}Y_{l-1,m}\Bigr],
 
 and
@@ -137,3 +137,17 @@ Using the product formula for the spherical harmonics it follows that
         l^\prime & l & L \\
         0 & 0 & 0 
     \end{pmatrix}
+
+
+.. math:: 
+
+    \int Y_{l^\prime, m^\prime}^*(\Omega) x Y_{l,m}(\Omega) d\Omega &= \frac{1}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
+    - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1} 
+    - b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1}
+    + b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1}\Bigl. \Bigr], \\
+    \int Y_{l^\prime, m^\prime}^*(\Omega) y Y_{l,m}(\Omega) d\Omega &= \frac{i}{2}r&\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1}
+    - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1}
+    + b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1} 
+    - b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1} \Bigl. \Bigr], \\
+    \int Y_{l^\prime, m^\prime}^*(\Omega) z Y_{l,m}(\Omega) d\Omega &= r\Bigl[a_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m} 
+    + a_{l-1,m}\delta_{l^\prime, l-1}\delta_{m^\prime, m}\Bigr],
