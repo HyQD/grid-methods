@@ -93,16 +93,18 @@ and the radial TISE becomes
 
 .. math::
     :name: eq:unsymmetric_radial_TISE
+    
     -\frac{1}{2} \left( \frac{1}{\dot{r}(x)^2} \frac{d^2 \psi}{dx^2} - \frac{\ddot{r}(x)}{\dot{r}(x)^3} \frac{d \psi}{dx} \right) + V_l(r(x)) \psi(r(x)) = \epsilon \psi(r(x)),
     
 where we have defined :math:`V_l(r(x)) \equiv V(r(x)) + \frac{l(l+1)}{2 r(x)^2}`. Note that this is, in general, an unsymmetric eigenvalue problem 
 due to the presence of the term :math:`\frac{\ddot{r}(x)}{\dot{r}(x)^3}`.
 
 In order to reformulate the above as a symmetric eigenvalue problem, we define the new wavefunction :math:`f(x) = \dot{r}(x)^{1/2} \psi(r(x))`.
-Insertion of this into Eq. :ref:`eq:unsymmetric_radial_TISE` yields 
+Insertion of this into Eq. :ref:`<eq:unsymmetric_radial_TISE>` yields 
 
 .. math::
     :name: eq:symmetric_radial_TISE
+    
     \left(-\frac{1}{2} \frac{1}{\dot{r}(x)} \frac{d^2}{dx^2} \frac{1}{\dot{r}(x)} + V_l(r(x))+\tilde{V}(r(x)) \right) f(x) = \epsilon f(x),
 
 where we have introduced the new potential :math:`\tilde{V}(x) \equiv \frac{2\dddot{r}(x)\dot{r}(x)-3\ddot{r}(x)^2}{4\dot{r}(x)^4}`.
@@ -114,7 +116,7 @@ We discretize this equation with the pseudospectral method by expanding :math:`f
     f(x) &= \sum_{j=0}^N f(x_j) g_j(x), \\
     \frac{f(x)}{\dot{r}(x)} &= \sum_{j=0}^N \frac{f(x_j)}{\dot{r}(x_j)} g_j(x).
 
-Inserting these expansions into Eq.:ref:`eq:symmetric_radial_TISE` we have that 
+Inserting these expansions into Eq.:ref:`<eq:symmetric_radial_TISE>` we have that 
 
 .. math::
 
@@ -124,6 +126,5 @@ Next, we multiply through with :math:`g_i(x)` and integrate over :math:`x`,
 
 .. math::
 
-     &\sum_{j=0}^N \left(-\frac{1}{2}  \frac{f(x_j)}{\dot{r}(x_j)} \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx +  f(x_j) \int g_i(x) V(r(x)) g_j(x) dx \right) \nonumber \\ 
-     = \epsilon &\sum_{j=0}^N f(x_j) \int g_i(x) g_j(x) dx
+     \sum_{j=0}^N \left(-\frac{1}{2}  \frac{f(x_j)}{\dot{r}(x_j)} \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx +  f(x_j) \int g_i(x) V(r(x)) g_j(x) dx \right) = \epsilon &\sum_{j=0}^N f(x_j) \int g_i(x) g_j(x) dx
 
