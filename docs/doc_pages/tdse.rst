@@ -23,7 +23,7 @@ Inserting this ansatz into to TDSE yields
 
 .. math::
 
-    i \sum_{l,m} \frac{1}{r} \dot{u}_{l,m}(r,t) Y_l^m(\Omega) = \sum_{l,m} \left( \frac{1}{r}\left( -\frac{1}{2}  \frac{d^2}d r^2} + V_l(r) \right) u_{l,m}(r,t) Y_l^m(\Omega) \right) 
+    i \sum_{l,m} \frac{1}{r} \dot{u}_{l,m}(r,t) Y_l^m(\Omega) = \sum_{l,m} \left( \frac{1}{r}\left( -\frac{1}{2}  \frac{d^2}{d r^2} + V_l(r) \right) u_{l,m}(r,t) Y_l^m(\Omega) \right) 
     + \left( A(\mathbf{r},t) \cdot \hat{p} + \frac{1}{2}A(\mathbf{r},t)^2 \right) \Psi(\mathbf{r}, t)
 
 
