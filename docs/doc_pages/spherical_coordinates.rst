@@ -104,7 +104,7 @@ Insertion of this into Eq. :ref:`Link title <eq:unsymmetric_radial_TISE>` yields
 
 .. math::
     :label: symmetric_radial_TISE
-    
+
     \left(-\frac{1}{2} \frac{1}{\dot{r}(x)} \frac{d^2}{dx^2} \frac{1}{\dot{r}(x)} + V_l(r(x))+\tilde{V}(r(x)) \right) f(x) = \epsilon f(x),
     
 
@@ -129,3 +129,35 @@ Next, we multiply through with :math:`g_i(x)` and integrate over :math:`x`,
 
      \sum_{j=0}^N \left(-\frac{1}{2}  \frac{f(x_j)}{\dot{r}(x_j)} \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx +  f(x_j) \int g_i(x) V(r(x)) g_j(x) dx \right) = \epsilon \sum_{j=0}^N f(x_j) \int g_i(x) g_j(x) dx
 
+The integrals are evaluated with by quadrature and using the property :math:`g_j(x_i) = \delta_{i,j}` we have that 
+
+.. math::
+    
+    \int g_i(x) g_j(x) dx &= \sum_{m=0}^N g_i(x_m) g_j(x_m) w_m = \sum_{m=0} w_m \delta_{i, m} \delta_{j,m} = w_i \delta_{i,j}, \\
+    \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx &= \sum_{m=0} g_i(x_m) V(r(x_m)) g_j(x_m) w_m = w_i V(r(x_i)) \delta_{i,j}, \\
+    \int \frac{g_i(x)}{\dot{r}(x)} g^{\prime \prime}_j(x) dx & \underbrace{=}_{???} \sum_{m=1}^{N-1} \frac{g_i(x_m)}{\dot{r}(x_m)} g^{\prime \prime}_j(x_m) = w_i \frac{g^{\prime \prime}_j(x_i)}{\dot{r}(x_i)},  \ \ i=1,\cdots,N-1.
+
+
+Thus, for the interior grid points,
+
+.. math::
+     
+     \sum_{j=1}^{N-1} \left(-\frac{1}{2}  \frac{f(x_j)}{\dot{r}(x_j)} w_i \frac{g^{\prime \prime}_j(x_i)}{\dot{r}(x_i)} +  f(x_j) w_i V(r(x_i)) \delta_{i,j} \right) = \epsilon \sum_{j=1}^{N-1} f(x_j) w_i \delta_{i,j}. 
+
+Using the expressions for the :math:`\tilde{g}^{\prime \prime}` we can write this as (notice that the weights :math:`w_i` cancels)
+
+.. math::
+     
+     \sum_{j=1}^{N-1} \left(-\frac{1}{2}  \frac{\tilde{g}^{\prime \prime}_j(x_i) P_N(x_i)}{\dot{r}(x_i) \dot{r}(x_j)} \frac{f(x_j)} {P_N(x_j)} \right) +  f(x_i) V(r(x_i))  = \epsilon  f(x_i). 
+
+Furthermore, dividing through with :math:`P_N(x_i)`, we have that 
+
+.. math::
+
+     \sum_{j=1}^{N-1} \left(-\frac{1}{2}  \frac{\tilde{g}^{\prime \prime}_j(x_i)}{\dot{r}(x_i) \dot{r}(x_j)} \tilde{f}(x_j) \right) +   V(r(x_i))\tilde{f}(x_i)  = \epsilon  \tilde{f}(x_i),
+
+where we have defined 
+
+.. math::
+    
+    \tilde{f}(x_i) \equiv \frac{f(x_i)}{P_N(x_i)}.
