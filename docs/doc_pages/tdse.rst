@@ -59,8 +59,7 @@ Using the integrals over position operators given in (see :ref:`sph-label`) we h
 
 .. math::
 
-    i \dot{u}_{l^\prime,m^\prime}(r,t) &= \left( -\frac{1}{2}  \frac{d^2 u_{l^\prime,m^\prime}(r,t)}{dr^2} + V_l^\prime(r)u_{l^\prime,m^\prime}(r,t) \right) \\
-    &= + \begin{cases}
+    i \dot{u}_{l^\prime,m^\prime}(r,t) = \left( -\frac{1}{2}  \frac{d^2 u_{l^\prime,m^\prime}(r,t)}{dr^2} + V_l^\prime(r)u_{l^\prime,m^\prime}(r,t) \right) + \begin{cases}
     r \mathcal{E}(t) \sum_{l, m} \frac{1}{2}\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
     - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1} 
     - b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1}
