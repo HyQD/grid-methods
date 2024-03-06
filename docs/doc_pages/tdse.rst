@@ -60,10 +60,16 @@ Using the integrals over position operators given in (see :ref:`sph-label`) we h
 .. math::
 
     i \dot{u}_{l^\prime,m^\prime}(r,t) &= \left( -\frac{1}{2}  \frac{d^2 u_{l^\prime,m^\prime}(r,t)}{dr^2} + V_l^\prime(r)u_{l^\prime,m^\prime}(r,t) \right) \\
-    &= + r \sum_{l^\prime, m^\prime} \frac{1}{2}r\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
+    &= + r \mathcal{E}(t) \sum_{l, m} \frac{1}{2}r\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
     - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1} 
     - b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1}
-    + b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1}\Bigl. \Bigr] \frac{u_{l^\prime,m^\prime}(r,t)}{r}
+    + b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1}\Bigl. \Bigr] \frac{u_{l^\prime,m^\prime}(r,t)}{r} \\
+    &= + r \mathcal{E}(t) \sum_{l,m} \frac{i}{2}r\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1}
+    - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1}
+    + b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1} 
+    - b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1} \Bigl. \Bigr] \frac{u_{l^\prime,m^\prime}(r,t)}{r} \\
+    &= + r \mathcal{E}(t) \sum_{l,m} r\Bigl[a_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m} 
+    + a_{l-1,m}\delta_{l^\prime, l-1}\delta_{m^\prime, m}\Bigr] \frac{u_{l^\prime,m^\prime}(r,t)}{r}
 
 Velocity gauge
 --------------
