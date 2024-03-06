@@ -39,8 +39,10 @@ Multiplying through with :math:`r` and :math:`Y_{l}^{m *}(\Omega)` and integrati
     i \dot{u}_{l,m}(r,t)  = \left( -\frac{1}{2}  \frac{d^2 u_{l,m}(r,t)}{dr^2} + V_l(r)u_{l,m}(r,t) \right)   
     + r \int (Y_l^m)^*(\Omega) V_I(\mathbf{r}, t) \Psi(\mathbf{r}, t) d\Omega 
 
-Electromagnetic fields
-======================
+Classical electromagnetic fields
+================================
+
+
 
 The dipole approximation
 ------------------------
@@ -51,14 +53,24 @@ Length gauge
 
 .. math::
 
-    V_I(\mathbf{r}, t) = V_I(t) = \mathcal{E}(t) \cdot \mathbf{r}
+    V_I(\mathbf{r}, t) = \mathcal{E}(t) \cdot \mathbf{r}
+
+Using the integrals over position operators given in (see :ref:`sph-label`) we have that 
+
+.. math::
+
+    i \dot{u}_{l^\prime,m^\prime}(r,t) &= \left( -\frac{1}{2}  \frac{d^2 u_{l^\prime,m^\prime}(r,t)}{dr^2} + V_l^\prime(r)u_{l^\prime,m^\prime}(r,t) \right) \\
+    &= + r \sum_{l^\prime, m^\prime} \frac{1}{2}r\Bigl[\Bigr.b_{l-1,-m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m+1} 
+    - b_{l,m}\delta_{l^\prime, l+1}\delta_{m^\prime, m+1} 
+    - b_{l-1,m-1}\delta_{l^\prime, l-1}\delta_{m^\prime, m-1}
+    + b_{l,-m}\delta_{l^\prime, l+1}\delta_{m^\prime, m-1}\Bigl. \Bigr] \frac{u_{l^\prime,m^\prime}(r,t)}{r}
 
 Velocity gauge
 --------------
 
 .. math::
 
-    V_I(\mathbf{r}, t) = V_I(t) = \mathcal{A}(t) \cdot \hat{p} + \frac{1}{2}A(t)^2
+    V_I(\mathbf{r}, t) = A(t) \cdot \hat{p} + \frac{1}{2}A(t)^2
 
 Beyond dipole approximation
 ===========================
