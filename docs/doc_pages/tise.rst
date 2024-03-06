@@ -1,3 +1,5 @@
+.. _tise-label:
+
 The time-independent Schrödinger equation
 #########################################
 
