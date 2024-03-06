@@ -1,3 +1,5 @@
+.. _sph-label:
+
 Spherical harmonics
 ###################
 
