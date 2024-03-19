@@ -75,8 +75,8 @@ class GaussLegendreLobatto:
                     if not symmetrize:
                         self.D1[i, j] *= self.PN_x2[i] / self.PN_x2[j]
 
-        for i in range(1, N - 1):
-            for j in range(1, N - 1):
+        for i in range(1, N):
+            for j in range(1, N):
                 if i == j:
                     self.D2[i, j] = (
                         -1
