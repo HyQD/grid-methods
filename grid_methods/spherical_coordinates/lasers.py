@@ -35,6 +35,21 @@ class sine_laser:
         )
 
 
+class discrete_delta_pulse:
+    def __init__(self, field_strength, dt, t0=0.0, **kwargs):
+        self.field_strength = field_strength
+        self.dt = dt
+        self.t0 = t0
+
+    def __call__(self, t):
+        dt = t - self.t0
+        return (
+            self.field_strength
+            * np.heaviside(self.dt - dt, 0.0)
+            * np.heaviside(self.dt + dt, 0.0)
+        )
+
+
 class sine_square_laser:
     def __init__(self, E0, omega, td, phase=0.0, start=0.0):
         self.F_str = E0
@@ -62,9 +77,7 @@ class sine_square_laser:
 
 
 class square_length_dipole:
-    def __init__(
-        self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs
-    ):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
@@ -98,9 +111,7 @@ class square_length_dipole:
 
 
 class square_velocity_dipole:
-    def __init__(
-        self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs
-    ):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
@@ -127,9 +138,7 @@ class square_velocity_dipole:
 
 
 class square_velocity_first:
-    def __init__(
-        self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs
-    ):
+    def __init__(self, field_strength, omega, ncycles, phase=0.0, t0=0.0, **kwargs):
         self.field_strength = field_strength
         self.A0 = field_strength / omega
         self.omega = omega
