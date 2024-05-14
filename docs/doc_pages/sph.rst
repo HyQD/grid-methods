@@ -80,7 +80,7 @@ the product rule for two spherical harmonics. Some important relations are
     \sin{\theta}\cos{\phi} &= \sqrt{\frac{2\pi}{3}}\Bigl[ Y_{1,-1} - Y_{1,1} \Bigr] \\
     \sin{\theta}\sin{\phi} &= \sqrt{\frac{2\pi}{3}}i\Bigl[ Y_{1,-1} + Y_{1,1} \Bigr] 
 
-The action of the Cartesian position and derivativte operators on the spherical harmonics are given by
+The action of the Cartesian position and derivative operators on the spherical harmonics are given by
 
 .. math::
 
