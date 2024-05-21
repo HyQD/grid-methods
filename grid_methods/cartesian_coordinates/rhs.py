@@ -3,8 +3,8 @@ from grid_methods.cartesian_coordinates.sinc_dvr import compute_mean_field
 
 
 class FockOperator:
-    def __init__(self, H, w12, x, e_field):
-        self.H = H
+    def __init__(self, H0, w12, x, e_field):
+        self.H0 = H0
         self.w12 = w12
         self.x = x
         self.e_field = e_field
@@ -60,13 +60,13 @@ class FockOperator:
 
     def __call__(self, psi, t):
 
-        H_phi = np.dot(self.H, psi)
+        H0_phi = np.dot(self.H0, psi)
         et_phi = self.e_field(t) * np.einsum("i,ij->ij", self.x, psi)
 
         Vdir_phi = self.Vdirect_phi(psi, psi)
         Vex_phi = self.Vexchange_phi(psi, psi)
 
-        F_phi = H_phi - et_phi + 2 * Vdir_phi - Vex_phi
+        F_phi = H0_phi - et_phi + 2 * Vdir_phi - Vex_phi
         return -1j * F_phi
 
 
