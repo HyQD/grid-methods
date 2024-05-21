@@ -1,31 +1,73 @@
 import numpy as np
-from grid_methods.cartesian_coordinates.sinc_dvr import mean_field
+from grid_methods.cartesian_coordinates.sinc_dvr import compute_mean_field
 
 
-class RHS:
+class FockOperator:
     def __init__(self, H, w12, x, e_field):
         self.H = H
+        self.w12 = w12
         self.x = x
         self.e_field = e_field
         self.w12 = w12
 
+    def Vexchange_phi(self, psi, phi):
+        """
+        Apply the exchange potential to the orbitals phi.
+
+        \hat{V}_ex(psi)*phi_i = \sum_j (\int psi_j^*(r') w12(r,r') phi_i(r') dr') * psi_j(r)
+
+        Args:
+            psi (np.ndarray): The orbitals that \hat{V}_ex(psi) depend upon.
+            phi (np.ndarray): The orbitals to act with \hat{V}_ex(psi) upon.
+        Returns:
+            np.ndarray: The orbitals after the exchange potential has been applied.
+        """
+        Vex_phi = np.zeros(phi.shape, dtype=phi.dtype)
+
+        for i in range(psi.shape[1]):
+            for j in range(phi.shape[1]):
+                Vex_phi[:, i] += (
+                    compute_mean_field(self.w12, psi[:, j], phi[:, i])
+                    * psi[:, j]
+                )
+
+        return Vex_phi
+
+    def Vdirect_phi(self, psi, phi):
+        """
+        Apply the direct potential to the orbitals phi.
+            \hat{V}_dir(psi) * phi_i = (sum_j (\int |\psi_j(r')|^2 w12(r,r') dr')) * phi_i
+                                    = direct * phi_i
+            direct = sum_j (\int |\psi_j(r')|^2 w12(r,r') dr')
+
+        Args:
+            psi (np.ndarray): The orbitals that \hat{V}_dir(psi) depend upon.
+            phi (np.ndarray): The orbitals to act with \hat{V}_dir(psi) upon.
+        Returns:
+            np.ndarray: The orbitals after the direct potential has been applied.
+        """
+
+        direct = np.zeros(phi.shape[0], dtype=phi.dtype)
+        for i in range(phi.shape[1]):
+            direct += compute_mean_field(self.w12, psi[:, i], psi[:, i])
+
+        Vd_phi = np.zeros(phi.shape, dtype=phi.dtype)
+
+        for i in range(phi.shape[1]):
+            Vd_phi[:, i] = direct * phi[:, i]
+
+        return Vd_phi
+
     def __call__(self, psi, t):
-        pass
 
+        H_phi = np.dot(self.H, psi)
+        et_phi = self.e_field(t) * np.einsum("i,ij->ij", self.x, psi)
 
-class F_psi(RHS):
-    def __call__(self, psi, t):
-        rhs = np.dot(self.H, psi)
-        rhs += self.e_field(t) * self.x * psi
-        rhs += mean_field(self.w12, psi, psi) * psi
-        return -1j * rhs
+        Vdir_phi = self.Vdirect_phi(psi, psi)
+        Vex_phi = self.Vexchange_phi(psi, psi)
 
-
-class VW_psi(RHS):
-    def __call__(self, psi, t):
-        rhs = self.e_field(t) * self.x * psi
-        rhs += mean_field(self.w12, psi, psi) * psi
-        return -1j * rhs
+        F_phi = H_phi - et_phi + 2 * Vdir_phi - Vex_phi
+        return -1j * F_phi
 
 
 # def rhs_Wc(psi, t, direct):
