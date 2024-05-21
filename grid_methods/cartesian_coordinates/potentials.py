@@ -2,16 +2,27 @@ import numpy as np
 
 
 def Coulomb(x, Z, x_c=0.0, a=1.0):
+    """
+    Coulomb potential in 1D.
+
+    Args:
+        x (np.ndarray): The grid points.
+        Z (float): The nuclear charge.
+        x_c (float): The nuclear position.
+        a (float): The regularization parameter.
+    """
     return -Z / np.sqrt((x - x_c) ** 2 + a**2)
 
 
 class Molecule1D:
     def __init__(self, R=[0.0], Z=[1], alpha=1.0):
         """
-        kwargs:
-            R: list of nuclear positions
-            Z: list of nuclear charges
-            alpha: regularization parameter for the Coulomb potential
+        Molecular potential in 1D.
+
+        Args:
+            R (list): The nuclear positions.
+            Z (list): The nuclear charges.
+            alpha (float): The regularization parameter.
         """
         self.R_list = R
         self.Z_list = Z
