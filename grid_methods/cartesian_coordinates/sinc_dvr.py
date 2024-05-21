@@ -17,11 +17,11 @@ def compute_w12(x):
     n_dvr = len(x)
     w = np.zeros((n_dvr, n_dvr))
     for i in range(n_dvr):
-        w[i, :] = Coulomb(x[i] - x, Z=-1, a=1)
+        w[i, :] = Coulomb(x[i] - x, Z=-1, alpha=1)
     return w
 
 
-def mean_field(w12, psi_j, psi_i):
+def compute_mean_field(w12, psi_j, psi_i):
     """
     Mean-field potential: V(x) = int psi_j^*(x') w(x,x') psi_i(x') dx'
     """

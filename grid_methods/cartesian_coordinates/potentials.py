@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def Coulomb(x, Z, x_c=0.0, a=1.0):
+def Coulomb(x, Z, x_c=0.0, alpha=1.0):
     """
     Coulomb potential in 1D.
 
@@ -11,7 +11,7 @@ def Coulomb(x, Z, x_c=0.0, a=1.0):
         x_c (float): The nuclear position.
         a (float): The regularization parameter.
     """
-    return -Z / np.sqrt((x - x_c) ** 2 + a**2)
+    return -Z / np.sqrt((x - x_c) ** 2 + alpha)
 
 
 class Molecule1D:
@@ -26,6 +26,8 @@ class Molecule1D:
         """
         self.R_list = R
         self.Z_list = Z
+        if alpha <= 0:
+            raise ValueError("The regularization parameter must be positive.")
         self.alpha = alpha
 
     def __call__(self, x):
@@ -34,7 +36,7 @@ class Molecule1D:
         else:
             potential = np.zeros(len(x))
         for R, Z in zip(self.R_list, self.Z_list):
-            potential += Coulomb(x, Z=Z, x_c=R, a=self.alpha)
+            potential += Coulomb(x, Z=Z, x_c=R, alpha=self.alpha)
         return potential
 
 
