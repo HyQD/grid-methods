@@ -127,7 +127,7 @@ class RungeKutta4:
 
 
 class CrankNicolson:
-    def __init__(self, H0, w12, x, e_field, n_docc, dt):
+    def __init__(self, H0, w12, x, e_field, n_docc, dt, rtol=1e-10):
         self.H0 = H0
         self.w12 = w12
         self.x = x
@@ -137,6 +137,7 @@ class CrankNicolson:
         self.dt = dt
         I = np.complex128(np.eye(self.n_dvr))
         self.M = np.linalg.inv(I + 1j * self.dt / 2 * self.H0)
+        self.rtol = rtol
 
     def M2phi(self, phi):
         phi = phi.reshape((self.n_dvr, self.n_docc))
@@ -155,14 +156,14 @@ class CrankNicolson:
 
         return F_phi
 
-    def step(self, phi, tn, rtol=1e-10):
+    def step(self, phi, t0):
 
         """
         Integrate the ODE
             i dot(phi)_i(t) = F(phi, t)*phi_i(t)
         from tn to tn + dt using the implicit midpoint rule.
         """
-
+        tn = t0 + self.dt / 2
         psi = phi.copy()
 
         psi_tmp = (
@@ -189,7 +190,7 @@ class CrankNicolson:
             psi_tmp,
             M=M_linear,
             x0=phi.ravel(),
-            tol=rtol,
+            tol=self.rtol,
             callback=local_counter,
         )
         phi = phi.reshape((self.n_dvr, self.n_docc))
