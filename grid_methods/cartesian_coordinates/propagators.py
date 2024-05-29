@@ -244,3 +244,92 @@ class CrankNicolson:
             raise ConvergenceError("BICGSTAB did not converge")
 
         return phi
+
+
+class CMF2:
+    def __init__(self, H0, w12, x, e_field, n_docc, dt, rtol=1e-10):
+        self.H0 = H0
+        self.w12 = w12
+        self.x = x
+        self.n_dvr = len(x)
+        self.n_docc = n_docc
+        self.e_field = e_field
+        self.dt = dt
+        I = np.complex128(np.eye(self.n_dvr))
+        self.M = np.linalg.inv(I + 1j * self.dt / 4 * self.H0)
+        self.rtol = rtol
+
+    def M2phi(self, phi):
+        phi = phi.reshape((self.n_dvr, self.n_docc))
+        return np.dot(self.M, phi).ravel()
+
+    def Fphi(self, psi, phi, t):
+
+        phi = phi.reshape((self.n_dvr, self.n_docc))
+        H0_phi = np.dot(self.H0, phi)
+        et_phi = self.e_field(t) * np.einsum("i,ij->ij", self.x, phi)
+
+        Vdir_phi = Vdirect_phi(psi, phi, self.w12)
+        Vex_phi = Vexchange_phi(psi, phi, self.w12)
+
+        F_phi = H0_phi - et_phi + 2 * Vdir_phi - Vex_phi
+
+        return F_phi
+
+    def local_step(self, psi, phi, t0, tstop):
+
+        t_mid = (t0 + tstop) / 2
+        step_length = tstop - t0
+
+        psi_tmp = (
+            phi.ravel()
+            - 1j * step_length / 2 * self.Fphi(psi, phi, t_mid).ravel()
+        )
+
+        Ap_lambda = (
+            lambda phi, tn=t_mid, psi=psi: phi.ravel()
+            + 1j * step_length / 2 * self.Fphi(psi, phi, tn).ravel()
+        )
+        Ap_linear = LinearOperator(
+            dtype=np.complex128,
+            shape=(self.n_docc * self.n_dvr, self.n_docc * self.n_dvr),
+            matvec=Ap_lambda,
+        )
+        M_linear = LinearOperator(
+            (self.n_docc * self.n_dvr, self.n_docc * self.n_dvr),
+            matvec=self.M2phi,
+        )
+
+        local_counter = Counter()
+        phi_new, info = bicgstab(
+            Ap_linear,
+            psi_tmp,
+            M=M_linear,
+            x0=phi.ravel(),
+            tol=self.rtol,
+            callback=local_counter,
+        )
+        phi_new = phi_new.reshape((self.n_dvr, self.n_docc))
+
+        if info != 0:
+            raise ConvergenceError("BICGSTAB did not converge")
+
+        return phi_new
+
+    def step(self, phi, t0):
+
+        """
+        Integrate the ODE
+            i dot(phi)_i(t) = F(phi, t)*phi_i(t)
+        from tn to tn + dt using the implicit midpoint rule.
+        """
+
+        psi = phi.copy()
+
+        phi_tmp = self.local_step(psi, phi, t0, t0 + self.dt / 2)
+        phi_half = self.local_step(phi_tmp, phi, t0, t0 + self.dt / 2)
+        phi_new = self.local_step(
+            phi_tmp, phi_half, t0 + self.dt / 2, t0 + self.dt
+        )
+
+        return phi_new
