@@ -4,7 +4,12 @@ import tqdm
 from matplotlib import pyplot as plt
 
 from grid_methods.spherical_coordinates.lasers import sine_square_laser
-from grid_methods.cartesian_coordinates.propagators import RungeKutta4
+from grid_methods.cartesian_coordinates.propagators import (
+    Rk4,
+    CrankNicolson,
+    CMF2,
+    Strang,
+)
 from grid_methods.cartesian_coordinates.rhs import FockOperator
 from grid_methods.cartesian_coordinates.potentials import Coulomb, Molecule1D
 from grid_methods.cartesian_coordinates.sinc_dvr import (
@@ -71,14 +76,16 @@ for i in range(n_docc):
     orbital_norms[0, i] = np.vdot(psi0[:, i], psi0[:, i])
 
 
-F_phi = FockOperator(H, w12, x, e_field)
-rk4 = RungeKutta4(F_phi, dt)
+integrator = Rk4(H, w12, x, e_field, n_docc, dt, CMF=False)
 psi_t = psi0.copy()
 
 for n in tqdm.tqdm(range(num_steps - 1)):
 
     time_points[n + 1] = (n + 1) * dt
-    psi_t = rk4.step(psi_t, time_points[n])
+    psi_t = integrator.step(psi_t, time_points[n])
+
+    if hasattr(integrator, "conv_iters"):
+        print(f"Number of convergence iterations: {integrator.conv_iters}")
 
     rho_t = np.sum(
         np.abs(psi_t[:, :n_docc]) ** 2, axis=1
@@ -100,20 +107,20 @@ plt.ylim(-2.4, -0.6)
 plt.legend()
 
 plt.figure()
-plt.plot(x, rho0, label=r"$\rho(x, t=0)$")
-plt.plot(x, rho_t, label=r"$\rho(x, t_{final})$")
+plt.semilogy(x, rho0, label=r"$\rho(x, t=0)$")
+plt.semilogy(x, rho_t, label=r"$\rho(x, t_{final})$")
 plt.legend()
 
 plt.figure()
-plt.plot(
+plt.semilogy(
     time_points,
-    1 - orbital_norms[:, 0].real,
-    label=r"$1-\langle \psi_0(t)|\psi_0(t) \rangle$",
+    np.abs(1 - orbital_norms[:, 0].real),
+    label=r"$|1-\langle \psi_0(t)|\psi_0(t) \rangle|$",
 )
-plt.plot(
+plt.semilogy(
     time_points,
-    1 - orbital_norms[:, 1].real,
-    label=r"$1-\langle \psi_1(t)|\psi_1(t) \rangle$",
+    np.abs(1 - orbital_norms[:, 1].real),
+    label=r"$|1-\langle \psi_1(t)|\psi_1(t) \rangle$|",
 )
 plt.legend()
 plt.show()
