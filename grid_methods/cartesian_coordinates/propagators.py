@@ -171,6 +171,76 @@ class Rk4:
         return phi + self.dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
 
 
+class Strang:
+    def __init__(self, H0, w12, x, e_field, n_docc, dt, rtol=1e-10, CMF=True):
+        self.H0 = H0
+        self.w12 = w12
+        self.x = x
+        self.n_dvr = len(x)
+        self.n_docc = n_docc
+        self.e_field = e_field
+        self.dt = dt
+        self.I = np.complex128(np.eye(self.n_dvr))
+        self.M = np.linalg.inv(self.I + 1j * self.dt / 4 * self.H0)
+        self.rtol = rtol
+        self.CMF = CMF
+
+    def M2phi(self, phi):
+        phi = phi.reshape((self.n_dvr, self.n_docc))
+        return np.dot(self.M, phi).ravel()
+
+    def rhs_W(self, psi, phi, t):
+
+        Vdir_psi = Vdirect_phi(psi, phi, self.w12)
+        Vex_psi = Vexchange_phi(psi, phi, self.w12)
+
+        return -1j * (2 * Vdir_psi - Vex_psi)
+
+    def step(self, phi, t0):
+
+        """
+        Integrate the ODE
+            i dot(phi)_i(t) = F(phi, t)*phi_i(t)
+        from tn to tn + dt using the Strang splitting method.
+        """
+
+        H_mid = self.H0 - self.e_field(t0 + self.dt / 4) * np.diag(self.x)
+        phi_m = np.linalg.solve(
+            self.I + 1j * self.dt / 4 * H_mid,
+            np.dot(self.I - 1j * self.dt / 4 * H_mid, phi),
+        )
+
+        if self.CMF:
+            k1_phi_p = self.rhs_W(phi, phi_m, t0)
+            k2_phi_p = self.rhs_W(
+                phi, phi_m + self.dt / 2 * k1_phi_p, t0 + self.dt / 2
+            )
+            k3_phi_p = self.rhs_W(
+                phi, phi_m + self.dt / 2 * k2_phi_p, t0 + self.dt / 2
+            )
+            k4_phi_p = self.rhs_W(phi, phi_m + self.dt * k3_phi_p, t0 + self.dt)
+        else:
+            k1_phi_p = self.rhs_W(phi_m, phi_m, t0)
+            tmp_1 = phi_m + self.dt / 2 * k1_phi_p
+            k2_phi_p = self.rhs_W(tmp_1, tmp_1, t0 + self.dt / 2)
+            tmp_2 = phi_m + self.dt / 2 * k2_phi_p
+            k3_phi_p = self.rhs_W(tmp_2, tmp_2, t0 + self.dt / 2)
+            tmp_3 = phi_m + self.dt * k3_phi_p
+            k4_phi_p = self.rhs_W(tmp_3, tmp_3, t0 + self.dt)
+
+        phi_p = phi_m + self.dt / 6 * (
+            k1_phi_p + 2 * k2_phi_p + 2 * k3_phi_p + k4_phi_p
+        )
+
+        H_mid = self.H0 - self.e_field(t0 + 3 * self.dt / 4) * np.diag(self.x)
+        phi_m = np.linalg.solve(
+            self.I + 1j * self.dt / 4 * H_mid,
+            np.dot(self.I - 1j * self.dt / 4 * H_mid, phi_p),
+        )
+
+        return phi_m
+
+
 class CrankNicolson:
     def __init__(self, H0, w12, x, e_field, n_docc, dt, rtol=1e-10):
         self.H0 = H0
