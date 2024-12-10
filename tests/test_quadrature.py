@@ -61,7 +61,7 @@ def test_integrate_polynomials_mapped_interval():
 
 def test_integrate_xk_exp_minus_a_x2():
     """
-    \int_0^\infty x^k exp(-a*x^2) dx = 0.5*a^(-(k+1)/2)*Gamma((k+1)/2), where Gamma is the gamma function.
+    int_0^\infty x^k exp(-a*x^2) dx = 0.5*a^(-(k+1)/2)*Gamma((k+1)/2), where Gamma is the gamma function.
     """
     from scipy.special import gamma
 
