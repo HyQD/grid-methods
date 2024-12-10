@@ -4,16 +4,17 @@ import tqdm
 from opt_einsum import contract
 from scipy.sparse.linalg import LinearOperator, bicgstab
 
+from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+    GaussLegendreLobatto,
+    Rational_map,
+    Linear_map,
+)
+
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
 from grid_methods.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_lm,
-)
-from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
-    GaussLegendreLobatto,
-    Rational_map,
-    Linear_map,
 )
 from grid_methods.spherical_coordinates.lasers import (
     square_velocity_dipole,
@@ -61,6 +62,7 @@ l_max = 3
 # setup Legendre-Lobatto grid
 gll = GaussLegendreLobatto(N, Linear_map(r_max=r_max))
 weights = gll.weights
+print(weights)
 
 # setup radial matrix elements
 radial_matrix_elements = RadialMatrixElements(gll)

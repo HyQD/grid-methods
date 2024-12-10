@@ -1,4 +1,15 @@
 import numpy as np
+import time
+from matplotlib import pyplot as plt
+import tqdm
+from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab
+from opt_einsum import contract
+
+from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+    GaussLegendreLobatto,
+    Rational_map,
+)
+
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
@@ -6,19 +17,11 @@ from grid_methods.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_l,
     AngularMatrixElements_lm,
 )
-from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
-    GaussLegendreLobatto,
-    Rational_map,
-)
-import time
-from matplotlib import pyplot as plt
+
 from grid_methods.spherical_coordinates.lasers import (
     square_length_dipole,
     square_velocity_dipole,
 )
-import tqdm
-from opt_einsum import contract
-from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab
 from grid_methods.spherical_coordinates.utils import mask_function
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
 from grid_methods.spherical_coordinates.rhs import (
@@ -30,7 +33,6 @@ from grid_methods.spherical_coordinates.time_dependent_field_interaction import 
     V_psi_length,
     V_psi_velocity,
 )
-from opt_einsum import contract
 from grid_methods.spherical_coordinates.utils import (
     Counter,
     quadrature,
@@ -56,9 +58,7 @@ r_max = 100
 l_max = 3
 alpha = 0.4
 
-
 ### SETUP ########################
-
 # setup Legendre-Lobatto grid
 gll = GaussLegendreLobatto(N, Rational_map(r_max=r_max, alpha=alpha))
 weights = gll.weights
@@ -123,10 +123,8 @@ H0_psi = H0Psi(
 Vt_psi = V_psi_length_z(
     angular_matrix_elements, radial_matrix_elements, e_field_z
 )
-# Vt_psi = V_psi_length(angular_matrix_elements, radial_matrix_elements, e_field_z=e_field_z)
 
 rhs = HtPsi(angular_matrix_elements, radial_matrix_elements, H0_psi, [Vt_psi])
-
 
 # preconditioner
 preconditioner = M2Psi(angular_matrix_elements, radial_matrix_elements, dt)
@@ -138,7 +136,6 @@ z_Omega = angular_matrix_elements("z_Omega")
 
 
 ### RUN ##########################
-
 for i in tqdm.tqdm(range(num_steps - 1)):
     ti = time_points[i] + dt / 2
 

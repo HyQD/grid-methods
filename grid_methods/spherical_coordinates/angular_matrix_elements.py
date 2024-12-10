@@ -1,8 +1,7 @@
 import numpy as np
-from numpy.polynomial import legendre
-from scipy.special import eval_legendre as Legendre
 import time
-from scipy.special import sph_harm, spherical_jn
+from numpy.polynomial import legendre
+from scipy.special import eval_legendre as Legendre, sph_harm, spherical_jn
 from pathlib import Path
 
 

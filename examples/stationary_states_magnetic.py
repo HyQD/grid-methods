@@ -1,13 +1,15 @@
 import numpy as np
 import time
 from matplotlib import pyplot as plt
-from grid_methods.spherical_coordinates.angular_matrix_elements import (
-    AngularMatrixElements_l,
-)
-from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
+
+from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Rational_map,
     Linear_map,
+)
+
+from grid_methods.spherical_coordinates.angular_matrix_elements import (
+    AngularMatrixElements_l,
 )
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
@@ -19,6 +21,7 @@ def kron_delta(x1, x2):
         return 1
     else:
         return 0
+
 
 N = 100
 r_max = 20
@@ -36,18 +39,14 @@ T_D2 = -(1 / 2) * radial_matrix_elements.D2
 Z = 1
 B = 1
 l_max = 12
-m_list = [0,-1,-2]
+m_list = [0, -1, -2]
 
 print()
 for m in m_list:
 
     dim = n_r * (l_max + 1 - abs(m))
     angular_matrix_elements = AngularMatrixElements_l(
-        arr_to_calc=[
-            "H_Bz_Omega"
-        ],
-        l_max=l_max,
-        m=m
+        arr_to_calc=["H_Bz_Omega"], l_max=l_max, m=m
     )
 
     H_Bz = angular_matrix_elements("H_Bz_Omega")
@@ -85,11 +84,9 @@ for m in m_list:
 
     eps, C = np.linalg.eigh(H)
 
-
     # Print binding energy as defined in Ref.[1] and groundstate energy.
     # The resulting binding energies for m=0,-1,-2 and B=1.0 are in reasonable agreement with
     # the values reported in Ref.[1] (Table 1,2, and 3).
     print(f"Lowest eigenvalue m={m}: {eps[0]}")
     print(f"Binding energy    m={m}: {0.5 * B * (abs(m) + m + 1) - eps[0]}")
     print()
-    

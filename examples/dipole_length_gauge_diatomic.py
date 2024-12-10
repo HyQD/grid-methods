@@ -1,4 +1,15 @@
 import numpy as np
+import time
+from matplotlib import pyplot as plt
+import tqdm
+from opt_einsum import contract
+from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab
+
+from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+    GaussLegendreLobatto,
+    Linear_map,
+)
+
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
@@ -6,18 +17,9 @@ from grid_methods.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_l,
     AngularMatrixElements_lr_Coulomb,
 )
-from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
-    GaussLegendreLobatto,
-    Linear_map,
-)
-import time
-from matplotlib import pyplot as plt
 from grid_methods.spherical_coordinates.lasers import (
     square_length_dipole,
 )
-import tqdm
-from opt_einsum import contract
-from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab
 from grid_methods.spherical_coordinates.utils import mask_function
 from grid_methods.spherical_coordinates.preconditioners import M2Psi
 from grid_methods.spherical_coordinates.rhs import (
@@ -28,7 +30,6 @@ from grid_methods.spherical_coordinates.time_dependent_field_interaction import 
     V_psi_length_z,
     V_Coulomb,
 )
-from opt_einsum import contract
 from grid_methods.spherical_coordinates.utils import (
     Counter,
     quadrature,
@@ -50,10 +51,10 @@ dt = 0.25
 
 
 # grid inputs
-N = 200
+N = 100
 nr = N - 1
-r_max = 100
-l_max = 8
+r_max = 40
+l_max = 6
 L_max = l_max  # max l number in partial wave expansion of the Coulomb potential
 a = 2.0  # H2+ bond length
 
@@ -71,7 +72,9 @@ D1 = radial_matrix_elements.D1
 T_D2 = -(1 / 2) * radial_matrix_elements.D2
 
 # setup angular matrix elements
-angular_matrix_elements = AngularMatrixElements_l(arr_to_calc=["z_Omega"], l_max=l_max)
+angular_matrix_elements = AngularMatrixElements_l(
+    arr_to_calc=["z_Omega"], l_max=l_max
+)
 
 angular_matrix_elements_Coulomb = AngularMatrixElements_lr_Coulomb(
     arr_to_calc=["1/(r-a)"],
@@ -95,7 +98,8 @@ eps, phi_n = compute_ground_state_diatomic(
     potential,
     l_max,
 )
-
+print(eps[0])
+stop
 psi_t = phi_n[:, 0] / np.sqrt(quadrature(weights, np.abs(phi_n[:, 0]) ** 2))
 psi_t = psi_t.reshape(l_max + 1, nr)
 
@@ -128,7 +132,9 @@ H0_psi = H0Psi(
     potential,
 )
 
-Vt_psi = V_psi_length_z(angular_matrix_elements, radial_matrix_elements, e_field_z)
+Vt_psi = V_psi_length_z(
+    angular_matrix_elements, radial_matrix_elements, e_field_z
+)
 
 V_Coulomb = V_Coulomb(angular_matrix_elements_Coulomb, radial_matrix_elements)
 
@@ -179,4 +185,4 @@ samples = {
     "expec_z": expec_z,
 }
 
-np.savez("output", **samples)
+# np.savez("output", **samples)
