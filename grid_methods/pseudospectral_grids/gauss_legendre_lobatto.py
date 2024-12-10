@@ -30,13 +30,12 @@ class Linear_map:
 
 class GaussLegendreLobatto:
     def __init__(self, N, Mapping, symmetrize=True):
-        # Get inner nodes
         c = np.zeros((N + 1,))
         c[-1] = 1
         dc = legendre.legder(c)
 
         """
-        Find the Gauss-Legendre-Lobatto grid points, defined as the roots of the derivative N-th order Legendre polynomial,
+        Find the Legendre-Lobatto grid points, defined as the roots of the derivative N-th order Legendre polynomial,
             dP_N(x)/dx|_{x=x_i} = 0, i=1,...,N, 
         and x_0 = -1, x_{N+1} = 1.
         """
@@ -52,7 +51,7 @@ class GaussLegendreLobatto:
 
         self.weights = 2 / (N * (N + 1))
         if not symmetrize:
-            self.weights /= self.PN_x**2
+            self.weights /= self.PN_x2**2
 
         self.r = Mapping.r_x(self.x)
         self.r_dot = Mapping.dr_dx(self.x)
@@ -60,7 +59,7 @@ class GaussLegendreLobatto:
         for i in range(N + 1):
             for j in range(N + 1):
                 if i == 0 and j == 0:
-                    self.D1[i, j] = (
+                    self.D1[i, j] = -(
                         0.25
                         * N
                         * (N + 1)
@@ -68,7 +67,7 @@ class GaussLegendreLobatto:
                     )
                 elif i == N and j == N:
                     self.D1[i, j] = (
-                        -0.25
+                        0.25
                         * N
                         * (N + 1)
                         / np.sqrt(self.r_dot[i] * self.r_dot[j])
@@ -101,4 +100,4 @@ class GaussLegendreLobatto:
                         / (self.r_dot[i] * self.r_dot[j])
                     )
                     if not symmetrize:
-                        self.D2[i, j] *= self.PN_x[i] / self.PN_x[j]
+                        self.D2[i, j] *= self.PN_x2[i] / self.PN_x2[j]
