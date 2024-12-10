@@ -1,13 +1,15 @@
 import numpy as np
 import time
 from matplotlib import pyplot as plt
-from grid_methods.spherical_coordinates.angular_matrix_elements import (
-    AngularMatrixElements_l,
-)
-from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
+
+from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Rational_map,
     Linear_map,
+)
+
+from grid_methods.spherical_coordinates.angular_matrix_elements import (
+    AngularMatrixElements_l,
 )
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
@@ -38,7 +40,7 @@ T_D2 = -(1 / 2) * radial_matrix_elements.D2
 
 Z = 1
 B = 1
-l_max = 12
+l_max = 20
 
 m_list = [0, -1, -2]
 

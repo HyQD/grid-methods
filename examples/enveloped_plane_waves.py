@@ -4,6 +4,12 @@ import tqdm
 from opt_einsum import contract
 from scipy.sparse.linalg import LinearOperator, bicgstab
 
+from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+    GaussLegendreLobatto,
+    Rational_map,
+    Linear_map,
+)
+
 from grid_methods.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
@@ -11,11 +17,7 @@ from grid_methods.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_lm,
     AngularMatrixElements_lmr,
 )
-from grid_methods.spherical_coordinates.gauss_legendre_lobatto import (
-    GaussLegendreLobatto,
-    Rational_map,
-    Linear_map,
-)
+
 
 from grid_methods.spherical_coordinates.lasers import (
     square_velocity_exp_p,
