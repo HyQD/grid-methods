@@ -5,7 +5,6 @@ from scipy.sparse.linalg import LinearOperator, bicgstab
 import tqdm
 from grid_methods.spherical_coordinates.utils import (
     Counter,
-    quadrature,
 )
 from opt_einsum import contract
 
