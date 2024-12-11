@@ -7,8 +7,11 @@ from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
 
 
 def test_particle_in_box():
-    def test_particle_in_box(L):
+    print()
+    print(f"** Test 1D particle-in-box **")
 
+    def test_particle_in_box(L):
+        print(f"* Box length L = {L}")
         N = 40
         x_min = 0
         x_max = L
@@ -60,8 +63,11 @@ def test_particle_in_box():
 def test_harmonic_oscillator():
     from scipy.special import eval_hermite as Hermite, factorial as fac
 
-    def test_harmonic_oscillator(omega):
+    print()
+    print(f"** Test 1D harmonic oscillator **")
 
+    def test_harmonic_oscillator(omega):
+        print(f"* Oscillator frequency omega = {omega}")
         N = 80
         a = 0.5 * omega
 
@@ -120,5 +126,96 @@ def test_harmonic_oscillator():
     test_harmonic_oscillator(0.75)
 
 
-if __name__ == "__main__":
-    test_harmonic_oscillator()
+def test_hydrogenic_spherical_coordinates():
+
+    from scipy.special import eval_genlaguerre as Laguerre, factorial as fac
+
+    def u_nl_exact(r, n, l, Z):
+        R_nl = (
+            (2 * Z / n) ** (3 / 2)
+            * np.sqrt(fac(n - l - 1) / (2 * n * fac(n + l)))
+            * (2 * Z * r / n) ** l
+            * Laguerre(n - l - 1, 2 * l + 1, 2 * Z * r / n)
+            * np.exp(-Z * r / n)
+        )
+        u_nl = r * R_nl
+        return u_nl
+
+    print()
+    print(f"** Test hydrogenic systems in spherical coordinates **")
+
+    def test_hydrogenic_sphc(Z):
+        print(f"* Nuclear charge Z = {Z}")
+        N = 200
+        r_min = 0
+        r_max = 140
+        GLL = GaussLegendreLobatto(
+            N, Linear_map(r_min, r_max), symmetrize=False
+        )
+        r = GLL.r[1:-1]
+        w = GLL.weights[1:-1]
+        r_dot = GLL.r_dot[1:-1]
+        D1 = GLL.D1
+        D2 = np.dot(D1, D1)[1:-1, 1:-1]
+        for l in range(0, 3):
+
+            eps_exact = -(Z**2) / (2 * np.arange(l + 1, l + 4) ** 2)
+
+            Tl = -0.5 * D2 + np.diag(l * (l + 1) / (2 * r**2))
+            V = np.diag(-Z / r)
+            Hl = Tl + V
+            eps, U = np.linalg.eig(Hl)
+            idx = np.argsort(eps)
+            eps = eps[idx]
+            U = U[:, idx]
+
+            n1 = l + 1
+            n2 = l + 2
+            n3 = l + 3
+            u_n1_l = u_nl_exact(r, n1, l, Z)
+            u_n2_l = u_nl_exact(r, n2, l, Z)
+            u_n3_l = u_nl_exact(r, n3, l, Z)
+
+            u_n1_l_approx = U[:, 0]
+            norm_u_n1_l_approx = np.dot(w, r_dot * u_n1_l_approx**2)
+            u_n1_l_approx /= np.sqrt(norm_u_n1_l_approx)
+
+            u_n2_l_approx = U[:, 1]
+            norm_u_n2_l_approx = np.dot(w, r_dot * u_n2_l_approx**2)
+            u_n2_l_approx /= np.sqrt(norm_u_n2_l_approx)
+
+            u_n3_l_approx = U[:, 2]
+            norm_u_n3_l_approx = np.dot(w, r_dot * u_n3_l_approx**2)
+            u_n3_l_approx /= np.sqrt(norm_u_n3_l_approx)
+
+            np.testing.assert_allclose(
+                eps[0:3], eps_exact, rtol=0.0, atol=1e-12
+            )
+            np.testing.assert_allclose(
+                np.abs(u_n1_l) ** 2,
+                np.abs(u_n1_l_approx) ** 2,
+                rtol=0.0,
+                atol=1e-10,
+            )
+            np.testing.assert_allclose(
+                np.abs(u_n2_l) ** 2,
+                np.abs(u_n2_l_approx) ** 2,
+                rtol=0.0,
+                atol=1e-10,
+            )
+            np.testing.assert_allclose(
+                np.abs(u_n3_l) ** 2,
+                np.abs(u_n3_l_approx) ** 2,
+                rtol=0.0,
+                atol=1e-10,
+            )
+
+    test_hydrogenic_sphc(1)
+    test_hydrogenic_sphc(2)
+    test_hydrogenic_sphc(4)
+    test_hydrogenic_sphc(10)
+
+
+# if __name__ == "__main__":
+#     # test_harmonic_oscillator()
+#     test_hydrogenic_spherical_coordinates()
