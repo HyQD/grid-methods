@@ -9,7 +9,6 @@ def compute_ground_state(
     T_D2 = -(1 / 2) * radial_matrix_elements.D2
 
     H0 = np.zeros((nr, nr))
-    l = 0
     T = T_D2 + np.diag(l * (l + 1) / (2 * r**2))
     V = np.diag(potential)
 
