@@ -42,7 +42,7 @@ def compute_mean_field_einsum(A, W, y, L_max, M_max):
     n_LM = number_of_lm_states(L_max, M_max)
     n_r = W.shape[1]
 
-    Wqs_LM = np.zeros((n_LM, n_active, n_active, n_r), dtype=np.complex128)
+    Wqs_LM = np.zeros((n_LM, n_active, n_active, n_r), dtype=A.dtype)
 
     for M in range(-M_max, M_max + 1):
         for L in range(abs(M), n_L):
@@ -124,7 +124,7 @@ def compute_mean_field_numba(A, W, y, L_max, M_max):
     n_r = W.shape[1]
 
     n_qs = n_active * (n_active + 1) // 2
-    Wqs_LM = np.zeros((n_qs, n_LM, n_r), dtype=np.complex128)
+    Wqs_LM = np.zeros((n_qs, n_LM, n_r), dtype=A.dtype)
 
     for M in range(-M_max, M_max + 1):
         for L in range(abs(M), n_L):
