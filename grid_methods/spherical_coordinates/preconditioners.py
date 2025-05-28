@@ -25,7 +25,7 @@ class MPsi:
         psi_new = np.zeros((self.n_lm, self.nr), dtype=np.complex128)
 
         for I in range(self.n_lm):
-            psi_new[I] = np.dot(M, psi[I])
+            psi_new[I] = np.dot(self.M, psi[I])
 
         return psi_new.ravel()
 
