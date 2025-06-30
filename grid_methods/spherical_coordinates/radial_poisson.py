@@ -58,8 +58,7 @@ def solve_radial_Poisson_dvr(GLL, n_L):
     r = GLL.r[1:-1]
     w_r = GLL.weights[1:-1]
     r_dot = GLL.r_dot[1:-1]
-    D1 = GLL.D1
-    D2 = np.dot(D1, D1)[1:-1, 1:-1]
+    D2 = GLL.D2[1:-1, 1:-1]
 
     n_r = len(r)
     tilde_vL = np.zeros((n_L, n_r, n_r))
