@@ -43,5 +43,43 @@ def test_D2():
     print(np.allclose(D2[1:-1, 1:-1], np.dot(D1, D1)[1:-1, 1:-1]))
 
 
+def test_D2_LegendreDirichlet():
+
+    N = 40
+    x_min = 0.0
+    x_max = 10.0
+    symmetrize = [True, False]
+
+    for symm in symmetrize:
+
+        GLL = GaussLegendreLobatto(
+            N, Linear_map(x_min, x_max), symmetrize=symmetrize
+        )
+
+        D2 = np.zeros((N + 1, N + 1))
+        for i in range(1, N):
+            for j in range(1, N):
+                if i == j:
+                    D2[i, j] = (
+                        -1
+                        / 3
+                        * N
+                        * (N + 1)
+                        / (1 - GLL.x[i] ** 2)
+                        / (GLL.r_dot[i] * GLL.r_dot[j])
+                    )
+                else:
+                    D2[i, j] = (
+                        -2
+                        / (GLL.x[i] - GLL.x[j]) ** 2
+                        / (GLL.r_dot[i] * GLL.r_dot[j])
+                    )
+                    if not symmetrize:
+                        D2[i, j] *= GLL.PN_x2[i] / GLL.PN_x2[j]
+
+        assert np.allclose(GLL.D2[1:-1, 1:-1], D2[1:-1, 1:-1])
+
+
 if __name__ == "__main__":
     test_D2()
+    test_D2_LegendreDirichlet()
