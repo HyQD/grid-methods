@@ -55,6 +55,7 @@ class GaussLegendreLobatto:
 
         self.r = Mapping.r_x(self.x)
         self.r_dot = Mapping.dr_dx(self.x)
+        self.weights *= self.r_dot
 
         for i in range(N + 1):
             for j in range(N + 1):
