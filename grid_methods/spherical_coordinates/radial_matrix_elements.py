@@ -13,4 +13,4 @@ class RadialMatrixElements:
         self.D1 = gll.D1[1:-1, 1:-1]
         self.D2 = gll.D2[1:-1, 1:-1]
         self.nr = len(self.r)
-        self.weights = gll.weights
+        self.weights = gll.weights[1:-1]
