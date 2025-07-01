@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Counter:
     # Used to count iterations until convergence in bicgstab
     def __init__(self):
