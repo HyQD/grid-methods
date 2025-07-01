@@ -49,7 +49,7 @@ class GaussLegendreLobatto:
         self.PN_x = legendre.legval(self.x[1:-1], c)
         self.PN_x2 = legendre.legval(self.x, c)
 
-        self.weights = 2 / (N * (N + 1))
+        self.weights = 2 / (N * (N + 1)) * np.ones(N + 1)
         if not symmetrize:
             self.weights /= self.PN_x2**2
 
