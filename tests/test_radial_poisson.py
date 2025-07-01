@@ -47,7 +47,7 @@ def test_radial_poisson():
     r_dot = GLL.r_dot[1:-1]
 
     u_1s_gaussian = r * np.exp(-(r**2))
-    norm_psi = np.dot(w_r, r_dot * u_1s_gaussian**2)
+    norm_psi = np.dot(w_r, u_1s_gaussian**2)
     u_1s_gaussian /= np.sqrt(norm_psi)
 
     tilde_V0 = np.einsum(
@@ -65,7 +65,7 @@ def test_radial_poisson():
     assert np.max(np.abs(tilde_V0 - tilde_V0_exact_1s_gaussian)) < 1e-10
 
     u_1s = r * np.exp(-r)
-    norm_1s = np.dot(w_r, r_dot * u_1s**2)
+    norm_1s = np.dot(w_r, u_1s**2)
     u_1s /= np.sqrt(norm_1s)
     tilde_V0_1s = np.einsum(
         "b, ab, b->a", u_1s, tilde_V0_dvr[0], u_1s, optimize=True

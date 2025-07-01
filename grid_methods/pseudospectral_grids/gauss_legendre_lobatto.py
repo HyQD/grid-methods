@@ -49,12 +49,13 @@ class GaussLegendreLobatto:
         self.PN_x = legendre.legval(self.x[1:-1], c)
         self.PN_x2 = legendre.legval(self.x, c)
 
-        self.weights = 2 / (N * (N + 1))
+        self.weights = 2 / (N * (N + 1)) * np.ones(N + 1)
         if not symmetrize:
             self.weights /= self.PN_x2**2
 
         self.r = Mapping.r_x(self.x)
         self.r_dot = Mapping.dr_dx(self.x)
+        self.weights *= self.r_dot
 
         for i in range(N + 1):
             for j in range(N + 1):

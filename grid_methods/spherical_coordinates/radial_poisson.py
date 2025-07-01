@@ -74,7 +74,7 @@ def solve_radial_Poisson_dvr(GLL, n_L):
         tilde_vL_hom = np.zeros((n_r, n_r))
         for a in range(n_r):
             tilde_vL_hom[:, a] = (
-                r_dot * r[a] ** L * w_r[a] / r_max ** (2 * L + 1)
+                r[a] ** L * w_r[a] / r_max ** (2 * L + 1)
             ) * r ** (L + 1)
 
         tilde_vL[L] = tilde_vL_inhom + tilde_vL_hom
