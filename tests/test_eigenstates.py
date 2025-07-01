@@ -38,12 +38,12 @@ def test_particle_in_box():
         for k in range(1, N_max):
             eps_k_approx = eps[k - 1]
             psi_k_approx = U[:, k - 1]
-            norm_psi_k_approx = np.dot(w, x_dot * psi_k_approx**2)
+            norm_psi_k_approx = np.dot(w, psi_k_approx**2)
             psi_k_approx /= np.sqrt(norm_psi_k_approx)
 
             eps_k_exact = k**2 * np.pi**2 / (2 * L**2)
             psi_k_exact = np.sqrt(2 / L) * np.sin(k * np.pi * x / L)
-            norm_psi_k_exact = np.dot(w, x_dot * psi_k_exact**2)
+            norm_psi_k_exact = np.dot(w, psi_k_exact**2)
             np.testing.assert_allclose(
                 eps_k_approx, eps_k_exact, rtol=0.0, atol=1e-12
             )
@@ -99,7 +99,7 @@ def test_harmonic_oscillator():
             eps_k_exact = omega * (k + 0.5)
 
             psi_k_approx = U[:, k]
-            norm_psi_k_approx = np.dot(w, x_dot * psi_k_approx**2)
+            norm_psi_k_approx = np.dot(w, psi_k_approx**2)
             psi_k_approx /= np.sqrt(norm_psi_k_approx)
 
             psi_k_exact = (
@@ -177,15 +177,15 @@ def test_hydrogenic_spherical_coordinates():
             u_n3_l = u_nl_exact(r, n3, l, Z)
 
             u_n1_l_approx = U[:, 0]
-            norm_u_n1_l_approx = np.dot(w, r_dot * u_n1_l_approx**2)
+            norm_u_n1_l_approx = np.dot(w, u_n1_l_approx**2)
             u_n1_l_approx /= np.sqrt(norm_u_n1_l_approx)
 
             u_n2_l_approx = U[:, 1]
-            norm_u_n2_l_approx = np.dot(w, r_dot * u_n2_l_approx**2)
+            norm_u_n2_l_approx = np.dot(w, u_n2_l_approx**2)
             u_n2_l_approx /= np.sqrt(norm_u_n2_l_approx)
 
             u_n3_l_approx = U[:, 2]
-            norm_u_n3_l_approx = np.dot(w, r_dot * u_n3_l_approx**2)
+            norm_u_n3_l_approx = np.dot(w, u_n3_l_approx**2)
             u_n3_l_approx /= np.sqrt(norm_u_n3_l_approx)
 
             np.testing.assert_allclose(
