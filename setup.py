@@ -1,8 +1,17 @@
 from setuptools import setup, find_packages
 
+def find_version(path):
+    import re
+    s = open(path, 'rt').read()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              s, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Version not found")
+
 setup(
     name="HyQD-grid-methods",
-    version="0.0.0",
+    version=find_version("grid_methods/version.py"),
     packages=find_packages(),
     install_requires=["scipy", "opt_einsum"],
     include_package_data=True,
