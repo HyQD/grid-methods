@@ -1,7 +1,7 @@
 import numpy as np
 from opt_einsum import contract
 
-from grid_methods.spherical_coordinates.utils import quadrature
+from grid_lib.spherical_coordinates.utils import quadrature
 
 
 def expec_x_i(psi, weights, r, xi_Omega):

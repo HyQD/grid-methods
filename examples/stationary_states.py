@@ -1,10 +1,10 @@
 import numpy as np
 
-from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+from grid_lib.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Rational_map,
 )
-from grid_methods.spherical_coordinates.potentials import (
+from grid_lib.spherical_coordinates.potentials import (
     Coulomb,
     SAE,
     Gaussian_charge_distribution,

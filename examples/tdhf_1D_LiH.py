@@ -3,21 +3,21 @@ import numpy as np
 import tqdm
 from matplotlib import pyplot as plt
 
-from grid_methods.spherical_coordinates.lasers import sine_square_laser
-from grid_methods.cartesian_coordinates.propagators import (
+from grid_lib.spherical_coordinates.lasers import sine_square_laser
+from grid_lib.cartesian_coordinates.propagators import (
     Rk4,
     CrankNicolson,
     CMF2,
     Strang,
 )
-from grid_methods.cartesian_coordinates.rhs import FockOperator
-from grid_methods.cartesian_coordinates.potentials import Coulomb, Molecule1D
-from grid_methods.cartesian_coordinates.sinc_dvr import (
+from grid_lib.cartesian_coordinates.rhs import FockOperator
+from grid_lib.cartesian_coordinates.potentials import Coulomb, Molecule1D
+from grid_lib.cartesian_coordinates.sinc_dvr import (
     T_sinc_dvr,
     compute_w12,
     compute_mean_field,
 )
-from grid_methods.cartesian_coordinates.ground_state import scf_diagonalization
+from grid_lib.cartesian_coordinates.ground_state import scf_diagonalization
 
 ############################################################################
 """

@@ -1,1 +1,1 @@
-[Documentation](https://hyqd.github.io/grid-methods/)
+[Documentation](https://hyqd.github.io/grid-lib/)

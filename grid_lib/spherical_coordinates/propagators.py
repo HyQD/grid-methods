@@ -1,9 +1,9 @@
 import numpy as np
-from grid_methods.spherical_coordinates.preconditioners import M2Psi
-from grid_methods.spherical_coordinates.properties import expec_x_i, expec_p_i
+from grid_lib.spherical_coordinates.preconditioners import M2Psi
+from grid_lib.spherical_coordinates.properties import expec_x_i, expec_p_i
 from scipy.sparse.linalg import LinearOperator, bicgstab
 import tqdm
-from grid_methods.spherical_coordinates.utils import (
+from grid_lib.spherical_coordinates.utils import (
     Counter,
 )
 from opt_einsum import contract

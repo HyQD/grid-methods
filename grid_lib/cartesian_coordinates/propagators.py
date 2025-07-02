@@ -1,11 +1,11 @@
 import numpy as np
-from grid_methods.cartesian_coordinates.rhs import Vdirect_phi, Vexchange_phi
+from grid_lib.cartesian_coordinates.rhs import Vdirect_phi, Vexchange_phi
 from scipy.sparse.linalg import LinearOperator, bicgstab
-from grid_methods.spherical_coordinates.utils import (
+from grid_lib.spherical_coordinates.utils import (
     Counter,
     quadrature,
 )
-from grid_methods.cartesian_coordinates.exceptions import ConvergenceError
+from grid_lib.cartesian_coordinates.exceptions import ConvergenceError
 
 
 class ForwardEuler:

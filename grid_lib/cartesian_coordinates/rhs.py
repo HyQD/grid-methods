@@ -1,5 +1,5 @@
 import numpy as np
-from grid_methods.cartesian_coordinates.sinc_dvr import compute_mean_field
+from grid_lib.cartesian_coordinates.sinc_dvr import compute_mean_field
 
 
 class FockOperator:

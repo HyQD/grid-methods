@@ -1,5 +1,5 @@
 import numpy as np
-from grid_methods.spherical_coordinates.angular_momentum import (
+from grid_lib.spherical_coordinates.angular_momentum import (
     LM_to_I,
     number_of_lm_states,
 )

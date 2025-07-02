@@ -10,8 +10,8 @@ def find_version(path):
     raise RuntimeError("Version not found")
 
 setup(
-    name="HyQD-grid-methods",
-    version=find_version("grid_methods/version.py"),
+    name="HyQD-grid-lib",
+    version=find_version("grid_lib/version.py"),
     packages=find_packages(),
     install_requires=["scipy", "opt_einsum"],
     include_package_data=True,

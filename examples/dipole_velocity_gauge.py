@@ -4,42 +4,42 @@ import tqdm
 from opt_einsum import contract
 from scipy.sparse.linalg import LinearOperator, bicgstab
 
-from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+from grid_lib.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Rational_map,
     Linear_map,
 )
 
-from grid_methods.spherical_coordinates.radial_matrix_elements import (
+from grid_lib.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
-from grid_methods.spherical_coordinates.angular_matrix_elements import (
+from grid_lib.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_l,
 )
-from grid_methods.spherical_coordinates.lasers import (
+from grid_lib.spherical_coordinates.lasers import (
     square_velocity_dipole,
 )
-from grid_methods.spherical_coordinates.utils import mask_function
-from grid_methods.spherical_coordinates.preconditioners import M2Psi
+from grid_lib.spherical_coordinates.utils import mask_function
+from grid_lib.spherical_coordinates.preconditioners import M2Psi
 
-from grid_methods.spherical_coordinates.rhs import (
+from grid_lib.spherical_coordinates.rhs import (
     H0Psi,
     HtPsi,
 )
-from grid_methods.spherical_coordinates.time_dependent_field_interaction import (
+from grid_lib.spherical_coordinates.time_dependent_field_interaction import (
     V_psi_velocity_z,
 )
-from grid_methods.spherical_coordinates.utils import (
+from grid_lib.spherical_coordinates.utils import (
     Counter,
     quadrature,
 )
-from grid_methods.spherical_coordinates.properties import (
+from grid_lib.spherical_coordinates.properties import (
     expec_x_i,
     expec_p_i,
     compute_norm,
 )
 
-from grid_methods.spherical_coordinates.ground_state import compute_ground_state
+from grid_lib.spherical_coordinates.ground_state import compute_ground_state
 
 
 ### INPUTS #######################

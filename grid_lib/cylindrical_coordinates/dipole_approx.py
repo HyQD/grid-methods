@@ -16,8 +16,8 @@ import tqdm
 
 from scipy.sparse.linalg import LinearOperator, bicgstab
 
-from grid_methods.spherical_coordinates.utils import Counter
-from grid_methods.spherical_coordinates.lasers import (
+from grid_lib.spherical_coordinates.utils import Counter
+from grid_lib.spherical_coordinates.lasers import (
     square_length_dipole,
     square_velocity_dipole,
 )
