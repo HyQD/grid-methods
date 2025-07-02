@@ -44,7 +44,7 @@ def test_integrate_polynomials_mapped_interval():
         r_dot = GLL.r_dot
         a_tol = 1e-12
         for n in range(1, 2 * N):
-            integral_xn = np.dot(w, r_dot * GLL.r**n)
+            integral_xn = np.dot(w, GLL.r**n)
             np.testing.assert_allclose(
                 np.array([integral_xn]),
                 np.array([(b ** (n + 1) - a ** (n + 1)) / (n + 1)]),
@@ -84,7 +84,7 @@ def test_integrate_xk_exp_minus_a_x2():
 
         for k in range(6):
             f = x**k * np.exp(-a * x**2)
-            integral_quadrature = np.dot(w, x_dot * f)
+            integral_quadrature = np.dot(w, f)
             integral_exact = 0.5 * a ** (-(k + 1) / 2) * gamma((k + 1) / 2)
             np.testing.assert_allclose(
                 integral_quadrature, integral_exact, rtol=0.0, atol=1e-12

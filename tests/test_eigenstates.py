@@ -4,7 +4,7 @@ from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Linear_map,
 )
-
+from grid_methods.pseudospectral_grids.femdvr import FEMDVR
 
 def test_particle_in_box():
     print()
@@ -38,12 +38,12 @@ def test_particle_in_box():
         for k in range(1, N_max):
             eps_k_approx = eps[k - 1]
             psi_k_approx = U[:, k - 1]
-            norm_psi_k_approx = np.dot(w, x_dot * psi_k_approx**2)
+            norm_psi_k_approx = np.dot(w, psi_k_approx**2)
             psi_k_approx /= np.sqrt(norm_psi_k_approx)
 
             eps_k_exact = k**2 * np.pi**2 / (2 * L**2)
             psi_k_exact = np.sqrt(2 / L) * np.sin(k * np.pi * x / L)
-            norm_psi_k_exact = np.dot(w, x_dot * psi_k_exact**2)
+            norm_psi_k_exact = np.dot(w, psi_k_exact**2)
             np.testing.assert_allclose(
                 eps_k_approx, eps_k_exact, rtol=0.0, atol=1e-12
             )
@@ -99,7 +99,7 @@ def test_harmonic_oscillator():
             eps_k_exact = omega * (k + 0.5)
 
             psi_k_approx = U[:, k]
-            norm_psi_k_approx = np.dot(w, x_dot * psi_k_approx**2)
+            norm_psi_k_approx = np.dot(w, psi_k_approx**2)
             psi_k_approx /= np.sqrt(norm_psi_k_approx)
 
             psi_k_exact = (
@@ -177,15 +177,15 @@ def test_hydrogenic_spherical_coordinates():
             u_n3_l = u_nl_exact(r, n3, l, Z)
 
             u_n1_l_approx = U[:, 0]
-            norm_u_n1_l_approx = np.dot(w, r_dot * u_n1_l_approx**2)
+            norm_u_n1_l_approx = np.dot(w, u_n1_l_approx**2)
             u_n1_l_approx /= np.sqrt(norm_u_n1_l_approx)
 
             u_n2_l_approx = U[:, 1]
-            norm_u_n2_l_approx = np.dot(w, r_dot * u_n2_l_approx**2)
+            norm_u_n2_l_approx = np.dot(w, u_n2_l_approx**2)
             u_n2_l_approx /= np.sqrt(norm_u_n2_l_approx)
 
             u_n3_l_approx = U[:, 2]
-            norm_u_n3_l_approx = np.dot(w, r_dot * u_n3_l_approx**2)
+            norm_u_n3_l_approx = np.dot(w, u_n3_l_approx**2)
             u_n3_l_approx /= np.sqrt(norm_u_n3_l_approx)
 
             np.testing.assert_allclose(
@@ -214,6 +214,41 @@ def test_hydrogenic_spherical_coordinates():
     test_hydrogenic_sphc(2)
     test_hydrogenic_sphc(4)
     test_hydrogenic_sphc(10)
+
+def test_ho_fem():
+
+    a = -10
+    b = 10
+    n_elem = 3
+    points_per_elem = 31
+
+    nodes_list = [np.linspace(a, b, n_elem + 1), np.array([-10, -2, 2, 10])]
+    n_points_list = [
+        np.ones((n_elem,), dtype=int) * points_per_elem,
+        np.array([21, 21, 21]),
+    ]
+
+    for nodes, n_points in zip(nodes_list, n_points_list):
+
+        femdvr = FEMDVR(nodes, n_points, Linear_map, GaussLegendreLobatto)
+
+        # Get nodes and weights and differentiation matrix.
+        r = femdvr.r
+        r_dot = femdvr.r_dot
+        w = femdvr.weights
+        D = femdvr.D1
+        D2 = femdvr.D2
+        ei = femdvr.edge_indices
+
+        H_full = -0.5 * D2 + np.diag(0.5 * r**2)
+        H = H_full[1:-1, 1:-1]
+
+        E, U = np.linalg.eig(H)
+        i = np.argsort(E)
+        E = E[i]
+        U = U[:, i]
+
+        assert np.allclose(E[:5], [0.5, 1.5, 2.5, 3.5, 4.5], rtol=1e-12)
 
 
 # if __name__ == "__main__":
