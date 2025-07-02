@@ -1,5 +1,5 @@
 import numpy as np
-from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+from grid_lib.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Linear_map,
 )

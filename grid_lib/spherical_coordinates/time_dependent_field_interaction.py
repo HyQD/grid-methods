@@ -2,8 +2,8 @@ import numpy as np
 from opt_einsum import contract
 
 
-from grid_methods.spherical_coordinates.rhs import VPsi
-from grid_methods.spherical_coordinates.Hpsi_components import (
+from grid_lib.spherical_coordinates.rhs import VPsi
+from grid_lib.spherical_coordinates.Hpsi_components import (
     x_psi,
     y_psi,
     z_psi,

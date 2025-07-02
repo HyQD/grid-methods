@@ -1,1 +1,1 @@
-recursive-include grid_methods/spherical_coordinates/Lebedev *
+recursive-include grid_lib/spherical_coordinates/Lebedev *

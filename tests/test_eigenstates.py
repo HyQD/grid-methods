@@ -1,10 +1,10 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+from grid_lib.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Linear_map,
 )
-from grid_methods.pseudospectral_grids.femdvr import FEMDVR
+from grid_lib.pseudospectral_grids.femdvr import FEMDVR
 
 def test_particle_in_box():
     print()

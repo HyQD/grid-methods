@@ -2,24 +2,24 @@ import numpy as np
 import time
 from matplotlib import pyplot as plt
 
-from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+from grid_lib.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Rational_map,
     Linear_map,
 )
 
-from grid_methods.spherical_coordinates.angular_matrix_elements import (
+from grid_lib.spherical_coordinates.angular_matrix_elements import (
     AngularMatrixElements_l,
 )
-from grid_methods.spherical_coordinates.radial_matrix_elements import (
+from grid_lib.spherical_coordinates.radial_matrix_elements import (
     RadialMatrixElements,
 )
-from grid_methods.spherical_coordinates.utils import (
+from grid_lib.spherical_coordinates.utils import (
     Counter,
     quadrature,
 )
-from grid_methods.spherical_coordinates.rhs import H0_B_Psi, HtPsi
-from grid_methods.spherical_coordinates.preconditioners import M2Psi
+from grid_lib.spherical_coordinates.rhs import H0_B_Psi, HtPsi
+from grid_lib.spherical_coordinates.preconditioners import M2Psi
 import tqdm
 from opt_einsum import contract
 from scipy.sparse.linalg import LinearOperator, eigsh, eigs, cg, gmres, bicgstab

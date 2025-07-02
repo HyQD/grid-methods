@@ -1,5 +1,5 @@
 import numpy as np
-from grid_methods.cartesian_coordinates.potentials import Coulomb
+from grid_lib.cartesian_coordinates.potentials import Coulomb
 
 
 class SincDvr:

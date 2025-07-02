@@ -1,12 +1,12 @@
 import numpy as np
-from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
+from grid_lib.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Linear_map,
 )
-from grid_methods.spherical_coordinates.radial_poisson import (
+from grid_lib.spherical_coordinates.radial_poisson import (
     solve_radial_Poisson_dvr,
 )
-from grid_methods.pseudospectral_grids.femdvr import FEMDVR
+from grid_lib.pseudospectral_grids.femdvr import FEMDVR
 from matplotlib import pyplot as plt
 from scipy.special import erf
 

@@ -1,5 +1,5 @@
 import numpy as np
-from grid_methods.spherical_coordinates.radial_poisson import (
+from grid_lib.spherical_coordinates.radial_poisson import (
     solve_radial_Poisson_dvr,
 )
 
