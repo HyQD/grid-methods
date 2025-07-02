@@ -4,7 +4,7 @@ from grid_methods.pseudospectral_grids.gauss_legendre_lobatto import (
     GaussLegendreLobatto,
     Linear_map,
 )
-
+from grid_methods.pseudospectral_grids.femdvr import FEMDVR
 
 def test_particle_in_box():
     print()
@@ -214,6 +214,41 @@ def test_hydrogenic_spherical_coordinates():
     test_hydrogenic_sphc(2)
     test_hydrogenic_sphc(4)
     test_hydrogenic_sphc(10)
+
+def test_ho_fem():
+
+    a = -10
+    b = 10
+    n_elem = 3
+    points_per_elem = 31
+
+    nodes_list = [np.linspace(a, b, n_elem + 1), np.array([-10, -2, 2, 10])]
+    n_points_list = [
+        np.ones((n_elem,), dtype=int) * points_per_elem,
+        np.array([21, 21, 21]),
+    ]
+
+    for nodes, n_points in zip(nodes_list, n_points_list):
+
+        femdvr = FEMDVR(nodes, n_points, Linear_map, GaussLegendreLobatto)
+
+        # Get nodes and weights and differentiation matrix.
+        r = femdvr.r
+        r_dot = femdvr.r_dot
+        w = femdvr.weights
+        D = femdvr.D1
+        D2 = femdvr.D2
+        ei = femdvr.edge_indices
+
+        H_full = -0.5 * D2 + np.diag(0.5 * r**2)
+        H = H_full[1:-1, 1:-1]
+
+        E, U = np.linalg.eig(H)
+        i = np.argsort(E)
+        E = E[i]
+        U = U[:, i]
+
+        assert np.allclose(E[:5], [0.5, 1.5, 2.5, 3.5, 4.5], rtol=1e-12)
 
 
 # if __name__ == "__main__":
